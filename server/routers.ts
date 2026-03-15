@@ -3,6 +3,13 @@ import { COOKIE_NAME } from "../shared/const.js";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
+import {
+  registriereNutzer,
+  getNutzerByTelefon,
+  getNutzerById,
+  sperrNutzer,
+  entsperrNutzer,
+} from "./db";
 
 // Externe Hobbyanbau-Suite API
 const EXTERNE_API = "https://gefluegel-app-ghkbktmv.manus.space/api/trpc";
@@ -36,6 +43,86 @@ export const appRouter = router({
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
       return { success: true } as const;
     }),
+  }),
+
+  // ── Gartenglück-Nutzer-Verwaltung ─────────────────────────────────────
+  nutzer: router({
+    /**
+     * Nutzer registrieren oder einloggen (Telefonnummer als Identität).
+     * Gibt das Nutzerprofil zurück. Wenn gesperrt, wird ein Fehler geworfen.
+     */
+    registrieren: publicProcedure
+      .input(
+        z.object({
+          telefon: z.string().min(6).max(30),
+          name: z.string().min(2).max(200),
+          strasse: z.string().max(200).optional(),
+          ort: z.string().max(100).optional(),
+          plz: z.string().max(10).optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const nutzer = await registriereNutzer({
+          telefon: input.telefon.trim(),
+          name: input.name.trim(),
+          strasse: input.strasse?.trim() ?? null,
+          ort: input.ort?.trim() ?? null,
+          plz: input.plz?.trim() ?? null,
+        });
+        if (!nutzer) throw new Error("Registrierung fehlgeschlagen");
+        if (nutzer.gesperrt) {
+          throw new Error(
+            `Dein Konto wurde gesperrt.${nutzer.sperrGrund ? " Grund: " + nutzer.sperrGrund : ""}`
+          );
+        }
+        return {
+          id: nutzer.id,
+          telefon: nutzer.telefon,
+          name: nutzer.name,
+          strasse: nutzer.strasse,
+          ort: nutzer.ort,
+          plz: nutzer.plz,
+          gesperrt: nutzer.gesperrt,
+        };
+      }),
+
+    /** Eigenes Profil per Telefonnummer abrufen (für Wiedereinstieg nach App-Neustart). */
+    profil: publicProcedure
+      .input(z.object({ telefon: z.string() }))
+      .query(async ({ input }) => {
+        const nutzer = await getNutzerByTelefon(input.telefon);
+        if (!nutzer) return null;
+        if (nutzer.gesperrt) {
+          throw new Error(
+            `Dein Konto wurde gesperrt.${nutzer.sperrGrund ? " Grund: " + nutzer.sperrGrund : ""}`
+          );
+        }
+        return {
+          id: nutzer.id,
+          telefon: nutzer.telefon,
+          name: nutzer.name,
+          strasse: nutzer.strasse,
+          ort: nutzer.ort,
+          plz: nutzer.plz,
+          gesperrt: nutzer.gesperrt,
+        };
+      }),
+
+    /** Admin: Nutzer sperren. */
+    sperren: publicProcedure
+      .input(z.object({ id: z.number(), grund: z.string().min(1) }))
+      .mutation(async ({ input }) => {
+        await sperrNutzer(input.id, input.grund);
+        return { success: true };
+      }),
+
+    /** Admin: Nutzer entsperren. */
+    entsperren: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await entsperrNutzer(input.id);
+        return { success: true };
+      }),
   }),
 
   hofmarkt: router({

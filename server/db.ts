@@ -1,4 +1,6 @@
-import { and, eq, gte, lte, sql } from "drizzle-orm";
+import {
+  and, eq, gte, lte, sql
+} from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   InsertUser,
@@ -13,6 +15,8 @@ import {
   imkerEinstellungen,
   gartenProdukte,
   holzProdukte,
+  gartengluckNutzer,
+  type InsertGartengluckNutzer,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -395,4 +399,69 @@ export async function getHofProduktePublic(userId: number): Promise<HofProdukt[]
   }
 
   return produkte;
+}
+
+// ── Gartenglück-Nutzer ────────────────────────────────────────────────
+
+export async function registriereNutzer(data: InsertGartengluckNutzer) {
+  const db = await getDb();
+  if (!db) throw new Error("Datenbank nicht verfügbar");
+  // Prüfen ob Telefonnummer bereits existiert
+  const existing = await db
+    .select()
+    .from(gartengluckNutzer)
+    .where(eq(gartengluckNutzer.telefon, data.telefon))
+    .limit(1);
+  if (existing.length > 0) {
+    // Bereits registriert — Profil zurückgeben
+    return existing[0];
+  }
+  const result = await db.insert(gartengluckNutzer).values(data);
+  const insertId = (result as any)[0]?.insertId ?? (result as any).insertId;
+  const neu = await db
+    .select()
+    .from(gartengluckNutzer)
+    .where(eq(gartengluckNutzer.id, insertId))
+    .limit(1);
+  return neu[0];
+}
+
+export async function getNutzerByTelefon(telefon: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db
+    .select()
+    .from(gartengluckNutzer)
+    .where(eq(gartengluckNutzer.telefon, telefon))
+    .limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function getNutzerById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db
+    .select()
+    .from(gartengluckNutzer)
+    .where(eq(gartengluckNutzer.id, id))
+    .limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function sperrNutzer(id: number, grund: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Datenbank nicht verfügbar");
+  await db
+    .update(gartengluckNutzer)
+    .set({ gesperrt: true, sperrGrund: grund })
+    .where(eq(gartengluckNutzer.id, id));
+}
+
+export async function entsperrNutzer(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Datenbank nicht verfügbar");
+  await db
+    .update(gartengluckNutzer)
+    .set({ gesperrt: false, sperrGrund: null })
+    .where(eq(gartengluckNutzer.id, id));
 }

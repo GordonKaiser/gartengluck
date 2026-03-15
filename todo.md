@@ -54,3 +54,14 @@
 - [x] Kategorie-Filter-Chips im Entdecken-Screen (horizontal scrollbar)
 - [x] Produkte im Hof-Detail gruppiert nach Kategorie anzeigen
 - [x] Preisformatierung: "0.40" → "0,40 €" (formatPreis-Funktion)
+
+## Nutzer-Registrierung & UX-Verbesserungen
+- [x] Backend: gartengluck_nutzer-Tabelle (id, telefon, name, strasse, ort, plz, gesperrt, erstellt_am)
+- [x] Backend: nutzer.registrieren Endpunkt (Telefonnummer + Name + Adresse)
+- [x] Backend: nutzer.profil Endpunkt (eigenes Profil abrufen)
+- [x] Backend: Admin-Endpunkte nutzer.sperren + nutzer.entsperren
+- [x] Onboarding-Screen: Telefonnummer, Name, Strasse, Ort, PLZ (2-Schritt-Flow)
+- [x] Onboarding: Nutzerdaten lokal in AsyncStorage gespeichert (nutzer-store.ts)
+- [x] Root-Layout: Onboarding-Flow vor Tab-Navigation geschaltet
+- [x] Favoriten-Screen auf userId umgestellt + "Zum Hof"-Button + Nutzerprofil-Anzeige + Abmelden
+- [x] "Mehr anzeigen"-Toggle für lange Produktbeschreibungen im Hof-Detail

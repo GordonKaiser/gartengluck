@@ -183,6 +183,22 @@ export const holzProdukte = mysqlTable("holz_produkte", {
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
+// ── Gartenglück-Nutzer (App 2 – Käufer-Registrierung) ───────────
+export const gartengluckNutzer = mysqlTable("gartengluck_nutzer", {
+  id: int("id").autoincrement().primaryKey(),
+  telefon: varchar("telefon", { length: 30 }).notNull().unique(),
+  name: varchar("name", { length: 200 }).notNull(),
+  strasse: varchar("strasse", { length: 200 }),
+  ort: varchar("ort", { length: 100 }),
+  plz: varchar("plz", { length: 10 }),
+  gesperrt: boolean("gesperrt").notNull().default(false),
+  sperrGrund: text("sperr_grund"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type GartengluckNutzer = typeof gartengluckNutzer.$inferSelect;
+export type InsertGartengluckNutzer = typeof gartengluckNutzer.$inferInsert;
+
 // ── Pilz-Einstellungen ────────────────────────────────────────
 export const pilzEinstellungen = mysqlTable("pilz_einstellungen", {
   id: int("id").autoincrement().primaryKey(),

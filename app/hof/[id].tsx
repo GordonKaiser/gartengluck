@@ -47,6 +47,16 @@ export default function HofDetailScreen() {
   const [profilLaed, setProfilLaed] = useState(true);
   const [produkteLaden, setProdukteLaden] = useState(true);
   const [istFavorit, setIstFavorit] = useState(false);
+  const [aufgeklappteProdukte, setAufgeklappteProdukte] = useState<Set<string>>(new Set());
+
+  const toggleProduktAufklappen = useCallback((produktId: string) => {
+    setAufgeklappteProdukte((prev) => {
+      const neu = new Set(prev);
+      if (neu.has(produktId)) neu.delete(produktId);
+      else neu.add(produktId);
+      return neu;
+    });
+  }, []);
 
   // Daten laden
   useEffect(() => {
@@ -256,6 +266,12 @@ export default function HofDetailScreen() {
       fontSize: 14,
       padding: 20,
     },
+    mehrAnzeigenText: {
+      fontSize: 12,
+      color: colors.primary,
+      marginTop: 4,
+      fontWeight: "600" as const,
+    },
   });
 
   if (profilLaed) {
@@ -284,20 +300,37 @@ export default function HofDetailScreen() {
       : produkt.vorbestellungDatum
         ? `ab ${produkt.vorbestellungDatum}`
         : "Vorbestellung";
+    const beschreibungLang = (produkt.beschreibung?.length ?? 0) > 80;
+    const istAufgeklappt = aufgeklappteProdukte.has(produkt.id);
 
     return (
-      <View
+      <Pressable
         key={produkt.id}
-        style={[styles.produktKarte, !produkt.verfuegbar && { opacity: 0.7 }]}
+        style={({ pressed }) => [
+          styles.produktKarte,
+          !produkt.verfuegbar && { opacity: 0.7 },
+          pressed && { opacity: 0.85 },
+        ]}
+        onPress={beschreibungLang ? () => toggleProduktAufklappen(produkt.id) : undefined}
       >
         <Text style={styles.produktEmoji}>{meta?.emoji ?? "🌿"}</Text>
         <View style={styles.produktInfo}>
           <Text style={styles.produktName}>{produkt.name}</Text>
           <Text style={styles.produktPreis}>{formatPreis(produkt.preis, produkt.einheit)}</Text>
           {produkt.beschreibung && (
-            <Text style={styles.produktBeschreibung} numberOfLines={2}>
-              {produkt.beschreibung}
-            </Text>
+            <>
+              <Text
+                style={styles.produktBeschreibung}
+                numberOfLines={istAufgeklappt ? undefined : 2}
+              >
+                {produkt.beschreibung}
+              </Text>
+              {beschreibungLang && (
+                <Text style={styles.mehrAnzeigenText}>
+                  {istAufgeklappt ? "Weniger anzeigen ▴" : "Mehr anzeigen ▾"}
+                </Text>
+              )}
+            </>
           )}
         </View>
         <View style={[styles.verfuegbarBadge, { backgroundColor: verfuegbarColor + "20" }]}>
@@ -305,7 +338,7 @@ export default function HofDetailScreen() {
             {verfuegbarText}
           </Text>
         </View>
-      </View>
+      </Pressable>
     );
   };
 
