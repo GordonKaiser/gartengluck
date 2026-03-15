@@ -1,11 +1,9 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
 import { router, useLocalSearchParams } from "expo-router";
-import * as WebBrowser from "expo-web-browser";
 import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Platform,
   Pressable,
   ScrollView,
@@ -27,9 +25,9 @@ import {
   ladeHofProfil,
   ladeHofProdukte,
 } from "@/lib/hofmarkt-api";
+import { useWarenkorb } from "@/lib/warenkorb-store";
 
 const FAVORITEN_KEY = "gartengluck_favoriten";
-const BESTELLHISTORIE_KEY = "gartengluck_bestellhistorie";
 
 interface FavoritHof {
   userId: number;
@@ -49,6 +47,8 @@ export default function HofDetailScreen() {
   const [produkteLaden, setProdukteLaden] = useState(true);
   const [istFavorit, setIstFavorit] = useState(false);
   const [aufgeklappteProdukte, setAufgeklappteProdukte] = useState<Set<string>>(new Set());
+
+  const { warenkorb, gesamtpreis, gesamtAnzahl, setzeHof, setze, erhoehe, verringere } = useWarenkorb();
 
   const toggleProduktAufklappen = useCallback((produktId: string) => {
     setAufgeklappteProdukte((prev) => {
@@ -82,6 +82,13 @@ export default function HofDetailScreen() {
     })();
   }, [userId]);
 
+  // Hof im Warenkorb registrieren sobald Profil geladen
+  useEffect(() => {
+    if (profil) {
+      setzeHof(profil.userId, profil.hofName);
+    }
+  }, [profil, setzeHof]);
+
   // Favoriten-Status prüfen
   useEffect(() => {
     (async () => {
@@ -112,34 +119,34 @@ export default function HofDetailScreen() {
     await AsyncStorage.setItem(FAVORITEN_KEY, JSON.stringify(favoriten));
   }, [istFavorit, userId, profil, params.hofName]);
 
-  const handleBestellen = useCallback(async () => {
-    const link = profil?.shopLink;
-    if (!link) {
-      Alert.alert("Kein Shop-Link", "Dieser Hof hat noch keinen Shop-Link hinterlegt.");
-      return;
-    }
+  const handleWarenkorbOeffnen = useCallback(() => {
+    if (gesamtAnzahl === 0) return;
     if (Platform.OS !== "web") {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    // Bestellhistorie-Eintrag speichern
-    try {
-      const raw = await AsyncStorage.getItem(BESTELLHISTORIE_KEY);
-      const historie = raw ? JSON.parse(raw) : [];
-      historie.push({
-        userId,
-        hofName: profil?.hofName ?? params.hofName ?? "Unbekannter Hof",
-        ort: profil?.ort ?? null,
-        datum: new Date().toISOString(),
-        shopLink: link,
-      });
-      // Maximal 50 Einträge behalten
-      if (historie.length > 50) historie.splice(0, historie.length - 50);
-      await AsyncStorage.setItem(BESTELLHISTORIE_KEY, JSON.stringify(historie));
-    } catch {
-      // Fehler beim Speichern ignorieren
-    }
-    await WebBrowser.openBrowserAsync(link);
-  }, [profil, userId, params.hofName]);
+    router.push({
+      pathname: "/bestellung",
+      params: {
+        hofUserId: String(userId),
+        hofName: profil?.hofName ?? params.hofName ?? "Hof",
+      },
+    } as never);
+  }, [gesamtAnzahl, userId, profil, params.hofName]);
+
+  const handleMengeAendern = useCallback(
+    (produkt: HofProdukt, delta: number) => {
+      if (Platform.OS !== "web") {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      }
+      if (delta > 0) {
+        const aktuelle = warenkorb?.positionen.find((p) => p.produkt.id === produkt.id)?.menge ?? 0;
+        setze(produkt, aktuelle + 1);
+      } else {
+        verringere(produkt.id);
+      }
+    },
+    [warenkorb, setze, verringere]
+  );
 
   const styles = StyleSheet.create({
     header: {
@@ -195,21 +202,6 @@ export default function HofDetailScreen() {
       color: colors.foreground,
       lineHeight: 22,
     },
-    bestellButton: {
-      margin: 16,
-      backgroundColor: colors.primary,
-      borderRadius: 14,
-      paddingVertical: 16,
-      alignItems: "center",
-      flexDirection: "row",
-      justifyContent: "center",
-      gap: 8,
-    },
-    bestellButtonText: {
-      color: "#fff",
-      fontSize: 16,
-      fontWeight: "700",
-    },
     sektionHeader: {
       paddingHorizontal: 20,
       paddingTop: 20,
@@ -236,6 +228,8 @@ export default function HofDetailScreen() {
       borderWidth: 1,
       borderColor: colors.border,
       padding: 14,
+    },
+    produktOben: {
       flexDirection: "row",
       alignItems: "center",
       gap: 12,
@@ -264,6 +258,12 @@ export default function HofDetailScreen() {
       marginTop: 2,
       lineHeight: 16,
     },
+    mehrAnzeigenText: {
+      fontSize: 12,
+      color: colors.primary,
+      marginTop: 4,
+      fontWeight: "600" as const,
+    },
     verfuegbarBadge: {
       paddingHorizontal: 10,
       paddingVertical: 4,
@@ -272,6 +272,60 @@ export default function HofDetailScreen() {
     verfuegbarText: {
       fontSize: 12,
       fontWeight: "600",
+    },
+    mengeBereich: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "flex-end",
+      marginTop: 10,
+      gap: 12,
+    },
+    mengeButton: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      backgroundColor: colors.primary,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    mengeButtonDisabled: {
+      backgroundColor: colors.border,
+    },
+    mengeButtonText: {
+      color: "#fff",
+      fontSize: 18,
+      fontWeight: "700",
+      lineHeight: 22,
+    },
+    mengeZahl: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: colors.foreground,
+      minWidth: 24,
+      textAlign: "center",
+    },
+    warenkorbBar: {
+      position: "absolute",
+      bottom: 0,
+      left: 0,
+      right: 0,
+      backgroundColor: colors.primary,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 20,
+      paddingVertical: 14,
+      paddingBottom: 24,
+    },
+    warenkorbBarText: {
+      color: "#fff",
+      fontSize: 15,
+      fontWeight: "700",
+    },
+    warenkorbBarPreis: {
+      color: "#fff",
+      fontSize: 15,
+      fontWeight: "700",
     },
     ladeContainer: {
       flex: 1,
@@ -283,12 +337,6 @@ export default function HofDetailScreen() {
       color: colors.muted,
       fontSize: 14,
       padding: 20,
-    },
-    mehrAnzeigenText: {
-      fontSize: 12,
-      color: colors.primary,
-      marginTop: 4,
-      fontWeight: "600" as const,
     },
   });
 
@@ -302,7 +350,7 @@ export default function HofDetailScreen() {
     );
   }
 
-  // Produkte nach Kategorie gruppieren (Reihenfolge aus API)
+  // Produkte nach Kategorie gruppieren
   const kategorieReihenfolge: Kategorie[] = produkteAntwort?.kategorien ?? [];
   const produkteNachKategorie: Record<string, HofProdukt[]> = {};
   for (const kat of kategorieReihenfolge) {
@@ -312,51 +360,81 @@ export default function HofDetailScreen() {
 
   const renderProdukt = (produkt: HofProdukt) => {
     const meta = KATEGORIE_MAP[produkt.kategorie];
-    const verfuegbarColor = produkt.verfuegbar ? colors.success : colors.warning;
+    const verfuegbarColor = produkt.verfuegbar
+      ? colors.success
+      : produkt.vorbestellung
+        ? colors.warning
+        : colors.muted;
     const verfuegbarText = produkt.verfuegbar
       ? "Verfügbar"
       : produkt.vorbestellungDatum
         ? `ab ${produkt.vorbestellungDatum}`
-        : "Vorbestellung";
+        : produkt.vorbestellung
+          ? "Vorbestellung"
+          : "Nicht verfügbar";
+
     const beschreibungLang = (produkt.beschreibung?.length ?? 0) > 80;
     const istAufgeklappt = aufgeklappteProdukte.has(produkt.id);
+    const aktMenge = warenkorb?.positionen.find((p) => p.produkt.id === produkt.id)?.menge ?? 0;
+    const kannBestellen = produkt.verfuegbar || produkt.vorbestellung;
 
     return (
-      <Pressable
-        key={produkt.id}
-        style={({ pressed }) => [
-          styles.produktKarte,
-          !produkt.verfuegbar && { opacity: 0.7 },
-          pressed && { opacity: 0.85 },
-        ]}
-        onPress={beschreibungLang ? () => toggleProduktAufklappen(produkt.id) : undefined}
-      >
-        <Text style={styles.produktEmoji}>{meta?.emoji ?? "🌿"}</Text>
-        <View style={styles.produktInfo}>
-          <Text style={styles.produktName}>{produkt.name}</Text>
-          <Text style={styles.produktPreis}>{formatPreis(produkt.preis, produkt.einheit)}</Text>
-          {produkt.beschreibung && (
-            <>
-              <Text
-                style={styles.produktBeschreibung}
-                numberOfLines={istAufgeklappt ? undefined : 2}
-              >
-                {produkt.beschreibung}
-              </Text>
-              {beschreibungLang && (
-                <Text style={styles.mehrAnzeigenText}>
-                  {istAufgeklappt ? "Weniger anzeigen ▴" : "Mehr anzeigen ▾"}
+      <View key={produkt.id} style={[styles.produktKarte, !kannBestellen && { opacity: 0.6 }]}>
+        <Pressable
+          style={styles.produktOben}
+          onPress={beschreibungLang ? () => toggleProduktAufklappen(produkt.id) : undefined}
+        >
+          <Text style={styles.produktEmoji}>{meta?.emoji ?? "🌿"}</Text>
+          <View style={styles.produktInfo}>
+            <Text style={styles.produktName}>{produkt.name}</Text>
+            <Text style={styles.produktPreis}>{formatPreis(produkt.preis, produkt.einheit)}</Text>
+            {produkt.beschreibung && (
+              <>
+                <Text
+                  style={styles.produktBeschreibung}
+                  numberOfLines={istAufgeklappt ? undefined : 2}
+                >
+                  {produkt.beschreibung}
                 </Text>
-              )}
-            </>
-          )}
-        </View>
-        <View style={[styles.verfuegbarBadge, { backgroundColor: verfuegbarColor + "20" }]}>
-          <Text style={[styles.verfuegbarText, { color: verfuegbarColor }]}>
-            {verfuegbarText}
-          </Text>
-        </View>
-      </Pressable>
+                {beschreibungLang && (
+                  <Text style={styles.mehrAnzeigenText}>
+                    {istAufgeklappt ? "Weniger anzeigen ▴" : "Mehr anzeigen ▾"}
+                  </Text>
+                )}
+              </>
+            )}
+          </View>
+          <View style={[styles.verfuegbarBadge, { backgroundColor: verfuegbarColor + "20" }]}>
+            <Text style={[styles.verfuegbarText, { color: verfuegbarColor }]}>
+              {verfuegbarText}
+            </Text>
+          </View>
+        </Pressable>
+
+        {/* Mengenauswahl */}
+        {kannBestellen && (
+          <View style={styles.mengeBereich}>
+            <Pressable
+              style={({ pressed }) => [
+                styles.mengeButton,
+                aktMenge === 0 && styles.mengeButtonDisabled,
+                pressed && { opacity: 0.7 },
+              ]}
+              onPress={() => handleMengeAendern(produkt, -1)}
+              disabled={aktMenge === 0}
+            >
+              <Text style={styles.mengeButtonText}>−</Text>
+            </Pressable>
+            <Text style={styles.mengeZahl}>{aktMenge}</Text>
+            <Pressable
+              style={({ pressed }) => [styles.mengeButton, pressed && { opacity: 0.7 }]}
+              onPress={() => handleMengeAendern(produkt, 1)}
+            >
+              <Text style={styles.mengeButtonText}>+</Text>
+            </Pressable>
+          </View>
+        )}
+      </View>
     );
   };
 
@@ -385,7 +463,10 @@ export default function HofDetailScreen() {
         </Pressable>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: gesamtAnzahl > 0 ? 100 : 40 }}
+      >
         {/* Hof-Profil */}
         <View style={styles.profilBereich}>
           <Text style={styles.hofName}>{profil?.hofName ?? params.hofName}</Text>
@@ -398,17 +479,6 @@ export default function HofDetailScreen() {
             <Text style={styles.beschreibung}>{profil.beschreibung}</Text>
           )}
         </View>
-
-        {/* Bestell-Button */}
-        {profil?.shopLink && (
-          <Pressable
-            style={({ pressed }) => [styles.bestellButton, pressed && { opacity: 0.85 }]}
-            onPress={handleBestellen}
-          >
-            <IconSymbol name="cart.fill" size={20} color="#fff" />
-            <Text style={styles.bestellButtonText}>Jetzt bestellen</Text>
-          </Pressable>
-        )}
 
         {/* Produkte */}
         {produkteLaden ? (
@@ -436,18 +506,23 @@ export default function HofDetailScreen() {
             Dieser Hof hat noch keine Produkte eingetragen.
           </Text>
         )}
-
-        {/* Kein Shop-Link Hinweis */}
-        {!profil?.shopLink && !produkteLaden && (
-          <View style={{ padding: 20, alignItems: "center" }}>
-            <Text style={{ color: colors.muted, fontSize: 14, textAlign: "center" }}>
-              Dieser Hof hat noch keinen direkten Bestelllink.{"\n"}Bitte nimm direkt Kontakt auf.
-            </Text>
-          </View>
-        )}
-
-        <View style={{ height: 40 }} />
       </ScrollView>
+
+      {/* Warenkorb-Bar */}
+      {gesamtAnzahl > 0 && (
+        <Pressable
+          style={({ pressed }) => [styles.warenkorbBar, pressed && { opacity: 0.9 }]}
+          onPress={handleWarenkorbOeffnen}
+        >
+          <View style={{ backgroundColor: "rgba(255,255,255,0.2)", borderRadius: 10, paddingHorizontal: 8, paddingVertical: 2 }}>
+            <Text style={styles.warenkorbBarText}>{gesamtAnzahl}</Text>
+          </View>
+          <Text style={styles.warenkorbBarText}>Warenkorb ansehen</Text>
+          <Text style={styles.warenkorbBarPreis}>
+            {gesamtpreis.toFixed(2).replace(".", ",")} €
+          </Text>
+        </Pressable>
+      )}
     </ScreenContainer>
   );
 }

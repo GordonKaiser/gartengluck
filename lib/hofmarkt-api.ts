@@ -51,12 +51,57 @@ export interface HofProfil {
   shopLink: string | null;
 }
 
+export interface BestellProdukt {
+  id: string;
+  name: string;
+  kategorie: string;
+  menge: number;
+  preis: string;
+  einheit: string;
+}
+
+export interface BestellungSenden {
+  hofUserId: number;
+  kundeName: string;
+  kundeTelefon: string;
+  kundeEmail?: string;
+  kundeStrasse?: string;
+  kundePlz?: string;
+  kundeOrt?: string;
+  produkte: BestellProdukt[];
+  gesamtpreis?: number;
+  nachricht?: string;
+}
+
+export interface BestellungAntwort {
+  id: number;
+  success: boolean;
+}
+
 export interface PlzOrt {
   plz: string;
   ort: string;
 }
 
 // ── Hilfsfunktion ────────────────────────────────────────────────────────────
+
+async function batchPost<T>(endpunkt: string, body: Record<string, unknown>): Promise<T> {
+  const url = `${BASIS_URL}/${endpunkt}?batch=1`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ "0": { json: body } }),
+  });
+  if (!res.ok) {
+    throw new Error(`API-Fehler ${res.status}: ${res.statusText}`);
+  }
+  const data = await res.json();
+  const ergebnis = Array.isArray(data) ? data[0] : data;
+  if (ergebnis?.error) {
+    throw new Error(ergebnis.error.json?.message ?? "Unbekannter API-Fehler");
+  }
+  return ergebnis.result.data.json as T;
+}
 
 async function batchGet<T>(endpunkt: string, input: Record<string, unknown>): Promise<T> {
   const inputStr = JSON.stringify({ "0": { json: input } });
@@ -112,6 +157,13 @@ export async function ladeHofProfil(userId: number): Promise<HofProfil | null> {
   } catch {
     return null;
   }
+}
+
+/**
+ * Bestellung an einen Hof senden.
+ */
+export async function sendeBestellung(bestellung: BestellungSenden): Promise<BestellungAntwort> {
+  return batchPost<BestellungAntwort>("hofmarkt.bestellungSenden", bestellung as unknown as Record<string, unknown>);
 }
 
 /**

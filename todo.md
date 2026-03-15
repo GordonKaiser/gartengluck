@@ -74,3 +74,12 @@
 
 ## Sicherheit
 - [x] ADMIN_PIN als Server-Secret gesetzt (via Secrets-Einstellungen)
+
+## Bestell-Flow
+- [x] API-Client: bestellungSenden-Funktion ergänzt
+- [x] Warenkorb-State (WarenkorbContext + WarenkorbProvider)
+- [x] Hof-Detail-Screen: Mengenauswahl (+/-) pro Produkt
+- [x] Hof-Detail-Screen: Warenkorb-Bar unten (Anzahl + Gesamtpreis + Öffnen-Button)
+- [x] Bestellformular-Screen (Kundendaten vorausgefüllt, Adresse, Nachricht)
+- [x] Bestätigungsscreen nach erfolgreicher Bestellung
+- [x] Bestellhistorie-Eintrag nach erfolgreicher API-Bestellung

@@ -8,6 +8,7 @@ import "react-native-reanimated";
 import { Platform } from "react-native";
 import "@/lib/_core/nativewind-pressable";
 import { ThemeProvider } from "@/lib/theme-provider";
+import { WarenkorbProvider } from "@/lib/warenkorb-provider";
 import {
   SafeAreaFrameContext,
   SafeAreaInsetsContext,
@@ -91,6 +92,7 @@ export default function RootLayout() {
 
   const content = (
     <GestureHandlerRootView style={{ flex: 1 }}>
+      <WarenkorbProvider>
       <trpc.Provider client={trpcClient} queryClient={queryClient}>
         <QueryClientProvider client={queryClient}>
           {/* Default to hiding native headers so raw route segments don't appear (e.g. "(tabs)", "products/[id]"). */}
@@ -100,11 +102,13 @@ export default function RootLayout() {
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="hof/[id]" />
             <Stack.Screen name="onboarding" options={{ presentation: "fullScreenModal" }} />
+            <Stack.Screen name="bestellung" options={{ presentation: "modal" }} />
             <Stack.Screen name="oauth/callback" />
           </Stack>
           <StatusBar style="auto" />
         </QueryClientProvider>
       </trpc.Provider>
+      </WarenkorbProvider>
     </GestureHandlerRootView>
   );
 
