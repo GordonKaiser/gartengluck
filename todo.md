@@ -65,3 +65,9 @@
 - [x] Root-Layout: Onboarding-Flow vor Tab-Navigation geschaltet
 - [x] Favoriten-Screen auf userId umgestellt + "Zum Hof"-Button + Nutzerprofil-Anzeige + Abmelden
 - [x] "Mehr anzeigen"-Toggle für lange Produktbeschreibungen im Hof-Detail
+
+## Admin & Bestellhistorie
+- [x] Admin-Bereich im Einstellungen-Screen (PIN-geschützt, alle Nutzer anzeigen, sperren/entsperren)
+- [x] Backend: nutzer.alleNutzer Endpunkt (Admin-only, PIN-geschützt)
+- [x] Bestellhistorie: lokale Liste im Favoriten-Tab (Hof + Datum, max. 50 Einträge)
+- [x] Bestellhistorie: Eintrag wird beim "Jetzt bestellen"-Tap automatisch gespeichert

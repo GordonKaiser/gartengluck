@@ -29,6 +29,7 @@ import {
 } from "@/lib/hofmarkt-api";
 
 const FAVORITEN_KEY = "gartengluck_favoriten";
+const BESTELLHISTORIE_KEY = "gartengluck_bestellhistorie";
 
 interface FavoritHof {
   userId: number;
@@ -120,8 +121,25 @@ export default function HofDetailScreen() {
     if (Platform.OS !== "web") {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     }
+    // Bestellhistorie-Eintrag speichern
+    try {
+      const raw = await AsyncStorage.getItem(BESTELLHISTORIE_KEY);
+      const historie = raw ? JSON.parse(raw) : [];
+      historie.push({
+        userId,
+        hofName: profil?.hofName ?? params.hofName ?? "Unbekannter Hof",
+        ort: profil?.ort ?? null,
+        datum: new Date().toISOString(),
+        shopLink: link,
+      });
+      // Maximal 50 Einträge behalten
+      if (historie.length > 50) historie.splice(0, historie.length - 50);
+      await AsyncStorage.setItem(BESTELLHISTORIE_KEY, JSON.stringify(historie));
+    } catch {
+      // Fehler beim Speichern ignorieren
+    }
     await WebBrowser.openBrowserAsync(link);
-  }, [profil]);
+  }, [profil, userId, params.hofName]);
 
   const styles = StyleSheet.create({
     header: {

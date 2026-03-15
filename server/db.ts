@@ -465,3 +465,12 @@ export async function entsperrNutzer(id: number) {
     .set({ gesperrt: false, sperrGrund: null })
     .where(eq(gartengluckNutzer.id, id));
 }
+
+export async function getAlleNutzer() {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select()
+    .from(gartengluckNutzer)
+    .orderBy(gartengluckNutzer.createdAt);
+}

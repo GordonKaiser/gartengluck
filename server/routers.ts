@@ -7,6 +7,7 @@ import {
   registriereNutzer,
   getNutzerByTelefon,
   getNutzerById,
+  getAlleNutzer,
   sperrNutzer,
   entsperrNutzer,
 } from "./db";
@@ -122,6 +123,28 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         await entsperrNutzer(input.id);
         return { success: true };
+      }),
+
+    /** Admin: Alle Nutzer abrufen (PIN-geschützt im Client). */
+    alleNutzer: publicProcedure
+      .input(z.object({ adminPin: z.string() }))
+      .query(async ({ input }) => {
+        const ADMIN_PIN = process.env.ADMIN_PIN ?? "1234";
+        if (input.adminPin !== ADMIN_PIN) {
+          throw new Error("Falscher Admin-PIN");
+        }
+        const nutzer = await getAlleNutzer();
+        return nutzer.map((n) => ({
+          id: n.id,
+          telefon: n.telefon,
+          name: n.name,
+          strasse: n.strasse,
+          ort: n.ort,
+          plz: n.plz,
+          gesperrt: n.gesperrt,
+          sperrGrund: n.sperrGrund,
+          erstelltAm: n.createdAt?.toISOString() ?? null,
+        }));
       }),
   }),
 
