@@ -351,7 +351,17 @@ export default function HofDetailScreen() {
   }
 
   // Produkte nach Kategorie gruppieren
-  const kategorieReihenfolge: Kategorie[] = produkteAntwort?.kategorien ?? [];
+  // Kategorien direkt aus den Produkten ableiten (nicht aus kategorien-Array,
+  // da dieses manchmal unvollständig ist). Reihenfolge: zuerst bekannte Kategorien
+  // in definierter Reihenfolge, dann unbekannte alphabetisch.
+  const KATEGORIE_REIHENFOLGE: Kategorie[] = ["eier", "gefluegel", "pilze", "imkerei", "garten", "holz"];
+  const alleProdukteKategorien = Array.from(
+    new Set((produkteAntwort?.produkte ?? []).map((p) => p.kategorie))
+  );
+  const kategorieReihenfolge: Kategorie[] = [
+    ...KATEGORIE_REIHENFOLGE.filter((k) => alleProdukteKategorien.includes(k)),
+    ...alleProdukteKategorien.filter((k) => !KATEGORIE_REIHENFOLGE.includes(k as Kategorie)) as Kategorie[],
+  ];
   const produkteNachKategorie: Record<string, HofProdukt[]> = {};
   for (const kat of kategorieReihenfolge) {
     const liste = (produkteAntwort?.produkte ?? []).filter((p) => p.kategorie === kat);

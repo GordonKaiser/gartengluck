@@ -93,3 +93,8 @@
 - [x] Bug 2: Garten-Produkte werden einzeln angezeigt; doppeltes Emoji behoben
 - [x] Bug 3: Holz-Produkte werden einzeln angezeigt; doppeltes Emoji behoben
 - [x] Bug 4: Bestellstruktur war bereits korrekt (id, name, kategorie, preis, einheit direkt aus API)
+
+## Bugfixes v3 (API-Struktur-Update)
+- [x] Bug 1: Produkte nicht angezeigt – Kategorien jetzt direkt aus Produkten abgeleitet (nicht aus kategorien-Array)
+- [x] Bug 2: Einheit im Bestellformular korrekt angezeigt (z.B. "2× 10er-Paket")
+- [x] Bug 3: Bestellstruktur war bereits korrekt – id, name, kategorie, preis, einheit direkt aus API

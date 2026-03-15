@@ -384,7 +384,7 @@ export default function BestellungScreen() {
                 <View key={pos.produkt.id} style={styles.produktZeile}>
                   <Text style={styles.produktZeileName}>{pos.produkt.name}</Text>
                   <Text style={styles.produktZeileMenge}>
-                    {pos.menge}× {formatPreis(pos.produkt.preis, pos.produkt.einheit)}
+                    {pos.menge}× {pos.produkt.einheit}
                   </Text>
                   <Text style={styles.produktZeilePreis}>
                     {gesamt.toFixed(2).replace(".", ",")} €
