@@ -9,21 +9,56 @@ type IconMapping = Record<SymbolViewProps["name"], ComponentProps<typeof Materia
 type IconSymbolName = keyof typeof MAPPING;
 
 /**
- * Add your SF Symbols to Material Icons mappings here.
- * - see Material Icons in the [Icons Directory](https://icons.expo.fyi).
- * - see SF Symbols in the [SF Symbols](https://developer.apple.com/sf-symbols/) app.
+ * SF Symbols → Material Icons mapping for Hofmarkt App
  */
 const MAPPING = {
+  // Navigation
   "house.fill": "home",
+  "magnifyingglass": "search",
+  "heart.fill": "favorite",
+  "heart": "favorite-border",
+  "gearshape.fill": "settings",
+  "gearshape": "settings",
+  // Actions
   "paperplane.fill": "send",
   "chevron.left.forwardslash.chevron.right": "code",
   "chevron.right": "chevron-right",
+  "chevron.left": "chevron-left",
+  "arrow.left": "arrow-back",
+  "xmark": "close",
+  "xmark.circle.fill": "cancel",
+  // Location
+  "location.fill": "location-on",
+  "location": "location-on",
+  "map.fill": "map",
+  // Shop / Markt
+  "cart.fill": "shopping-cart",
+  "cart": "shopping-cart",
+  "bag.fill": "shopping-bag",
+  "storefront.fill": "storefront",
+  "storefront": "storefront",
+  // Hof / Natur
+  "leaf.fill": "eco",
+  "leaf": "eco",
+  "sun.max.fill": "wb-sunny",
+  // Info
+  "info.circle.fill": "info",
+  "info.circle": "info-outline",
+  "exclamationmark.circle.fill": "error",
+  "checkmark.circle.fill": "check-circle",
+  "checkmark": "check",
+  // Misc
+  "star.fill": "star",
+  "star": "star-border",
+  "phone.fill": "phone",
+  "envelope.fill": "email",
+  "link": "link",
+  "square.and.arrow.up": "share",
+  "arrow.clockwise": "refresh",
 } as IconMapping;
 
 /**
  * An icon component that uses native SF Symbols on iOS, and Material Icons on Android and web.
- * This ensures a consistent look across platforms, and optimal resource usage.
- * Icon `name`s are based on SF Symbols and require manual mapping to Material Icons.
  */
 export function IconSymbol({
   name,

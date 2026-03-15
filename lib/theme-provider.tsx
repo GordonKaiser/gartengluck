@@ -47,6 +47,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         "color-foreground": SchemeColors[colorScheme].foreground,
         "color-muted": SchemeColors[colorScheme].muted,
         "color-border": SchemeColors[colorScheme].border,
+        "color-accent": SchemeColors[colorScheme].accent,
         "color-success": SchemeColors[colorScheme].success,
         "color-warning": SchemeColors[colorScheme].warning,
         "color-error": SchemeColors[colorScheme].error,
