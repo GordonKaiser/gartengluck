@@ -474,3 +474,12 @@ export async function getAlleNutzer() {
     .from(gartengluckNutzer)
     .orderBy(gartengluckNutzer.createdAt);
 }
+
+export async function updateNutzerPushToken(telefon: string, pushToken: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Datenbank nicht verfügbar");
+  await db
+    .update(gartengluckNutzer)
+    .set({ pushToken })
+    .where(eq(gartengluckNutzer.telefon, telefon));
+}

@@ -27,11 +27,15 @@ interface FavoritHof {
 }
 
 export interface BestellHistorieEintrag {
+  id?: number;          // Bestellnummer aus API
   userId: number;
   hofName: string;
   ort: string | null;
-  datum: string; // ISO-String
+  datum: string;        // ISO-String
   shopLink: string | null;
+  gesamtpreis?: number;
+  anzahlProdukte?: number;
+  status?: "neu" | "bestaetigt" | "abgeholt" | "storniert"; // vom Anbieter gesetzt
 }
 
 type AktivTab = "favoriten" | "bestellungen";
@@ -168,31 +172,49 @@ export default function FavoritenScreen() {
       minute: "2-digit",
     });
 
+    const statusInfo: Record<string, { label: string; farbe: string; emoji: string }> = {
+      neu:        { label: "Neu",         farbe: colors.warning,  emoji: "⏳" },
+      bestaetigt: { label: "Bestätigt",   farbe: colors.success,  emoji: "✅" },
+      abgeholt:   { label: "Abgeholt",    farbe: colors.muted,    emoji: "🎉" },
+      storniert:  { label: "Storniert",   farbe: colors.error,    emoji: "❌" },
+    };
+    const status = statusInfo[item.status ?? "neu"] ?? statusInfo.neu;
+
     return (
       <View style={s.karte}>
         <View style={s.karteInfo}>
-          <Text style={s.karteName} numberOfLines={1}>
-            🛒 {item.hofName}
-          </Text>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 3 }}>
+            <Text style={s.karteName} numberOfLines={1}>
+              🛒 {item.hofName}
+            </Text>
+          </View>
           {item.ort && <Text style={s.karteOrt}>📍 {item.ort}</Text>}
           <Text style={s.karteZusatz}>
             {datumText} um {zeitText} Uhr
+            {item.gesamtpreis !== undefined ? ` · ${item.gesamtpreis.toFixed(2).replace(".", ",")} €` : ""}
           </Text>
+          {/* Status-Badge */}
+          <View style={[s.statusBadge, { backgroundColor: status.farbe + "20" }]}>
+            <Text style={[s.statusText, { color: status.farbe }]}>
+              {status.emoji} {status.label}
+            </Text>
+          </View>
+          {item.id && (
+            <Text style={[s.karteZusatz, { marginTop: 2 }]}>Bestellnr. #{item.id}</Text>
+          )}
         </View>
         <View style={s.aktionen}>
-          {item.shopLink && (
-            <Pressable
-              style={({ pressed }) => [s.hofButton, pressed && { opacity: 0.7 }]}
-              onPress={() =>
-                router.push({
-                  pathname: "/hof/[id]" as any,
-                  params: { id: item.userId, userId: item.userId, hofName: item.hofName },
-                })
-              }
-            >
-              <Text style={s.hofButtonText}>Zum Hof →</Text>
-            </Pressable>
-          )}
+          <Pressable
+            style={({ pressed }) => [s.hofButton, pressed && { opacity: 0.7 }]}
+            onPress={() =>
+              router.push({
+                pathname: "/hof/[id]" as any,
+                params: { id: item.userId, userId: item.userId, hofName: item.hofName },
+              })
+            }
+          >
+            <Text style={s.hofButtonText}>Zum Hof →</Text>
+          </Pressable>
           <Pressable
             style={({ pressed }) => [s.entfernenButton, pressed && { opacity: 0.7 }]}
             onPress={() => handleBestellungLoeschen(index)}
@@ -429,4 +451,12 @@ const styles = (colors: ReturnType<typeof useColors>) =>
       borderRadius: 12,
     },
     entdeckenButtonText: { color: "#fff", fontSize: 15, fontWeight: "700" },
+    statusBadge: {
+      alignSelf: "flex-start",
+      paddingHorizontal: 8,
+      paddingVertical: 3,
+      borderRadius: 8,
+      marginTop: 6,
+    },
+    statusText: { fontSize: 12, fontWeight: "600" },
   });

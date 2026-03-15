@@ -10,6 +10,7 @@ import {
   getAlleNutzer,
   sperrNutzer,
   entsperrNutzer,
+  updateNutzerPushToken,
 } from "./db";
 
 // Externe Hobbyanbau-Suite API
@@ -122,6 +123,14 @@ export const appRouter = router({
       .input(z.object({ id: z.number() }))
       .mutation(async ({ input }) => {
         await entsperrNutzer(input.id);
+        return { success: true };
+      }),
+
+    /** Push-Token eines Nutzers speichern/aktualisieren. */
+    pushTokenSpeichern: publicProcedure
+      .input(z.object({ telefon: z.string(), pushToken: z.string() }))
+      .mutation(async ({ input }) => {
+        await updateNutzerPushToken(input.telefon, input.pushToken);
         return { success: true };
       }),
 

@@ -98,3 +98,11 @@
 - [x] Bug 1: Produkte nicht angezeigt – Kategorien jetzt direkt aus Produkten abgeleitet (nicht aus kategorien-Array)
 - [x] Bug 2: Einheit im Bestellformular korrekt angezeigt (z.B. "2× 10er-Paket")
 - [x] Bug 3: Bestellstruktur war bereits korrekt – id, name, kategorie, preis, einheit direkt aus API
+
+## Integration mit Hobbyanbau Suite (Push + Bestellstatus)
+- [x] Push-Token beim App-Start registrieren (expo-notifications)
+- [x] Push-Token im Backend in gartengluck_nutzer-Tabelle speichern (nutzer.pushToken-Endpunkt)
+- [x] Notification-Handler im Root-Layout einrichten
+- [x] "Meine Bestellungen"-Tab mit Status-Badge (neu/bestätigt/abgeholt/storniert)
+- [x] Bestellstatus initial als "neu" gespeichert; Aktualisierung via Push-Benachrichtigung
+- [x] Push-Benachrichtigung empfangen und auf Favoriten-Tab navigieren

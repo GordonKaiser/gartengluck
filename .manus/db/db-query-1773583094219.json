@@ -1,0 +1,13 @@
+{
+  "query": "SHOW TABLES LIKE 'gartengluck%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2To2D9UzzTKA2Dw.41d30386b88a --database WNedjZEAh55HEwZrLbvRkH --execute SHOW TABLES LIKE 'gartengluck%';",
+  "rows": [
+    {
+      "Tables_in_WNedjZEAh55HEwZrLbvRkH (gartengluck%)": "gartengluck_nutzer"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_WNedjZEAh55HEwZrLbvRkH (gartengluck%)\ngartengluck_nutzer\n",
+  "stderr": "",
+  "execution_time_ms": 510
+}

@@ -118,9 +118,11 @@ export default function BestellungScreen() {
             id: antwort.id,
             userId: hofUserId,
             hofName,
+            ort: ort.trim() || null,
             datum: new Date().toISOString(),
             gesamtpreis,
             anzahlProdukte: warenkorb.positionen.length,
+            status: "neu",
           });
           if (historie.length > 50) historie.splice(0, historie.length - 50);
           await AsyncStorage.setItem(BESTELLHISTORIE_KEY, JSON.stringify(historie));
