@@ -6,7 +6,6 @@ import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  FlatList,
   Platform,
   Pressable,
   ScrollView,
@@ -18,45 +17,68 @@ import {
 import { ScreenContainer } from "@/components/screen-container";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useColors } from "@/hooks/use-colors";
-import { trpc } from "@/lib/trpc";
-import type { HofProdukt } from "@/shared/hofmarkt-types";
-import { MODUL_LABELS } from "@/shared/hofmarkt-types";
+import {
+  type HofProfil,
+  type HofProdukt,
+  type HofProdukteAntwort,
+  type Kategorie,
+  KATEGORIE_MAP,
+  formatPreis,
+  ladeHofProfil,
+  ladeHofProdukte,
+} from "@/lib/hofmarkt-api";
 
 const FAVORITEN_KEY = "gartengluck_favoriten";
 
 interface FavoritHof {
-  id: number;
   userId: number;
   hofName: string;
   ort: string | null;
   plz: string | null;
-  distanzKm?: number;
 }
 
 export default function HofDetailScreen() {
   const colors = useColors();
   const params = useLocalSearchParams<{ id: string; userId: string; hofName: string }>();
-  const hofId = parseInt(params.id ?? "0");
-  const userId = parseInt(params.userId ?? "0");
+  const userId = parseInt(params.userId ?? params.id ?? "0");
+
+  const [profil, setProfil] = useState<HofProfil | null>(null);
+  const [produkteAntwort, setProdukteAntwort] = useState<HofProdukteAntwort | null>(null);
+  const [profilLaed, setProfilLaed] = useState(true);
+  const [produkteLaden, setProdukteLaden] = useState(true);
   const [istFavorit, setIstFavorit] = useState(false);
 
-  const { data: profil, isLoading: profilLaed } = trpc.hofmarkt.hofProfil.useQuery(
-    { userId },
-    { enabled: userId > 0 }
-  );
-  const { data: produkte, isLoading: produkteLaden } = trpc.hofmarkt.hofProdukte.useQuery(
-    { userId },
-    { enabled: userId > 0 }
-  );
+  // Daten laden
+  useEffect(() => {
+    if (userId <= 0) return;
+
+    (async () => {
+      setProfilLaed(true);
+      const p = await ladeHofProfil(userId);
+      setProfil(p);
+      setProfilLaed(false);
+    })();
+
+    (async () => {
+      setProdukteLaden(true);
+      try {
+        const pa = await ladeHofProdukte(userId);
+        setProdukteAntwort(pa);
+      } catch {
+        setProdukteAntwort(null);
+      }
+      setProdukteLaden(false);
+    })();
+  }, [userId]);
 
   // Favoriten-Status prüfen
   useEffect(() => {
     (async () => {
       const raw = await AsyncStorage.getItem(FAVORITEN_KEY);
       const favoriten: FavoritHof[] = raw ? JSON.parse(raw) : [];
-      setIstFavorit(favoriten.some((f) => f.id === hofId));
+      setIstFavorit(favoriten.some((f) => f.userId === userId));
     })();
-  }, [hofId]);
+  }, [userId]);
 
   const toggleFavorit = useCallback(async () => {
     if (Platform.OS !== "web") {
@@ -65,11 +87,10 @@ export default function HofDetailScreen() {
     const raw = await AsyncStorage.getItem(FAVORITEN_KEY);
     let favoriten: FavoritHof[] = raw ? JSON.parse(raw) : [];
     if (istFavorit) {
-      favoriten = favoriten.filter((f) => f.id !== hofId);
+      favoriten = favoriten.filter((f) => f.userId !== userId);
       setIstFavorit(false);
     } else {
       favoriten.push({
-        id: hofId,
         userId,
         hofName: profil?.hofName ?? params.hofName ?? "Unbekannter Hof",
         ort: profil?.ort ?? null,
@@ -78,7 +99,7 @@ export default function HofDetailScreen() {
       setIstFavorit(true);
     }
     await AsyncStorage.setItem(FAVORITEN_KEY, JSON.stringify(favoriten));
-  }, [istFavorit, hofId, userId, profil, params.hofName]);
+  }, [istFavorit, userId, profil, params.hofName]);
 
   const handleBestellen = useCallback(async () => {
     const link = profil?.shopLink;
@@ -165,6 +186,12 @@ export default function HofDetailScreen() {
       paddingHorizontal: 20,
       paddingTop: 20,
       paddingBottom: 8,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+    },
+    sektionEmoji: {
+      fontSize: 16,
     },
     sektionTitel: {
       fontSize: 13,
@@ -203,6 +230,12 @@ export default function HofDetailScreen() {
       fontSize: 13,
       color: colors.muted,
     },
+    produktBeschreibung: {
+      fontSize: 12,
+      color: colors.muted,
+      marginTop: 2,
+      lineHeight: 16,
+    },
     verfuegbarBadge: {
       paddingHorizontal: 10,
       paddingVertical: 4,
@@ -217,6 +250,12 @@ export default function HofDetailScreen() {
       alignItems: "center",
       justifyContent: "center",
     },
+    keinProduktText: {
+      textAlign: "center",
+      color: colors.muted,
+      fontSize: 14,
+      padding: 20,
+    },
   });
 
   if (profilLaed) {
@@ -229,37 +268,35 @@ export default function HofDetailScreen() {
     );
   }
 
-  // Produkte nach Kategorie gruppieren
-  const kategorien = ["gefluegel", "imkerei", "pilze", "garten", "holz"] as const;
-  const produkteNachKategorie = kategorien.reduce(
-    (acc, kat) => {
-      const liste = (produkte ?? []).filter((p: HofProdukt) => p.kategorie === kat);
-      if (liste.length > 0) acc[kat] = liste;
-      return acc;
-    },
-    {} as Record<string, HofProdukt[]>
-  );
+  // Produkte nach Kategorie gruppieren (Reihenfolge aus API)
+  const kategorieReihenfolge: Kategorie[] = produkteAntwort?.kategorien ?? [];
+  const produkteNachKategorie: Record<string, HofProdukt[]> = {};
+  for (const kat of kategorieReihenfolge) {
+    const liste = (produkteAntwort?.produkte ?? []).filter((p) => p.kategorie === kat);
+    if (liste.length > 0) produkteNachKategorie[kat] = liste;
+  }
 
-  const renderProdukt = ({ item }: { item: HofProdukt }) => {
-    const verfuegbarColor = item.verfuegbar ? colors.success : colors.warning;
-    const verfuegbarText = item.verfuegbar
+  const renderProdukt = (produkt: HofProdukt) => {
+    const meta = KATEGORIE_MAP[produkt.kategorie];
+    const verfuegbarColor = produkt.verfuegbar ? colors.success : colors.warning;
+    const verfuegbarText = produkt.verfuegbar
       ? "Verfügbar"
-      : item.vorbestellungDatum
-        ? `ab ${item.vorbestellungDatum}`
+      : produkt.vorbestellungDatum
+        ? `ab ${produkt.vorbestellungDatum}`
         : "Vorbestellung";
 
     return (
-      <View style={[styles.produktKarte, !item.verfuegbar && { opacity: 0.7 }]}>
-        <Text style={styles.produktEmoji}>{item.emoji}</Text>
+      <View
+        key={produkt.id}
+        style={[styles.produktKarte, !produkt.verfuegbar && { opacity: 0.7 }]}
+      >
+        <Text style={styles.produktEmoji}>{meta?.emoji ?? "🌿"}</Text>
         <View style={styles.produktInfo}>
-          <Text style={styles.produktName}>{item.name}</Text>
-          {item.preis && (
-            <Text style={styles.produktPreis}>
-              {parseFloat(item.preis).toLocaleString("de-DE", {
-                style: "currency",
-                currency: "EUR",
-              })}{" "}
-              / {item.einheit}
+          <Text style={styles.produktName}>{produkt.name}</Text>
+          <Text style={styles.produktPreis}>{formatPreis(produkt.preis, produkt.einheit)}</Text>
+          {produkt.beschreibung && (
+            <Text style={styles.produktBeschreibung} numberOfLines={2}>
+              {produkt.beschreibung}
             </Text>
           )}
         </View>
@@ -303,7 +340,7 @@ export default function HofDetailScreen() {
           <Text style={styles.hofName}>{profil?.hofName ?? params.hofName}</Text>
           {(profil?.ort || profil?.plz) && (
             <Text style={styles.ortText}>
-              📍 {[profil.ort, profil.plz].filter(Boolean).join(" · ")}
+              📍 {[profil?.ort, profil?.plz].filter(Boolean).join(" · ")}
             </Text>
           )}
           {profil?.beschreibung && (
@@ -326,27 +363,34 @@ export default function HofDetailScreen() {
         {produkteLaden ? (
           <View style={{ padding: 20, alignItems: "center" }}>
             <ActivityIndicator color={colors.primary} />
+            <Text style={{ color: colors.muted, marginTop: 8, fontSize: 13 }}>
+              Produkte werden geladen…
+            </Text>
           </View>
-        ) : (
-          Object.entries(produkteNachKategorie).map(([kat, liste]) => (
-            <View key={kat}>
-              <View style={styles.sektionHeader}>
-                <Text style={styles.sektionTitel}>
-                  {MODUL_LABELS[kat] ?? kat}
-                </Text>
+        ) : Object.keys(produkteNachKategorie).length > 0 ? (
+          Object.entries(produkteNachKategorie).map(([kat, liste]) => {
+            const meta = KATEGORIE_MAP[kat as Kategorie];
+            return (
+              <View key={kat}>
+                <View style={styles.sektionHeader}>
+                  <Text style={styles.sektionEmoji}>{meta?.emoji ?? "🌿"}</Text>
+                  <Text style={styles.sektionTitel}>{meta?.label ?? kat}</Text>
+                </View>
+                {liste.map(renderProdukt)}
               </View>
-              {liste.map((produkt, idx) => (
-                <View key={idx}>{renderProdukt({ item: produkt })}</View>
-              ))}
-            </View>
-          ))
+            );
+          })
+        ) : (
+          <Text style={styles.keinProduktText}>
+            Dieser Hof hat noch keine Produkte eingetragen.
+          </Text>
         )}
 
         {/* Kein Shop-Link Hinweis */}
         {!profil?.shopLink && !produkteLaden && (
           <View style={{ padding: 20, alignItems: "center" }}>
             <Text style={{ color: colors.muted, fontSize: 14, textAlign: "center" }}>
-              Dieser Hof hat noch keinen direkten Bestelllink. Bitte nimm direkt Kontakt auf.
+              Dieser Hof hat noch keinen direkten Bestelllink.{"\n"}Bitte nimm direkt Kontakt auf.
             </Text>
           </View>
         )}

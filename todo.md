@@ -45,3 +45,12 @@
 - [x] Neues Logo für Gartenglück generieren (Scheune + Produkte)
 - [x] app.config.ts App-Name aktualisieren
 - [x] Proxy zur externen Hobbyanbau-Suite-API implementiert (hofmarkt.suche + hofmarkt.hofProfil)
+
+## API-Integration v2 (Batch-Format)
+- [x] Direkter Fetch statt tRPC-Proxy — alle 4 Endpunkte mit batch=1 Format
+- [x] hofmarkt.suche mit umkreisKm und optionalem kategorien-Filter
+- [x] hofmarkt.produkte — vollständige Produktliste mit verfuegbar/vorbestellung
+- [x] hofmarkt.plzLookup — Ortsname beim PLZ-Eingeben anzeigen (Debounce 500ms)
+- [x] Kategorie-Filter-Chips im Entdecken-Screen (horizontal scrollbar)
+- [x] Produkte im Hof-Detail gruppiert nach Kategorie anzeigen
+- [x] Preisformatierung: "0.40" → "0,40 €" (formatPreis-Funktion)
