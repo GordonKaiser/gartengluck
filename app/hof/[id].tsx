@@ -41,8 +41,8 @@ export default function HofDetailScreen() {
   const [istFavorit, setIstFavorit] = useState(false);
 
   const { data: profil, isLoading: profilLaed } = trpc.hofmarkt.hofProfil.useQuery(
-    { hofId },
-    { enabled: hofId > 0 }
+    { userId },
+    { enabled: userId > 0 }
   );
   const { data: produkte, isLoading: produkteLaden } = trpc.hofmarkt.hofProdukte.useQuery(
     { userId },

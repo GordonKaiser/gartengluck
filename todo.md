@@ -44,3 +44,4 @@
 - [x] Untertitel auf "Produkte aus Hobby-Anbau & -Haltung" ändern
 - [x] Neues Logo für Gartenglück generieren (Scheune + Produkte)
 - [x] app.config.ts App-Name aktualisieren
+- [x] Proxy zur externen Hobbyanbau-Suite-API implementiert (hofmarkt.suche + hofmarkt.hofProfil)

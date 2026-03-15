@@ -6,8 +6,8 @@ export interface HofSucheErgebnis {
   hofName: string;
   plz: string | null;
   ort: string | null;
-  lat: string | null;
-  lon: string | null;
+  lat?: string | null;
+  lon?: string | null;
   beschreibung: string | null;
   shopLink: string | null;
   distanzKm: number;
