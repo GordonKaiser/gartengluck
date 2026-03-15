@@ -1,0 +1,15 @@
+{
+  "query": "SELECT @@hostname, @@port, DATABASE() as db_name;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2To2D9UzzTKA2Dw.41d30386b88a --database WNedjZEAh55HEwZrLbvRkH --execute SELECT @@hostname, @@port, DATABASE() as db_name;",
+  "rows": [
+    {
+      "@@hostname": "localhost",
+      "@@port": "4000",
+      "db_name": "WNedjZEAh55HEwZrLbvRkH"
+    }
+  ],
+  "messages": [],
+  "stdout": "@@hostname\t@@port\tdb_name\nlocalhost\t4000\tWNedjZEAh55HEwZrLbvRkH\n",
+  "stderr": "",
+  "execution_time_ms": 449
+}
