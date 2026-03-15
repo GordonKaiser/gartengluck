@@ -71,3 +71,6 @@
 - [x] Backend: nutzer.alleNutzer Endpunkt (Admin-only, PIN-geschützt)
 - [x] Bestellhistorie: lokale Liste im Favoriten-Tab (Hof + Datum, max. 50 Einträge)
 - [x] Bestellhistorie: Eintrag wird beim "Jetzt bestellen"-Tap automatisch gespeichert
+
+## Sicherheit
+- [x] ADMIN_PIN als Server-Secret gesetzt (via Secrets-Einstellungen)
