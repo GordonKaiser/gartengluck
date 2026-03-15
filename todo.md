@@ -38,3 +38,9 @@
 
 ## Bugs
 - [x] API-URL auf öffentliche URL umstellen (EXPO_PUBLIC_API_BASE_URL gesetzt)
+
+## Umbenennung
+- [x] App-Name auf "Gartenglück" ändern (war: Hofmarkt)
+- [x] Untertitel auf "Produkte aus Hobby-Anbau & -Haltung" ändern
+- [x] Neues Logo für Gartenglück generieren (Scheune + Produkte)
+- [x] app.config.ts App-Name aktualisieren

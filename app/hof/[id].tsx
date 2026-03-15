@@ -22,7 +22,7 @@ import { trpc } from "@/lib/trpc";
 import type { HofProdukt } from "@/shared/hofmarkt-types";
 import { MODUL_LABELS } from "@/shared/hofmarkt-types";
 
-const FAVORITEN_KEY = "hofmarkt_favoriten";
+const FAVORITEN_KEY = "gartengluck_favoriten";
 
 interface FavoritHof {
   id: number;

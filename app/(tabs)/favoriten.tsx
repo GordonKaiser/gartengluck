@@ -13,7 +13,7 @@ import { ScreenContainer } from "@/components/screen-container";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useColors } from "@/hooks/use-colors";
 
-const FAVORITEN_KEY = "hofmarkt_favoriten";
+const FAVORITEN_KEY = "gartengluck_favoriten";
 
 interface FavoritHof {
   id: number;

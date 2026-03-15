@@ -20,8 +20,8 @@ import { trpc } from "@/lib/trpc";
 import type { HofSucheErgebnis, RadiusOption } from "@/shared/hofmarkt-types";
 import { MODUL_EMOJIS, RADIUS_OPTIONEN } from "@/shared/hofmarkt-types";
 
-const STORAGE_PLZ_KEY = "hofmarkt_letzte_plz";
-const STORAGE_RADIUS_KEY = "hofmarkt_letzter_radius";
+const STORAGE_PLZ_KEY = "gartengluck_letzte_plz";
+const STORAGE_RADIUS_KEY = "gartengluck_letzter_radius";
 
 export default function EntdeckenScreen() {
   const colors = useColors();
@@ -258,8 +258,8 @@ export default function EntdeckenScreen() {
     <ScreenContainer className="flex-1">
       {/* Header mit Suchbereich */}
       <View style={styles.header}>
-        <Text style={styles.titel}>Hofmarkt</Text>
-        <Text style={styles.untertitel}>Frische Produkte direkt vom Hof</Text>
+        <Text style={styles.titel}>Gartenglück</Text>
+        <Text style={styles.untertitel}>Produkte aus Hobby-Anbau & -Haltung</Text>
 
         {/* PLZ-Eingabe + Suche-Button */}
         <View style={styles.suchbereich}>

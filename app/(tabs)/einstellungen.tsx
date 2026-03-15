@@ -16,8 +16,8 @@ import { ScreenContainer } from "@/components/screen-container";
 import { useColors } from "@/hooks/use-colors";
 import { useThemeContext } from "@/lib/theme-provider";
 
-const FAVORITEN_KEY = "hofmarkt_favoriten";
-const STORAGE_PLZ_KEY = "hofmarkt_letzte_plz";
+const FAVORITEN_KEY = "gartengluck_favoriten";
+const STORAGE_PLZ_KEY = "gartengluck_letzte_plz";
 
 export default function EinstellungenScreen() {
   const colors = useColors();
@@ -205,7 +205,7 @@ export default function EinstellungenScreen() {
           </View>
         </View>
 
-        <Text style={styles.versionText}>Hofmarkt v{version}</Text>
+        <Text style={styles.versionText}>Gartenglück v{version}</Text>
       </ScrollView>
     </ScreenContainer>
   );

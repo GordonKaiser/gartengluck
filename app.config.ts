@@ -28,11 +28,11 @@ const schemeFromBundleId = `manus${timestamp}`;
 
 const env = {
   // App branding - update these values directly (do not use env vars)
-  appName: "Hofmarkt",
+  appName: "Gartenglück",
   appSlug: "hofmarkt-app",
   // S3 URL of the app logo - set this to the URL returned by generate_image when creating custom logo
   // Leave empty to use the default icon from assets/images/icon.png
-  logoUrl: "https://d2xsxph8kpxj0f.cloudfront.net/310519663103279618/WNedjZEAh55HEwZrLbvRkH/icon-QeDUKnamu5QTcwSKBLy4CC.png",
+  logoUrl: "https://d2xsxph8kpxj0f.cloudfront.net/310519663103279618/WNedjZEAh55HEwZrLbvRkH/gartengluck-icon-YSMQG4oEBePpfk8XhNtYWa.png",
   scheme: schemeFromBundleId,
   iosBundleId: bundleId,
   androidPackage: bundleId,
@@ -43,7 +43,7 @@ const config: ExpoConfig = {
   slug: env.appSlug,
   version: "1.0.0",
   orientation: "portrait",
-  icon: "https://d2xsxph8kpxj0f.cloudfront.net/310519663103279618/WNedjZEAh55HEwZrLbvRkH/icon_42213569.png",
+  icon: "https://d2xsxph8kpxj0f.cloudfront.net/310519663103279618/WNedjZEAh55HEwZrLbvRkH/gartengluck-icon-YSMQG4oEBePpfk8XhNtYWa.png",
   scheme: env.scheme,
   userInterfaceStyle: "automatic",
   newArchEnabled: true,
@@ -57,7 +57,7 @@ const config: ExpoConfig = {
   android: {
     adaptiveIcon: {
       backgroundColor: "#E6F4FE",
-      foregroundImage: "https://d2xsxph8kpxj0f.cloudfront.net/310519663103279618/WNedjZEAh55HEwZrLbvRkH/android-icon-foreground_777eec26.png",
+      foregroundImage: "https://d2xsxph8kpxj0f.cloudfront.net/310519663103279618/WNedjZEAh55HEwZrLbvRkH/gartengluck-android_c76eb8ba.png",
       backgroundImage: "./assets/images/android-icon-background.png",
       monochromeImage: "./assets/images/android-icon-monochrome.png",
     },
@@ -82,7 +82,7 @@ const config: ExpoConfig = {
   web: {
     bundler: "metro",
     output: "static",
-    favicon: "https://d2xsxph8kpxj0f.cloudfront.net/310519663103279618/WNedjZEAh55HEwZrLbvRkH/favicon_636eb320.png",
+    favicon: "https://d2xsxph8kpxj0f.cloudfront.net/310519663103279618/WNedjZEAh55HEwZrLbvRkH/gartengluck-favicon_97343f09.png",
   },
   plugins: [
     "expo-router",
@@ -102,7 +102,7 @@ const config: ExpoConfig = {
     [
       "expo-splash-screen",
       {
-        image: "https://d2xsxph8kpxj0f.cloudfront.net/310519663103279618/WNedjZEAh55HEwZrLbvRkH/splash-icon_c71738ff.png",
+        image: "https://d2xsxph8kpxj0f.cloudfront.net/310519663103279618/WNedjZEAh55HEwZrLbvRkH/gartengluck-splash_4a2b67f2.png",
         imageWidth: 200,
         resizeMode: "contain",
         backgroundColor: "#ffffff",
