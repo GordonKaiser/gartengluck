@@ -35,3 +35,6 @@
 ## Lokale Datenpersistenz
 - [x] Letzte PLZ + Radius speichern (AsyncStorage)
 - [x] Favoriten-Höfe speichern (AsyncStorage)
+
+## Bugs
+- [x] API-URL auf öffentliche URL umstellen (EXPO_PUBLIC_API_BASE_URL gesetzt)
