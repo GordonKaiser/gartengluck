@@ -87,3 +87,9 @@
 ## Bugfixes (Tester-Feedback)
 - [x] Falsche Kategorie-Icons korrigiert (Garten: 🥕 → 🌱)
 - [x] Lieferadresse-Feld ausgeblendet (Daten aus Registrierung werden still übermittelt)
+
+## API-Bugfixes v2 (Tester-Feedback)
+- [x] Bug 1: Eier-Einheit "10er-Paket" / 4,00 € wird korrekt aus API übernommen (kein Fix nötig)
+- [x] Bug 2: Garten-Produkte werden einzeln angezeigt; doppeltes Emoji behoben
+- [x] Bug 3: Holz-Produkte werden einzeln angezeigt; doppeltes Emoji behoben
+- [x] Bug 4: Bestellstruktur war bereits korrekt (id, name, kategorie, preis, einheit direkt aus API)

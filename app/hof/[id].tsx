@@ -358,6 +358,9 @@ export default function HofDetailScreen() {
     if (liste.length > 0) produkteNachKategorie[kat] = liste;
   }
 
+  // Prüft ob ein String ein Emoji enthält
+  const hatEmoji = (text: string) => /\p{Emoji_Presentation}/u.test(text);
+
   const renderProdukt = (produkt: HofProdukt) => {
     const meta = KATEGORIE_MAP[produkt.kategorie];
     const verfuegbarColor = produkt.verfuegbar
@@ -384,7 +387,9 @@ export default function HofDetailScreen() {
           style={styles.produktOben}
           onPress={beschreibungLang ? () => toggleProduktAufklappen(produkt.id) : undefined}
         >
-          <Text style={styles.produktEmoji}>{meta?.emoji ?? "🌿"}</Text>
+          {!hatEmoji(produkt.name) && (
+            <Text style={styles.produktEmoji}>{meta?.emoji ?? "🌿"}</Text>
+          )}
           <View style={styles.produktInfo}>
             <Text style={styles.produktName}>{produkt.name}</Text>
             <Text style={styles.produktPreis}>{formatPreis(produkt.preis, produkt.einheit)}</Text>
