@@ -166,6 +166,25 @@ export async function sendeBestellung(bestellung: BestellungSenden): Promise<Bes
   return batchPost<BestellungAntwort>("hofmarkt.bestellungSenden", bestellung as unknown as Record<string, unknown>);
 }
 
+export interface BestellungStatusAntwort {
+  id: number;
+  status: "neu" | "bestaetigt" | "abholbereit" | "abgeholt" | "storniert";
+}
+
+/**
+ * Status einer Bestellung abrufen (nach Bestellnummer).
+ * Gibt null zurück wenn der Endpunkt noch nicht verfügbar ist.
+ */
+export async function ladeBestellungStatus(
+  bestellId: number
+): Promise<BestellungStatusAntwort | null> {
+  try {
+    return await batchGet<BestellungStatusAntwort>("hofmarkt.bestellungStatus", { id: bestellId });
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Ortsname zu einer PLZ ermitteln (für Autocomplete).
  * @param plz  5-stellige Postleitzahl

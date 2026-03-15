@@ -20,8 +20,32 @@ import {
 } from "react-native-safe-area-context";
 import type { EdgeInsets, Metrics, Rect } from "react-native-safe-area-context";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { trpc, createTRPCClient } from "@/lib/trpc";
 import { initManusRuntime, subscribeSafeAreaInsets } from "@/lib/_core/manus-runtime";
+
+const BESTELLHISTORIE_KEY = "gartengluck_bestellhistorie";
+
+/** Aktualisiert den Status einer Bestellung in der lokalen Historie */
+async function aktualisiereBestellStatus(bestellId: number, neuerStatus: string) {
+  try {
+    const raw = await AsyncStorage.getItem(BESTELLHISTORIE_KEY);
+    if (!raw) return;
+    const historie = JSON.parse(raw);
+    let geaendert = false;
+    for (const eintrag of historie) {
+      if (eintrag.id === bestellId) {
+        eintrag.status = neuerStatus;
+        geaendert = true;
+      }
+    }
+    if (geaendert) {
+      await AsyncStorage.setItem(BESTELLHISTORIE_KEY, JSON.stringify(historie));
+    }
+  } catch {
+    // Ignorieren
+  }
+}
 
 const DEFAULT_WEB_INSETS: EdgeInsets = { top: 0, right: 0, bottom: 0, left: 0 };
 const DEFAULT_WEB_FRAME: Rect = { x: 0, y: 0, width: 0, height: 0 };
@@ -136,16 +160,27 @@ export default function RootLayout() {
         shouldShowList: true,
       }),
     });
-    // Tap auf Benachrichtigung → Favoriten-Tab öffnen
-    const sub = Notifications.addNotificationResponseReceivedListener((response) => {
-      const url = response.notification.request.content.data?.url;
+    // Benachrichtigung im Vordergrund empfangen → Status lokal aktualisieren
+    const foregroundSub = Notifications.addNotificationReceivedListener(async (notification) => {
+      const data = notification.request.content.data;
+      if (data?.bestellId && data?.neuerStatus) {
+        await aktualisiereBestellStatus(Number(data.bestellId), String(data.neuerStatus));
+      }
+    });
+    // Tap auf Benachrichtigung → Status aktualisieren + Favoriten-Tab öffnen
+    const tapSub = Notifications.addNotificationResponseReceivedListener(async (response) => {
+      const data = response.notification.request.content.data;
+      if (data?.bestellId && data?.neuerStatus) {
+        await aktualisiereBestellStatus(Number(data.bestellId), String(data.neuerStatus));
+      }
+      const url = data?.url;
       if (typeof url === "string") {
         router.push(url as never);
       } else {
         router.push("/(tabs)/favoriten" as never);
       }
     });
-    return () => sub.remove();
+    return () => { foregroundSub.remove(); tapSub.remove(); };
   }, []);
 
   // Ensure minimum 8px padding for top and bottom on mobile

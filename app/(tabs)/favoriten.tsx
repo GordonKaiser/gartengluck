@@ -35,7 +35,7 @@ export interface BestellHistorieEintrag {
   shopLink: string | null;
   gesamtpreis?: number;
   anzahlProdukte?: number;
-  status?: "neu" | "bestaetigt" | "abgeholt" | "storniert"; // vom Anbieter gesetzt
+  status?: "neu" | "bestaetigt" | "abholbereit" | "abgeholt" | "storniert"; // vom Anbieter gesetzt
 }
 
 type AktivTab = "favoriten" | "bestellungen";
@@ -173,10 +173,11 @@ export default function FavoritenScreen() {
     });
 
     const statusInfo: Record<string, { label: string; farbe: string; emoji: string }> = {
-      neu:        { label: "Neu",         farbe: colors.warning,  emoji: "⏳" },
-      bestaetigt: { label: "Bestätigt",   farbe: colors.success,  emoji: "✅" },
-      abgeholt:   { label: "Abgeholt",    farbe: colors.muted,    emoji: "🎉" },
-      storniert:  { label: "Storniert",   farbe: colors.error,    emoji: "❌" },
+      neu:          { label: "Neu",           farbe: colors.warning,  emoji: "⏳" },
+      bestaetigt:   { label: "Bestätigt",     farbe: colors.success,  emoji: "✅" },
+      abholbereit:  { label: "Abholbereit",   farbe: colors.primary,  emoji: "📦" },
+      abgeholt:     { label: "Abgeholt",      farbe: colors.muted,    emoji: "🎉" },
+      storniert:    { label: "Storniert",     farbe: colors.error,    emoji: "❌" },
     };
     const status = statusInfo[item.status ?? "neu"] ?? statusInfo.neu;
 
@@ -184,7 +185,7 @@ export default function FavoritenScreen() {
       <View style={s.karte}>
         <View style={s.karteInfo}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 3 }}>
-            <Text style={s.karteName} numberOfLines={1}>
+            <Text style={s.karteName}>
               🛒 {item.hofName}
             </Text>
           </View>

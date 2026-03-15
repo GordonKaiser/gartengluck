@@ -106,3 +106,7 @@
 - [x] "Meine Bestellungen"-Tab mit Status-Badge (neu/bestätigt/abgeholt/storniert)
 - [x] Bestellstatus initial als "neu" gespeichert; Aktualisierung via Push-Benachrichtigung
 - [x] Push-Benachrichtigung empfangen und auf Favoriten-Tab navigieren
+
+## Status-Sync v1
+- [x] Bestellstatus-Update via Push-Benachrichtigung (bestellId + neuerStatus in data)
+- [x] Hofnamen-Abschneiden fixen (numberOfLines entfernt)
