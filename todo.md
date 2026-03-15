@@ -83,3 +83,7 @@
 - [x] Bestellformular-Screen (Kundendaten vorausgefüllt, Adresse, Nachricht)
 - [x] Bestätigungsscreen nach erfolgreicher Bestellung
 - [x] Bestellhistorie-Eintrag nach erfolgreicher API-Bestellung
+
+## Bugfixes (Tester-Feedback)
+- [x] Falsche Kategorie-Icons korrigiert (Garten: 🥕 → 🌱)
+- [x] Lieferadresse-Feld ausgeblendet (Daten aus Registrierung werden still übermittelt)

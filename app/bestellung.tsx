@@ -441,45 +441,7 @@ export default function BestellungScreen() {
             </View>
           </View>
 
-          {/* Adresse */}
-          <View style={styles.sektion}>
-            <Text style={styles.sektionTitel}>Lieferadresse (optional)</Text>
-            <View style={styles.eingabeZeile}>
-              <Text style={styles.eingabeLabel}>Straße</Text>
-              <TextInput
-                style={styles.eingabe}
-                value={strasse}
-                onChangeText={setStrasse}
-                placeholder="Musterstraße 1"
-                placeholderTextColor={colors.muted}
-                returnKeyType="next"
-              />
-            </View>
-            <View style={styles.eingabeZeile}>
-              <Text style={styles.eingabeLabel}>PLZ</Text>
-              <TextInput
-                style={styles.eingabe}
-                value={plz}
-                onChangeText={setPlz}
-                placeholder="12345"
-                placeholderTextColor={colors.muted}
-                keyboardType="numeric"
-                maxLength={5}
-                returnKeyType="next"
-              />
-            </View>
-            <View style={styles.eingabeZeile}>
-              <Text style={styles.eingabeLabel}>Ort</Text>
-              <TextInput
-                style={styles.eingabe}
-                value={ort}
-                onChangeText={setOrt}
-                placeholder="Musterstadt"
-                placeholderTextColor={colors.muted}
-                returnKeyType="next"
-              />
-            </View>
-          </View>
+          {/* Adresse – unsichtbar, Daten aus Registrierung werden still übermittelt */}
 
           {/* Nachricht */}
           <View style={styles.sektion}>

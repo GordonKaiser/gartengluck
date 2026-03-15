@@ -193,7 +193,7 @@ export const KATEGORIEN: { id: Kategorie; label: string; emoji: string }[] = [
   { id: "gefluegel", label: "Geflügel", emoji: "🐓" },
   { id: "pilze",     label: "Pilze",    emoji: "🍄" },
   { id: "imkerei",   label: "Imkerei",  emoji: "🍯" },
-  { id: "garten",    label: "Garten",   emoji: "🥕" },
+  { id: "garten",    label: "Garten",   emoji: "🌱" },
   { id: "holz",      label: "Holz",     emoji: "🪵" },
 ];
 
