@@ -4,6 +4,9 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Dimensions,
+  FlatList,
+  Image,
   Platform,
   Pressable,
   ScrollView,
@@ -332,6 +335,16 @@ export default function HofDetailScreen() {
       alignItems: "center",
       justifyContent: "center",
     },
+    galerieBereich: {
+      paddingVertical: 12,
+      borderBottomWidth: 0.5,
+      borderBottomColor: colors.border,
+    },
+    galerieBild: {
+      width: Dimensions.get("window").width * 0.7,
+      height: 180,
+      borderRadius: 12,
+    },
     keinProduktText: {
       textAlign: "center",
       color: colors.muted,
@@ -503,6 +516,26 @@ export default function HofDetailScreen() {
             <Text style={styles.beschreibung}>{profil.beschreibung}</Text>
           )}
         </View>
+
+        {/* Hof-Bilder-Galerie */}
+        {profil?.bilder && profil.bilder.length > 0 && (
+          <View style={styles.galerieBereich}>
+            <FlatList
+              data={profil.bilder}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={(item, idx) => `bild-${idx}`}
+              contentContainerStyle={{ paddingHorizontal: 16, gap: 10 }}
+              renderItem={({ item }) => (
+                <Image
+                  source={{ uri: item }}
+                  style={styles.galerieBild}
+                  resizeMode="cover"
+                />
+              )}
+            />
+          </View>
+        )}
 
         {/* Produkte */}
         {produkteLaden ? (

@@ -49,6 +49,7 @@ export interface HofProfil {
   beschreibung: string | null;
   aktiv: boolean;
   shopLink: string | null;
+  bilder?: string[]; // optionale Hof-Bilder (URLs)
 }
 
 export interface BestellProdukt {

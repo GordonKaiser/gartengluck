@@ -165,3 +165,7 @@
 - [ ] Vorbestellungs-System: Verfügbarkeit-Flag aus API, Bestellung sperren wenn nicht verfügbar
 - [x] Aktualisierte Integrations-Doku für anderen Tab
 - [x] Admin-Bereich komplett aus der App entfernen (kein Angriffspunkt für Nutzer)
+
+## Feature-Backlog v6 (16.03.2026)
+- [x] PIN vergessen / zurücksetzen (nach Eingabe der Telefonnummer)
+- [x] Hof-Bilder-Galerie im Hof-Detail (horizontale Bildgalerie wenn bilder[] vorhanden)

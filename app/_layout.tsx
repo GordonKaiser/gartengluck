@@ -100,6 +100,9 @@ export default function RootLayout() {
   const [pinAbfrageOffen, setPinAbfrageOffen] = useState(false);
   const [pinEingabe, setPinEingabe] = useState("");
   const [pinFehler, setPinFehler] = useState(false);
+  const [pinVergessen, setPinVergessen] = useState(false);
+  const [pinVergessenTelefon, setPinVergessenTelefon] = useState("");
+  const [pinVergessenFehler, setPinVergessenFehler] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -123,6 +126,31 @@ export default function RootLayout() {
       setPinEingabe("");
     }
   }, [pinEingabe]);
+
+  const handlePinZuruecksetzen = useCallback(async () => {
+    try {
+      const { ladeNutzerProfil } = await import("@/lib/nutzer-store");
+      const profil = await ladeNutzerProfil();
+      if (!profil?.telefon) {
+        setPinVergessenFehler("Kein Nutzerprofil gefunden.");
+        return;
+      }
+      const eingabe = pinVergessenTelefon.replace(/\s/g, "");
+      const gespeichert = profil.telefon.replace(/\s/g, "");
+      if (eingabe !== gespeichert) {
+        setPinVergessenFehler("Telefonnummer stimmt nicht überein.");
+        return;
+      }
+      await AsyncStorage.removeItem(APP_PIN_KEY);
+      setPinAbfrageOffen(false);
+      setPinGeprueft(true);
+      setPinVergessen(false);
+      setPinVergessenTelefon("");
+      setPinVergessenFehler("");
+    } catch {
+      setPinVergessenFehler("Fehler beim Zurücksetzen. Bitte erneut versuchen.");
+    }
+  }, [pinVergessenTelefon]);
 
   // Onboarding-Check: Beim ersten Start auf Onboarding-Screen weiterleiten
   useEffect(() => {
@@ -232,28 +260,69 @@ export default function RootLayout() {
     <Modal visible transparent animationType="fade">
       <View style={pinStyles.overlay}>
         <View style={pinStyles.box}>
-          <Text style={pinStyles.titel}>🔒 App gesperrt</Text>
-          <Text style={pinStyles.hinweis}>Bitte gib deinen PIN ein, um fortzufahren.</Text>
-          <TextInput
-            style={[pinStyles.input, pinFehler && pinStyles.inputFehler]}
-            value={pinEingabe}
-            onChangeText={(t) => { setPinEingabe(t.replace(/\D/g, "")); setPinFehler(false); }}
-            placeholder="PIN eingeben"
-            placeholderTextColor="#999"
-            keyboardType="numeric"
-            secureTextEntry
-            maxLength={8}
-            returnKeyType="done"
-            onSubmitEditing={handlePinPruefen}
-            autoFocus
-          />
-          {pinFehler && <Text style={pinStyles.fehler}>Falscher PIN. Bitte erneut versuchen.</Text>}
-          <Pressable
-            style={({ pressed }) => [pinStyles.button, pressed && { opacity: 0.85 }]}
-            onPress={handlePinPruefen}
-          >
-            <Text style={pinStyles.buttonText}>Entsperren</Text>
-          </Pressable>
+          {!pinVergessen ? (
+            <>
+              <Text style={pinStyles.titel}>🔒 App gesperrt</Text>
+              <Text style={pinStyles.hinweis}>Bitte gib deinen PIN ein, um fortzufahren.</Text>
+              <TextInput
+                style={[pinStyles.input, pinFehler && pinStyles.inputFehler]}
+                value={pinEingabe}
+                onChangeText={(t) => { setPinEingabe(t.replace(/\D/g, "")); setPinFehler(false); }}
+                placeholder="PIN eingeben"
+                placeholderTextColor="#999"
+                keyboardType="numeric"
+                secureTextEntry
+                maxLength={8}
+                returnKeyType="done"
+                onSubmitEditing={handlePinPruefen}
+                autoFocus
+              />
+              {pinFehler && <Text style={pinStyles.fehler}>Falscher PIN. Bitte erneut versuchen.</Text>}
+              <Pressable
+                style={({ pressed }) => [pinStyles.button, pressed && { opacity: 0.85 }]}
+                onPress={handlePinPruefen}
+              >
+                <Text style={pinStyles.buttonText}>Entsperren</Text>
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [pinStyles.vergessen, pressed && { opacity: 0.6 }]}
+                onPress={() => { setPinVergessen(true); setPinFehler(false); setPinEingabe(""); }}
+              >
+                <Text style={pinStyles.vergessenText}>PIN vergessen?</Text>
+              </Pressable>
+            </>
+          ) : (
+            <>
+              <Text style={pinStyles.titel}>🔓 PIN zurücksetzen</Text>
+              <Text style={pinStyles.hinweis}>
+                Gib deine registrierte Telefonnummer ein, um den PIN zu entfernen.
+              </Text>
+              <TextInput
+                style={[pinStyles.input, { letterSpacing: 1, fontSize: 16 }, pinVergessenFehler ? pinStyles.inputFehler : null]}
+                value={pinVergessenTelefon}
+                onChangeText={(t) => { setPinVergessenTelefon(t); setPinVergessenFehler(""); }}
+                placeholder="+49 151 12345678"
+                placeholderTextColor="#999"
+                keyboardType="phone-pad"
+                returnKeyType="done"
+                onSubmitEditing={handlePinZuruecksetzen}
+                autoFocus
+              />
+              {pinVergessenFehler ? <Text style={pinStyles.fehler}>{pinVergessenFehler}</Text> : null}
+              <Pressable
+                style={({ pressed }) => [pinStyles.button, pressed && { opacity: 0.85 }]}
+                onPress={handlePinZuruecksetzen}
+              >
+                <Text style={pinStyles.buttonText}>PIN entfernen</Text>
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [pinStyles.vergessen, pressed && { opacity: 0.6 }]}
+                onPress={() => { setPinVergessen(false); setPinVergessenFehler(""); setPinVergessenTelefon(""); }}
+              >
+                <Text style={pinStyles.vergessenText}>← Zurück</Text>
+              </Pressable>
+            </>
+          )}
         </View>
       </View>
     </Modal>
@@ -359,4 +428,6 @@ const pinStyles = StyleSheet.create({
     marginTop: 8,
   },
   buttonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+  vergessen: { alignItems: "center", marginTop: 16 },
+  vergessenText: { fontSize: 14, color: "#4a7c59" },
 });
