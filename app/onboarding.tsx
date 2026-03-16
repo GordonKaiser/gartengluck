@@ -16,6 +16,7 @@ import {
   Platform,
   Alert,
   StyleSheet,
+  Linking,
 } from "react-native";
 import { router } from "expo-router";
 import { ScreenContainer } from "@/components/screen-container";
@@ -32,6 +33,7 @@ export default function OnboardingScreen() {
   const [ort, setOrt] = useState("");
   const [plz, setPlz] = useState("");
   const [fehler, setFehler] = useState<string | null>(null);
+  const [dsgvoAkzeptiert, setDsgvoAkzeptiert] = useState(false);
 
   const registrierenMutation = trpc.nutzer.registrieren.useMutation({
     onSuccess: async (profil) => {
@@ -56,6 +58,10 @@ export default function OnboardingScreen() {
   const abschliessen = () => {
     if (name.trim().length < 2) {
       setFehler("Bitte gib deinen vollständigen Namen ein.");
+      return;
+    }
+    if (!dsgvoAkzeptiert) {
+      setFehler("Bitte stimme der Datenschutzerklärung zu, um fortzufahren.");
       return;
     }
     setFehler(null);
@@ -183,16 +189,61 @@ export default function OnboardingScreen() {
                 </View>
               </View>
 
+              {/* DSGVO-Einwilligung */}
+              <View style={s.dsgvoBox}>
+                <Text style={s.dsgvoTitel}>Datenschutz & Nutzungsbedingungen</Text>
+                <Text style={s.dsgvoHinweis}>
+                  Gartenglück ist eine Vermittlungsplattform. Kaufverträge kommen
+                  ausschließlich zwischen dir und dem jeweiligen Anbieter zustande.
+                  Gartenglück übernimmt keine Haftung für Produktqualität oder
+                  Vertragserfüllung durch Anbieter.
+                </Text>
+                <Pressable
+                  style={s.dsgvoZeile}
+                  onPress={() => setDsgvoAkzeptiert(!dsgvoAkzeptiert)}
+                >
+                  <View style={[s.checkbox, dsgvoAkzeptiert && s.checkboxAktiv]}>
+                    {dsgvoAkzeptiert && <Text style={s.checkboxHaken}>✓</Text>}
+                  </View>
+                  <Text style={s.dsgvoText}>
+                    Ich habe die{" "}
+                    <Text
+                      style={s.dsgvoLink}
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        router.push("/datenschutz" as any);
+                      }}
+                    >
+                      Datenschutzerklärung
+                    </Text>
+                    {" "}und die{" "}
+                    <Text
+                      style={s.dsgvoLink}
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        router.push("/nutzungsbedingungen" as any);
+                      }}
+                    >
+                      Nutzungsbedingungen
+                    </Text>
+                    {" "}gelesen und stimme diesen zu. Ich bin damit einverstanden,
+                    dass meine Daten (Name, Telefon, Adresse) zur Bestellabwicklung
+                    gespeichert und an den jeweiligen Anbieter weitergegeben werden.
+                    (Pflichtfeld *)
+                  </Text>
+                </Pressable>
+              </View>
+
               {fehler && <Text style={s.fehlerText}>{fehler}</Text>}
 
               <Pressable
                 style={({ pressed }) => [
                   s.button,
                   pressed && s.buttonPressed,
-                  registrierenMutation.isPending && s.buttonDisabled,
+                  (registrierenMutation.isPending || !dsgvoAkzeptiert) && s.buttonDisabled,
                 ]}
                 onPress={abschliessen}
-                disabled={registrierenMutation.isPending}
+                disabled={registrierenMutation.isPending || !dsgvoAkzeptiert}
               >
                 {registrierenMutation.isPending ? (
                   <ActivityIndicator color="#fff" />
@@ -211,8 +262,8 @@ export default function OnboardingScreen() {
           )}
 
           <Text style={s.hinweis}>
-            Mit der Registrierung stimmst du zu, dass deine Angaben gespeichert
-            werden, damit Anbieter dich kontaktieren können.
+            Datenschutzerklärung und Nutzungsbedingungen sind jederzeit in den
+            Einstellungen der App abrufbar.
           </Text>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -343,5 +394,62 @@ const styles = (colors: ReturnType<typeof useColors>) =>
       textAlign: "center",
       marginTop: 32,
       lineHeight: 16,
+    },
+    dsgvoZeile: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      marginTop: 20,
+      gap: 12,
+    },
+    checkbox: {
+      width: 22,
+      height: 22,
+      borderRadius: 6,
+      borderWidth: 2,
+      borderColor: colors.border,
+      backgroundColor: colors.surface,
+      alignItems: "center",
+      justifyContent: "center",
+      marginTop: 1,
+      flexShrink: 0,
+    },
+    checkboxAktiv: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
+    },
+    checkboxHaken: {
+      color: "#fff",
+      fontSize: 13,
+      fontWeight: "700",
+    },
+    dsgvoText: {
+      flex: 1,
+      fontSize: 13,
+      color: colors.muted,
+      lineHeight: 19,
+    },
+    dsgvoLink: {
+      color: colors.primary,
+      textDecorationLine: "underline",
+    },
+    dsgvoBox: {
+      backgroundColor: colors.surface,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: 14,
+      marginTop: 20,
+    },
+    dsgvoTitel: {
+      fontSize: 13,
+      fontWeight: "700",
+      color: colors.foreground,
+      marginBottom: 6,
+    },
+    dsgvoHinweis: {
+      fontSize: 12,
+      color: colors.muted,
+      lineHeight: 17,
+      marginBottom: 4,
     },
   });

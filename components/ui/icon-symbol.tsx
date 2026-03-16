@@ -55,6 +55,9 @@ const MAPPING = {
   "link": "link",
   "square.and.arrow.up": "share",
   "arrow.clockwise": "refresh",
+  // Bestellungen
+  "list.bullet": "receipt-long",
+  "clock.fill": "schedule",
 } as IconMapping;
 
 /**

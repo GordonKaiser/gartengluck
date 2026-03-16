@@ -110,3 +110,41 @@
 ## Status-Sync v1
 - [x] Bestellstatus-Update via Push-Benachrichtigung (bestellId + neuerStatus in data)
 - [x] Hofnamen-Abschneiden fixen (numberOfLines entfernt)
+
+## Feature-Backlog v4 (Notizen 16.03.2026)
+
+### Rechtliches
+- [x] DSGVO-Einwilligung beim Onboarding (Checkbox + Links zu Datenschutz + Nutzungsbedingungen)
+- [x] Datenschutzerklärung als In-App-Screen (app/datenschutz.tsx)
+- [x] Nutzungsbedingungen mit Haftungsausschluss als In-App-Screen (app/nutzungsbedingungen.tsx)
+- [x] Einstellungen-Screen: Datenschutz und Nutzungsbedingungen auf In-App-Screens verlinkt
+
+### Vorbestellungen
+- [ ] Vorbestellungen als auffälliger Marker anzeigen (z.B. orangefarbenes Badge)
+- [ ] Bestellungen nur verfügbar wenn Hof "Verfügbar" gesetzt hat – sonst nur Vorbestellung möglich
+- [ ] Vorbestellungs-Endpunkte in der API schaffen
+
+### Sicherheit
+- [ ] Passwortschutz für Nutzerkonto (PIN oder Passwort)
+- [ ] Passwort zurücksetzen / vergessen-Funktion
+
+### Zahlung
+- [ ] PayPal-Integration nach Hof (Anzahlung oder Vollzahlung)
+- [ ] Alternativ: Hof-Telefonkontakt + Bestätigung seitens Hof
+
+### Bewertungen
+- [ ] Bewertungen möglich machen (Sterne + Text)
+- [ ] Bewertungen erst nach Bestellabwicklung möglich
+
+### Navigation
+- [x] Bestellungen einsehen – separater Reiter "Bestellungen" in Tab-Navigation
+
+### Produkt-Filter
+- [ ] Filter: gewerblich / Hobby-Trennung
+
+### Admin
+- [ ] Einstellungen: Admin-Nutzerverwaltung für normale Nutzer unsichtbar machen
+- [ ] Nutzerverwaltung nur für Admin sichtbar (aktuell für alle sichtbar)
+
+### Optional
+- [ ] 0–5 Bilder von Hof-App (User-basiert) integrierbar machen (optionales Feature)

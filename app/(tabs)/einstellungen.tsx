@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
 import * as WebBrowser from "expo-web-browser";
+import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
   Alert,
@@ -248,15 +249,15 @@ export default function EinstellungenScreen() {
           <View style={s.sektionKarte}>
             <Pressable
               style={({ pressed }) => [s.zeile, pressed && { opacity: 0.7 }]}
-              onPress={() => WebBrowser.openBrowserAsync("https://manus.im/privacy")}
+              onPress={() => router.push("/datenschutz" as any)}
             >
-              <Text style={s.zeileTitel}>Datenschutz</Text>
+              <Text style={s.zeileTitel}>Datenschutzerklärung</Text>
               <Text style={s.zeileWert}>›</Text>
             </Pressable>
             <View style={s.trennlinie} />
             <Pressable
               style={({ pressed }) => [s.zeile, pressed && { opacity: 0.7 }]}
-              onPress={() => WebBrowser.openBrowserAsync("https://manus.im/terms")}
+              onPress={() => router.push("/nutzungsbedingungen" as any)}
             >
               <Text style={s.zeileTitel}>Nutzungsbedingungen</Text>
               <Text style={s.zeileWert}>›</Text>
