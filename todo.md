@@ -182,3 +182,11 @@
 - [x] Gartenglück-App sendet Push-Token beim Start an nutzer.pushTokenSpeichern
 - [ ] Gartenglück-Service auf Railway anlegen (neuer Service im zestful-sparkle Projekt)
 - [ ] EXPO_PUBLIC_API_BASE_URL auf Gartenglück-Railway-URL setzen (nach Deployment)
+
+## Railway-Deployment Abschluss (16.03.2026)
+- [x] GitHub-Repo GordonKaiser/gartengluck angelegt und Code gepusht
+- [x] Railway-Service gartengluck im Projekt zestful-sparkle erstellt
+- [x] Umgebungsvariablen gesetzt (DATABASE_URL, NODE_ENV, PORT)
+- [x] Domain gartengluck-production.up.railway.app generiert
+- [x] Deployment erfolgreich – Server Online
+- [x] EXPO_PUBLIC_API_BASE_URL auf gartengluck-production.up.railway.app gesetzt
