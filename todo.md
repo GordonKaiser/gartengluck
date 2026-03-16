@@ -206,3 +206,8 @@
 
 ## Bestellstatus Live-Refresh (16.03.2026)
 - [x] Bestellungen-Screen: Status beim Tab-Fokus vom HofSpot-Server abrufen (hofmarkt.bestellungStatus)
+
+## App-Umbenennung zu LocaBuy (16.03.2026)
+- [x] Neues LocaBuy-Logo generieren
+- [x] App-Name in app.config.ts auf LocaBuy setzen
+- [x] Logo-Dateien ersetzen (icon.png, splash-icon.png, favicon.png, android-icon-foreground.png)
