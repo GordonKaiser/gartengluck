@@ -190,3 +190,10 @@
 - [x] Domain gartengluck-production.up.railway.app generiert
 - [x] Deployment erfolgreich – Server Online
 - [x] EXPO_PUBLIC_API_BASE_URL auf gartengluck-production.up.railway.app gesetzt
+
+## EAS Update (16.03.2026)
+- [x] Expo-Projekt @gordon99/hofmarkt-app registriert (ID: 8f7f574b-415d-4912-9c4f-be79e1eb8d6f)
+- [x] eas.json mit build-Profilen (development, preview, production) erstellt
+- [x] app.config.ts mit updates.url, runtimeVersion und extra.eas.projectId ergänzt
+- [x] Update-Kanal "production" bei Expo angelegt
+- [ ] Ersten OTA-Update nach APK-Build veröffentlichen (eas update --channel production --message "...")
