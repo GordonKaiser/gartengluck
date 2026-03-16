@@ -32,7 +32,7 @@ const env = {
   appSlug: "hofmarkt-app",
   // S3 URL of the app logo - set this to the URL returned by generate_image when creating custom logo
   // Leave empty to use the default icon from assets/images/icon.png
-  logoUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663103279618/IArOLuEsJUdplwVY.png",
+  logoUrl: "https://d2xsxph8kpxj0f.cloudfront.net/310519663103279618/WNedjZEAh55HEwZrLbvRkH/icon_f1501bfb.png",
   scheme: schemeFromBundleId,
   iosBundleId: bundleId,
   androidPackage: bundleId,
@@ -43,7 +43,7 @@ const config: ExpoConfig = {
   slug: env.appSlug,
   version: "1.0.0",
   orientation: "portrait",
-  icon: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663103279618/IArOLuEsJUdplwVY.png",
+  icon: "https://d2xsxph8kpxj0f.cloudfront.net/310519663103279618/WNedjZEAh55HEwZrLbvRkH/icon_f1501bfb.png",
   scheme: env.scheme,
   userInterfaceStyle: "automatic",
   newArchEnabled: true,
@@ -56,8 +56,8 @@ const config: ExpoConfig = {
   },
   android: {
     adaptiveIcon: {
-      backgroundColor: "#E6F4FE",
-      foregroundImage: "https://d2xsxph8kpxj0f.cloudfront.net/310519663103279618/WNedjZEAh55HEwZrLbvRkH/gartengluck-android_c76eb8ba.png",
+      foregroundImage: "https://d2xsxph8kpxj0f.cloudfront.net/310519663103279618/WNedjZEAh55HEwZrLbvRkH/android-icon-foreground_0b835d84.png",
+      backgroundColor: "#8B2500",
       backgroundImage: "./assets/images/android-icon-background.png",
       monochromeImage: "./assets/images/android-icon-monochrome.png",
     },
@@ -82,7 +82,7 @@ const config: ExpoConfig = {
   web: {
     bundler: "metro",
     output: "static",
-    favicon: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663103279618/IArOLuEsJUdplwVY.png",
+    favicon: "https://d2xsxph8kpxj0f.cloudfront.net/310519663103279618/WNedjZEAh55HEwZrLbvRkH/favicon_b989a5bd.png",
   },
   plugins: [
     "expo-router",
@@ -102,7 +102,7 @@ const config: ExpoConfig = {
     [
       "expo-splash-screen",
       {
-        image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663103279618/IArOLuEsJUdplwVY.png",
+        image: "https://d2xsxph8kpxj0f.cloudfront.net/310519663103279618/WNedjZEAh55HEwZrLbvRkH/splash-icon_44836475.png",
         imageWidth: 200,
         resizeMode: "contain",
         backgroundColor: "#FFFBF5",
