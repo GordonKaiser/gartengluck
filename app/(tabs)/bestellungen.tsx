@@ -6,6 +6,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
+import { ladeBestellungStatus } from "@/lib/hofmarkt-api";
 import {
   FlatList,
   Pressable,
@@ -38,11 +39,45 @@ export default function BestellungenScreen() {
   const colors = useColors();
   const [bestellungen, setBestellungen] = useState<BestellHistorieEintrag[]>([]);
 
+  const [aktualisiert, setAktualisiert] = useState(false);
+
   useFocusEffect(
     useCallback(() => {
       (async () => {
+        // 1. Lokale Historie laden
         const raw = await AsyncStorage.getItem(BESTELLHISTORIE_KEY);
-        setBestellungen(raw ? JSON.parse(raw) : []);
+        const liste: BestellHistorieEintrag[] = raw ? JSON.parse(raw) : [];
+        setBestellungen(liste);
+        setAktualisiert(false);
+
+        // 2. Status aller Bestellungen mit ID vom Server abrufen
+        const mitId = liste.filter((e) => e.id !== undefined);
+        if (mitId.length === 0) return;
+
+        let geaendert = false;
+        const aktualisiert = [...liste];
+        await Promise.all(
+          mitId.map(async (eintrag) => {
+            try {
+              const serverStatus = await ladeBestellungStatus(eintrag.id!);
+              if (serverStatus && serverStatus.status !== eintrag.status) {
+                const idx = aktualisiert.findIndex((e) => e.id === eintrag.id);
+                if (idx !== -1) {
+                  aktualisiert[idx] = { ...aktualisiert[idx], status: serverStatus.status };
+                  geaendert = true;
+                }
+              }
+            } catch {
+              // Ignorieren – lokaler Status bleibt
+            }
+          })
+        );
+
+        if (geaendert) {
+          setBestellungen([...aktualisiert]);
+          await AsyncStorage.setItem(BESTELLHISTORIE_KEY, JSON.stringify(aktualisiert));
+          setAktualisiert(true);
+        }
       })();
     }, [])
   );
@@ -170,9 +205,14 @@ export default function BestellungenScreen() {
     <ScreenContainer>
       <View style={s.header}>
         <Text style={s.titel}>Meine Bestellungen</Text>
-        {bestellungen.length > 0 && (
-          <Text style={s.anzahl}>{bestellungen.length} Bestellung{bestellungen.length !== 1 ? "en" : ""}</Text>
-        )}
+        <View style={{ alignItems: "flex-end" }}>
+          {bestellungen.length > 0 && (
+            <Text style={s.anzahl}>{bestellungen.length} Bestellung{bestellungen.length !== 1 ? "en" : ""}</Text>
+          )}
+          {aktualisiert && (
+            <Text style={{ fontSize: 11, color: colors.success, marginTop: 2 }}>✓ Status aktualisiert</Text>
+          )}
+        </View>
       </View>
 
       {bestellungen.length === 0 ? (
