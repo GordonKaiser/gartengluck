@@ -206,16 +206,20 @@ export function formatPreis(preis: string | null, einheit: string): string {
   return `${betrag} € / ${einheit}`;
 }
 
-/** Kategorie-Metadaten */
-export const KATEGORIEN: { id: Kategorie; label: string; emoji: string }[] = [
-  { id: "eier",      label: "Eier",     emoji: "🥚" },
-  { id: "gefluegel", label: "Geflügel", emoji: "🐓" },
-  { id: "pilze",     label: "Pilze",    emoji: "🍄" },
-  { id: "imkerei",   label: "Imkerei",  emoji: "🍯" },
-  { id: "garten",    label: "Garten",   emoji: "🌱" },
-  { id: "holz",      label: "Holz",     emoji: "🪵" },
+/** Kategorie-Metadaten mit Typ-Kennzeichnung (hobby = Privatperson, gewerbe = gewerblich) */
+export const KATEGORIEN: { id: Kategorie; label: string; emoji: string; typ: "hobby" | "gewerbe" }[] = [
+  { id: "eier",      label: "Eier",     emoji: "🥚", typ: "hobby" },
+  { id: "gefluegel", label: "Gefügel", emoji: "🐓", typ: "hobby" },
+  { id: "pilze",     label: "Pilze",    emoji: "🍄", typ: "hobby" },
+  { id: "imkerei",   label: "Imkerei",  emoji: "🍯", typ: "hobby" },
+  { id: "garten",    label: "Garten",   emoji: "🌱", typ: "hobby" },
+  { id: "holz",      label: "Holz",     emoji: "🪵", typ: "hobby" },
 ];
+
+/** Alle Kategorien sind aktuell Hobby-Anbau. Gewerbliche Kategorien können später ergänzt werden. */
+export const HOBBY_KATEGORIEN = KATEGORIEN.filter((k) => k.typ === "hobby");
+export const GEWERBE_KATEGORIEN = KATEGORIEN.filter((k) => k.typ === "gewerbe");
 
 export const KATEGORIE_MAP = Object.fromEntries(
   KATEGORIEN.map((k) => [k.id, k])
-) as Record<Kategorie, { id: Kategorie; label: string; emoji: string }>;
+) as Record<Kategorie, { id: Kategorie; label: string; emoji: string; typ: "hobby" | "gewerbe" }>;

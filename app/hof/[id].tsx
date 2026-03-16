@@ -419,10 +419,19 @@ export default function HofDetailScreen() {
               </>
             )}
           </View>
-          <View style={[styles.verfuegbarBadge, { backgroundColor: verfuegbarColor + "20" }]}>
-            <Text style={[styles.verfuegbarText, { color: verfuegbarColor }]}>
-              {verfuegbarText}
-            </Text>
+          <View style={{ alignItems: "flex-end", gap: 4 }}>
+            <View style={[styles.verfuegbarBadge, { backgroundColor: verfuegbarColor + "20" }]}>
+              <Text style={[styles.verfuegbarText, { color: verfuegbarColor }]}>
+                {verfuegbarText}
+              </Text>
+            </View>
+            {produkt.vorbestellung && !produkt.verfuegbar && (
+              <View style={[styles.verfuegbarBadge, { backgroundColor: colors.warning + "20" }]}>
+                <Text style={[styles.verfuegbarText, { color: colors.warning, fontSize: 10 }]}>
+                  📦 Vorbestellung
+                </Text>
+              </View>
+            )}
           </View>
         </Pressable>
 

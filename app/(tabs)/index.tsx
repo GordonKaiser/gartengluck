@@ -38,6 +38,7 @@ export default function EntdeckenScreen() {
   const [ortName, setOrtName] = useState<string | null>(null);
   const [radius, setRadius] = useState<RadiusOption>(25);
   const [aktiveKategorien, setAktiveKategorien] = useState<Kategorie[]>([]);
+  const [anbieterTyp, setAnbieterTyp] = useState<"hobby" | "alle">("hobby");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hoefen, setHoefen] = useState<HofSucheErgebnis[]>([]);
@@ -411,6 +412,39 @@ export default function EntdeckenScreen() {
             </Text>
           </Pressable>
         ))}
+      </View>
+
+      {/* Hobby/Gewerbe-Filter */}
+      <Text style={styles.filterLabel}>Anbieter-Typ</Text>
+      <View style={styles.radiusContainer}>
+        <Pressable
+          style={[
+            styles.radiusChip,
+            {
+              backgroundColor: anbieterTyp === "hobby" ? colors.primary : colors.surface,
+              borderColor: anbieterTyp === "hobby" ? colors.primary : colors.border,
+            },
+          ]}
+          onPress={() => setAnbieterTyp("hobby")}
+        >
+          <Text style={[styles.radiusChipText, { color: anbieterTyp === "hobby" ? "#fff" : colors.muted }]}>
+            🌿 Hobby
+          </Text>
+        </Pressable>
+        <Pressable
+          style={[
+            styles.radiusChip,
+            {
+              backgroundColor: anbieterTyp === "alle" ? colors.primary : colors.surface,
+              borderColor: anbieterTyp === "alle" ? colors.primary : colors.border,
+            },
+          ]}
+          onPress={() => setAnbieterTyp("alle")}
+        >
+          <Text style={[styles.radiusChipText, { color: anbieterTyp === "alle" ? "#fff" : colors.muted }]}>
+            Alle
+          </Text>
+        </Pressable>
       </View>
 
       {/* Kategorie-Filter */}

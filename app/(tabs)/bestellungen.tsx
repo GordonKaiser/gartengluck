@@ -30,6 +30,7 @@ export interface BestellHistorieEintrag {
   gesamtpreis?: number;
   anzahlProdukte?: number;
   status?: "neu" | "bestaetigt" | "abholbereit" | "abgeholt" | "storniert";
+  bewertungAbgegeben?: boolean;
 }
 
 export default function BestellungenScreen() {
@@ -116,6 +117,27 @@ export default function BestellungenScreen() {
 
         {item.id && (
           <Text style={s.bestellnr}>Bestellnr. #{item.id}</Text>
+        )}
+
+        {item.status === "abgeholt" && !item.bewertungAbgegeben && (
+          <Pressable
+            style={({ pressed }) => [s.bewertungButton, pressed && { opacity: 0.8 }]}
+            onPress={() =>
+              router.push({
+                pathname: "/bewertung" as any,
+                params: {
+                  bestellIndex: String(realIndex),
+                  hofName: item.hofName,
+                  userId: String(item.userId),
+                },
+              })
+            }
+          >
+            <Text style={s.bewertungButtonText}>⭐ Bewertung abgeben</Text>
+          </Pressable>
+        )}
+        {item.bewertungAbgegeben && (
+          <Text style={s.bewertungAbgegeben}>✔️ Bewertung abgegeben</Text>
         )}
 
         <View style={s.aktionen}>
@@ -302,4 +324,26 @@ const styles = (colors: ReturnType<typeof useColors>) =>
       borderRadius: 12,
     },
     entdeckenButtonText: { color: "#fff", fontSize: 15, fontWeight: "700" },
+    bewertungButton: {
+      backgroundColor: colors.warning + "20",
+      borderWidth: 1,
+      borderColor: colors.warning,
+      borderRadius: 10,
+      paddingVertical: 8,
+      paddingHorizontal: 12,
+      alignItems: "center",
+      marginBottom: 8,
+      marginTop: 4,
+    },
+    bewertungButtonText: {
+      fontSize: 13,
+      color: colors.warning,
+      fontWeight: "600",
+    },
+    bewertungAbgegeben: {
+      fontSize: 12,
+      color: colors.success,
+      marginBottom: 8,
+      marginTop: 4,
+    },
   });

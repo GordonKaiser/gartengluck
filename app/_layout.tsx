@@ -19,12 +19,14 @@ import {
   initialWindowMetrics,
 } from "react-native-safe-area-context";
 import type { EdgeInsets, Metrics, Rect } from "react-native-safe-area-context";
+import { Modal, View, Text, TextInput, Pressable, StyleSheet } from "react-native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { trpc, createTRPCClient } from "@/lib/trpc";
 import { initManusRuntime, subscribeSafeAreaInsets } from "@/lib/_core/manus-runtime";
 
 const BESTELLHISTORIE_KEY = "gartengluck_bestellhistorie";
+const APP_PIN_KEY = "gartengluck_app_pin";
 
 /** Aktualisiert den Status einer Bestellung in der lokalen Historie */
 async function aktualisiereBestellStatus(bestellId: number, neuerStatus: string) {
@@ -93,8 +95,38 @@ export default function RootLayout() {
   );
   const [trpcClient] = useState(() => createTRPCClient());
 
+  // PIN-Abfrage beim App-Start
+  const [pinGeprueft, setPinGeprueft] = useState(false);
+  const [pinAbfrageOffen, setPinAbfrageOffen] = useState(false);
+  const [pinEingabe, setPinEingabe] = useState("");
+  const [pinFehler, setPinFehler] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const gespeicherterPin = await AsyncStorage.getItem(APP_PIN_KEY);
+      if (gespeicherterPin) {
+        setPinAbfrageOffen(true);
+      } else {
+        setPinGeprueft(true);
+      }
+    })();
+  }, []);
+
+  const handlePinPruefen = useCallback(async () => {
+    const gespeicherterPin = await AsyncStorage.getItem(APP_PIN_KEY);
+    if (pinEingabe === gespeicherterPin) {
+      setPinAbfrageOffen(false);
+      setPinGeprueft(true);
+      setPinFehler(false);
+    } else {
+      setPinFehler(true);
+      setPinEingabe("");
+    }
+  }, [pinEingabe]);
+
   // Onboarding-Check: Beim ersten Start auf Onboarding-Screen weiterleiten
   useEffect(() => {
+    if (!pinGeprueft) return;
     import("@/lib/nutzer-store").then(({ ladeNutzerProfil }) => {
       ladeNutzerProfil().then((profil) => {
         if (!profil) {
@@ -102,7 +134,7 @@ export default function RootLayout() {
         }
       });
     });
-  }, []);
+  }, [pinGeprueft]);
 
   // Push-Token registrieren und im Backend speichern
   useEffect(() => {
@@ -196,6 +228,37 @@ export default function RootLayout() {
     };
   }, [initialInsets, initialFrame]);
 
+  const pinModal = pinAbfrageOffen ? (
+    <Modal visible transparent animationType="fade">
+      <View style={pinStyles.overlay}>
+        <View style={pinStyles.box}>
+          <Text style={pinStyles.titel}>🔒 App gesperrt</Text>
+          <Text style={pinStyles.hinweis}>Bitte gib deinen PIN ein, um fortzufahren.</Text>
+          <TextInput
+            style={[pinStyles.input, pinFehler && pinStyles.inputFehler]}
+            value={pinEingabe}
+            onChangeText={(t) => { setPinEingabe(t.replace(/\D/g, "")); setPinFehler(false); }}
+            placeholder="PIN eingeben"
+            placeholderTextColor="#999"
+            keyboardType="numeric"
+            secureTextEntry
+            maxLength={8}
+            returnKeyType="done"
+            onSubmitEditing={handlePinPruefen}
+            autoFocus
+          />
+          {pinFehler && <Text style={pinStyles.fehler}>Falscher PIN. Bitte erneut versuchen.</Text>}
+          <Pressable
+            style={({ pressed }) => [pinStyles.button, pressed && { opacity: 0.85 }]}
+            onPress={handlePinPruefen}
+          >
+            <Text style={pinStyles.buttonText}>Entsperren</Text>
+          </Pressable>
+        </View>
+      </View>
+    </Modal>
+  ) : null;
+
   const content = (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <WarenkorbProvider>
@@ -236,7 +299,64 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider>
-      <SafeAreaProvider initialMetrics={providerInitialMetrics}>{content}</SafeAreaProvider>
+      <SafeAreaProvider initialMetrics={providerInitialMetrics}>
+        {content}
+        {pinModal}
+      </SafeAreaProvider>
     </ThemeProvider>
   );
 }
+
+const pinStyles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.7)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 24,
+  },
+  box: {
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    padding: 28,
+    width: "100%",
+    maxWidth: 360,
+  },
+  titel: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#11181C",
+    marginBottom: 8,
+    textAlign: "center",
+  },
+  hinweis: {
+    fontSize: 14,
+    color: "#687076",
+    textAlign: "center",
+    marginBottom: 20,
+    lineHeight: 20,
+  },
+  input: {
+    backgroundColor: "#f5f5f5",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 20,
+    color: "#11181C",
+    letterSpacing: 6,
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  inputFehler: { borderColor: "#EF4444" },
+  fehler: { fontSize: 13, color: "#EF4444", textAlign: "center", marginBottom: 8 },
+  button: {
+    backgroundColor: "#4a7c59",
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: "center",
+    marginTop: 8,
+  },
+  buttonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+});

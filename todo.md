@@ -148,3 +148,20 @@
 
 ### Optional
 - [ ] 0–5 Bilder von Hof-App (User-basiert) integrierbar machen (optionales Feature)
+
+## Feature-Backlog v5 (16.03.2026)
+- [x] Impressum-Screen erstellen und in Einstellungen verlinken
+- [x] Admin-Bereich vollständig entfernt (kein Angriffspunkt)
+- [x] Vorbestellungs-Badge im Hof-Detail (orangefarbenes Badge wenn vorbestellung: true)
+
+## Feature-Backlog v5 – Vollständige Umsetzung (16.03.2026)
+- [x] Impressum-Screen in Einstellungen verlinken
+- [x] Admin-Bereich vollständig entfernt
+- [x] Vorbestellungs-Badge im Hof-Detail (orangefarbenes Badge wenn vorbestellung: true)
+- [x] Passwortschutz (PIN) für Nutzerkonto – PIN setzen + PIN-Abfrage beim Start
+- [ ] Passwort vergessen / PIN zurücksetzen
+- [x] Bewertungs-System: Sterne + Text nach Bestellabwicklung (Status = abgeholt)
+- [x] Produkt-Filter: Hobby/Alle-Toggle in der Suche
+- [ ] Vorbestellungs-System: Verfügbarkeit-Flag aus API, Bestellung sperren wenn nicht verfügbar
+- [x] Aktualisierte Integrations-Doku für anderen Tab
+- [x] Admin-Bereich komplett aus der App entfernen (kein Angriffspunkt für Nutzer)
