@@ -169,3 +169,9 @@
 ## Feature-Backlog v6 (16.03.2026)
 - [x] PIN vergessen / zurücksetzen (nach Eingabe der Telefonnummer)
 - [x] Hof-Bilder-Galerie im Hof-Detail (horizontale Bildgalerie wenn bilder[] vorhanden)
+
+## Railway-Deployment-Vorbereitung (16.03.2026)
+- [x] Build-Format auf CJS umgestellt (--format=cjs in package.json)
+- [x] jose auf v4.15.9 downgegradet (v5/v6 sind ESM-only, bricht CJS-Build)
+- [x] API-Endpunkt auf HofSpot-Railway-URL umgestellt (hofspot-production.up.railway.app)
+- [x] Integrations-Dokumentation mit Railway-Infos aktualisiert
