@@ -221,3 +221,8 @@
 ## Bewertungs-Screen (16.03.2026)
 - [x] app/bewertung.tsx erstellen (Sterne-Auswahl, Kommentar, Absenden)
 - [x] API-Endpunkt hofmarkt.bewertungSenden in hofmarkt-api.ts prüfen/einbauen
+
+## Neues Logo einsetzen (16.03.2026)
+- [x] Nutzer-Logo als icon.png, splash-icon.png, favicon.png, android-icon-foreground.png einsetzen
+- [x] app.config.ts logoUrl aktualisieren
+- [x] theme.config.js auf LocaBuy-Farben anpassen (Dunkelrot, Grün, Orange, Gold)

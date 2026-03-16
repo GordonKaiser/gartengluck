@@ -32,7 +32,7 @@ const env = {
   appSlug: "hofmarkt-app",
   // S3 URL of the app logo - set this to the URL returned by generate_image when creating custom logo
   // Leave empty to use the default icon from assets/images/icon.png
-  logoUrl: "https://d2xsxph8kpxj0f.cloudfront.net/310519663103279618/WNedjZEAh55HEwZrLbvRkH/icon-ZabWtfth72M4jcMZT4zxZY.png",
+  logoUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663103279618/IArOLuEsJUdplwVY.png",
   scheme: schemeFromBundleId,
   iosBundleId: bundleId,
   androidPackage: bundleId,
@@ -43,7 +43,7 @@ const config: ExpoConfig = {
   slug: env.appSlug,
   version: "1.0.0",
   orientation: "portrait",
-  icon: "https://d2xsxph8kpxj0f.cloudfront.net/310519663103279618/WNedjZEAh55HEwZrLbvRkH/gartengluck-icon-YSMQG4oEBePpfk8XhNtYWa.png",
+  icon: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663103279618/IArOLuEsJUdplwVY.png",
   scheme: env.scheme,
   userInterfaceStyle: "automatic",
   newArchEnabled: true,
@@ -82,7 +82,7 @@ const config: ExpoConfig = {
   web: {
     bundler: "metro",
     output: "static",
-    favicon: "https://d2xsxph8kpxj0f.cloudfront.net/310519663103279618/WNedjZEAh55HEwZrLbvRkH/gartengluck-favicon_97343f09.png",
+    favicon: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663103279618/IArOLuEsJUdplwVY.png",
   },
   plugins: [
     "expo-router",
@@ -102,12 +102,12 @@ const config: ExpoConfig = {
     [
       "expo-splash-screen",
       {
-        image: "https://d2xsxph8kpxj0f.cloudfront.net/310519663103279618/WNedjZEAh55HEwZrLbvRkH/gartengluck-splash_4a2b67f2.png",
+        image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663103279618/IArOLuEsJUdplwVY.png",
         imageWidth: 200,
         resizeMode: "contain",
-        backgroundColor: "#ffffff",
+        backgroundColor: "#FFFBF5",
         dark: {
-          backgroundColor: "#000000",
+          backgroundColor: "#1A1008",
         },
       },
     ],

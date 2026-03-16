@@ -47,7 +47,7 @@ function buildRuntimePalette(scheme: ColorScheme): RuntimePalette {
     tint: base.primary,
     icon: base.muted,
     tabIconDefault: base.muted,
-    tabIconSelected: base.primary,
+    tabIconSelected: base.gold ?? base.primary,
     border: base.border,
   };
 }
