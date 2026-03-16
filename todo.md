@@ -234,3 +234,7 @@
 ## Urheberrechtsvermerk in AGBs (16.03.2026)
 - [x] Rechtssichere Formulierung recherchieren (deutsches Urheberrecht, Markenrecht)
 - [x] Urheberrechtsvermerk für Name und Logo in AGB-Screen einbauen
+
+## Impressum prüfen und ergänzen (16.03.2026)
+- [x] Bestehendes Impressum auf Vollständigkeit prüfen (§ 5 TMG, § 55 RStV)
+- [x] Fehlende Pflichtangaben ergänzen: Verantwortlicher für Inhalt (§ 18 MStV) und Umsatzsteuer-Hinweis

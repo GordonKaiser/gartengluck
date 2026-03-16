@@ -92,6 +92,23 @@ export default function ImpressumScreen() {
           </Text>
         </View>
 
+        <View style={s.karte}>
+          <Text style={s.label}>Verantwortlich für den Inhalt (§ 18 Abs. 2 MStV)</Text>
+          <Text style={s.text}>Gordon Kaiser{"\n"}Bahnhofstr. 10{"\n"}38889 Blankenburg (Harz)</Text>
+        </View>
+
+        <View style={s.karte}>
+          <Text style={s.label}>Umsatzsteuer</Text>
+          <Text style={s.text}>
+            LocaBuy wird derzeit von einer Privatperson ohne eingetragenes
+            Gewerbe betrieben. Es liegt keine Umsatzsteuer-Identifikationsnummer
+            vor, da keine gewerbliche Tätigkeit im Sinne des UStG ausgeübt wird.
+            {"\n\n"}
+            Sollte die App künftig gewerblich betrieben werden, wird das Impressum
+            entsprechend aktualisiert.
+          </Text>
+        </View>
+
         <Text style={s.stand}>Stand: März 2026</Text>
       </ScrollView>
     </ScreenContainer>
