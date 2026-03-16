@@ -90,7 +90,7 @@ export default function OnboardingScreen() {
           <View style={s.header}>
             <Text style={s.logo}>🌻</Text>
             <Text style={s.titel}>LocaBuy</Text>
-            <Text style={s.untertitel}>Produkte aus Hobby-Anbau & -Haltung</Text>
+            <Text style={s.untertitel}>Lokal kaufen. Direkt vom Erzeuger.</Text>
           </View>
 
           {/* Fortschrittsanzeige */}

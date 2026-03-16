@@ -214,3 +214,6 @@
 
 ## Gartenglück → LocaBuy Texte (16.03.2026)
 - [x] Alle "Gartenglück"-Texte in App-Screens durch "LocaBuy" ersetzen
+
+## Slogan-Änderung (16.03.2026)
+- [x] Untertitel auf "Lokal kaufen. Direkt vom Erzeuger." ändern
