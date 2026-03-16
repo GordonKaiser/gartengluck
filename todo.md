@@ -175,3 +175,10 @@
 - [x] jose auf v4.15.9 downgegradet (v5/v6 sind ESM-only, bricht CJS-Build)
 - [x] API-Endpunkt auf HofSpot-Railway-URL umgestellt (hofspot-production.up.railway.app)
 - [x] Integrations-Dokumentation mit Railway-Infos aktualisiert
+
+## Railway-Deployment Phase 2 (16.03.2026)
+- [x] gartengluck_nutzer-Tabelle in Railway-MySQL angelegt (vollständiges Schema)
+- [x] HofSpot-Server hat bereits bestellungStatusAendern mit Push-Logik (liest push_token aus gartengluck_nutzer)
+- [x] Gartenglück-App sendet Push-Token beim Start an nutzer.pushTokenSpeichern
+- [ ] Gartenglück-Service auf Railway anlegen (neuer Service im zestful-sparkle Projekt)
+- [ ] EXPO_PUBLIC_API_BASE_URL auf Gartenglück-Railway-URL setzen (nach Deployment)
