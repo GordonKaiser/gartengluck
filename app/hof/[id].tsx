@@ -22,11 +22,13 @@ import {
   type HofProfil,
   type HofProdukt,
   type HofProdukteAntwort,
+  type HofBewertungenAntwort,
   type Kategorie,
   KATEGORIE_MAP,
   formatPreis,
   ladeHofProfil,
   ladeHofProdukte,
+  ladeHofBewertungen,
 } from "@/lib/hofmarkt-api";
 import { useWarenkorb } from "@/lib/warenkorb-store";
 
@@ -50,6 +52,7 @@ export default function HofDetailScreen() {
   const [produkteLaden, setProdukteLaden] = useState(true);
   const [istFavorit, setIstFavorit] = useState(false);
   const [aufgeklappteProdukte, setAufgeklappteProdukte] = useState<Set<string>>(new Set());
+  const [bewertungen, setBewertungen] = useState<HofBewertungenAntwort | null>(null);
 
   const { warenkorb, gesamtpreis, gesamtAnzahl, setzeHof, setze, erhoehe, verringere } = useWarenkorb();
 
@@ -82,6 +85,11 @@ export default function HofDetailScreen() {
         setProdukteAntwort(null);
       }
       setProdukteLaden(false);
+    })();
+
+    (async () => {
+      const bw = await ladeHofBewertungen(userId);
+      setBewertungen(bw);
     })();
   }, [userId]);
 
@@ -351,6 +359,53 @@ export default function HofDetailScreen() {
       fontSize: 14,
       padding: 20,
     },
+    bewertungZusammenfassung: {
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+      borderBottomWidth: 0.5,
+      borderBottomColor: colors.border,
+      gap: 10,
+    },
+    bewertungSterneReihe: {
+      flexDirection: "row" as const,
+      alignItems: "center" as const,
+      gap: 4,
+    },
+    bewertungStern: {
+      fontSize: 20,
+      color: colors.warning,
+    },
+    bewertungDurchschnitt: {
+      fontSize: 16,
+      fontWeight: "700" as const,
+      color: colors.foreground,
+      marginLeft: 4,
+    },
+    bewertungAnzahl: {
+      fontSize: 13,
+      color: colors.muted,
+    },
+    bewertungKarte: {
+      backgroundColor: colors.surface,
+      borderRadius: 10,
+      padding: 10,
+      gap: 4,
+    },
+    bewertungKarteSterneReihe: {
+      flexDirection: "row" as const,
+      alignItems: "center" as const,
+      gap: 3,
+    },
+    bewertungDatum: {
+      fontSize: 11,
+      color: colors.muted,
+      marginLeft: 6,
+    },
+    bewertungKommentar: {
+      fontSize: 13,
+      color: colors.foreground,
+      lineHeight: 18,
+    },
   });
 
   if (profilLaed) {
@@ -516,6 +571,42 @@ export default function HofDetailScreen() {
             <Text style={styles.beschreibung}>{profil.beschreibung}</Text>
           )}
         </View>
+
+        {/* Bewertungs-Zusammenfassung */}
+        {bewertungen && bewertungen.anzahl > 0 && (
+          <View style={styles.bewertungZusammenfassung}>
+            <View style={styles.bewertungSterneReihe}>
+              {[1, 2, 3, 4, 5].map((s) => (
+                <Text key={s} style={styles.bewertungStern}>
+                  {s <= Math.round(bewertungen.durchschnitt) ? "★" : "☆"}
+                </Text>
+              ))}
+              <Text style={styles.bewertungDurchschnitt}>
+                {bewertungen.durchschnitt.toFixed(1)}
+              </Text>
+              <Text style={styles.bewertungAnzahl}>({bewertungen.anzahl} Bewertungen)</Text>
+            </View>
+            {bewertungen.bewertungen.slice(0, 3).map((bw) => (
+              <View key={bw.id} style={styles.bewertungKarte}>
+                <View style={styles.bewertungKarteSterneReihe}>
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <Text key={s} style={{ fontSize: 12, color: s <= bw.sterne ? colors.warning : colors.border }}>
+                      {s <= bw.sterne ? "★" : "☆"}
+                    </Text>
+                  ))}
+                  <Text style={styles.bewertungDatum}>
+                    {new Date(bw.createdAt).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" })}
+                  </Text>
+                </View>
+                {bw.kommentar && (
+                  <Text style={styles.bewertungKommentar} numberOfLines={3}>
+                    {bw.kommentar}
+                  </Text>
+                )}
+              </View>
+            ))}
+          </View>
+        )}
 
         {/* Hof-Bilder-Galerie */}
         {profil?.bilder && profil.bilder.length > 0 && (

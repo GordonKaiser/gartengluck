@@ -247,3 +247,29 @@ export interface BewertungInput {
 export async function sendeHofBewertung(input: BewertungInput): Promise<void> {
   await batchPost<void>("hofmarkt.bewertungSenden", input as unknown as Record<string, unknown>);
 }
+
+export interface HofBewertung {
+  id: number;
+  sterne: 1 | 2 | 3 | 4 | 5;
+  kommentar: string | null;
+  createdAt: string;
+}
+
+export interface HofBewertungenAntwort {
+  durchschnitt: number;    // z.B. 4.3
+  anzahl: number;
+  bewertungen: HofBewertung[];
+}
+
+/**
+ * Bewertungen eines Hofes laden.
+ * Benötigt hofmarkt.hofBewertungen in LocaFarm.
+ * Gibt null zurück wenn der Endpunkt noch nicht verfügbar ist.
+ */
+export async function ladeHofBewertungen(userId: number): Promise<HofBewertungenAntwort | null> {
+  try {
+    return await batchGet<HofBewertungenAntwort>("hofmarkt.hofBewertungen", { userId });
+  } catch {
+    return null;
+  }
+}

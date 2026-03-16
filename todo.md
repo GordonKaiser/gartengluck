@@ -226,3 +226,7 @@
 - [x] Nutzer-Logo als icon.png, splash-icon.png, favicon.png, android-icon-foreground.png einsetzen
 - [x] app.config.ts logoUrl aktualisieren
 - [x] theme.config.js auf LocaBuy-Farben anpassen (Dunkelrot, Grün, Orange, Gold)
+
+## Bewertungsanzeige im Hof-Detail (16.03.2026)
+- [x] hofmarkt.hofBewertungen-Endpunkt in hofmarkt-api.ts einbauen
+- [x] Bewertungsanzeige (Durchschnittssterne + Kommentarliste) im Hof-Detail-Screen einbauen
