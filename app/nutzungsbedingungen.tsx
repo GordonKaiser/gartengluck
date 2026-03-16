@@ -64,6 +64,17 @@ export default function NutzungsbedingungenScreen() {
           {`Es gilt das Recht der Bundesrepublik Deutschland.`}
         </Section>
 
+        <Section title="8. Urheberrecht & Markenrecht" colors={colors}>
+          {`© 2026 LocaBuy. Alle Rechte vorbehalten.`}
+        </Section>
+
+        <View style={s.urheberBox}>
+          <Text style={s.urheberTitel}>Schutz von Name und Logo</Text>
+          <Text style={s.urheberText}>
+            {`Der Name „LocaBuy", das LocaBuy-Logo sowie alle weiteren Kennzeichen, Grafiken, Symbole und das Erscheinungsbild der App sind urheberrechtlich und/oder markenrechtlich geschützt. Das Urheberrecht liegt beim Betreiber der App.\n\nJede Nutzung, Vervielfältigung, Verbreitung, öffentliche Wiedergabe oder sonstige Verwertung des Namens, des Logos oder anderer Bestandteile des Erscheinungsbilds von LocaBuy – auch in veränderter Form – ist ohne ausdrückliche schriftliche Zustimmung des Betreibers untersagt.\n\nDies gilt insbesondere für:\n• Die Nutzung des Namens „LocaBuy" oder verwechslungsfähiger Bezeichnungen als Unternehmens-, Produkt- oder Domainname\n• Die Nutzung des LocaBuy-Logos oder ähnlicher Grafiken\n• Die Verwendung des Erscheinungsbilds der App für eigene Produkte oder Dienstleistungen\n• Die Nutzung der Inhalte dieser App zum Zwecke des Text- und Data Minings durch KI-Systeme\n\nVerstöße gegen das Urheberrecht sind gemäß §§ 106 ff. UrhG strafbar und berechtigen den Betreiber zur Geltendmachung von Unterlassung, Schadensersatz und Erstattung von Abmahnkosten (§ 97 UrhG).`}
+          </Text>
+        </View>
+
         <View style={s.hinweisBox}>
           <Text style={s.hinweisText}>
             Diese Nutzungsbedingungen wurden nach bestem Wissen erstellt, ersetzen
@@ -171,5 +182,24 @@ const styles = (colors: ReturnType<typeof useColors>) =>
       color: colors.muted,
       lineHeight: 18,
       fontStyle: "italic",
+    },
+    urheberBox: {
+      backgroundColor: colors.primary + "10",
+      borderRadius: 12,
+      padding: 16,
+      borderWidth: 1,
+      borderColor: colors.primary + "30",
+      marginBottom: 24,
+    },
+    urheberTitel: {
+      fontSize: 14,
+      fontWeight: "700" as const,
+      color: colors.primary,
+      marginBottom: 10,
+    },
+    urheberText: {
+      fontSize: 13,
+      color: colors.muted,
+      lineHeight: 20,
     },
   });

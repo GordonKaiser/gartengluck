@@ -230,3 +230,7 @@
 ## Bewertungsanzeige im Hof-Detail (16.03.2026)
 - [x] hofmarkt.hofBewertungen-Endpunkt in hofmarkt-api.ts einbauen
 - [x] Bewertungsanzeige (Durchschnittssterne + Kommentarliste) im Hof-Detail-Screen einbauen
+
+## Urheberrechtsvermerk in AGBs (16.03.2026)
+- [x] Rechtssichere Formulierung recherchieren (deutsches Urheberrecht, Markenrecht)
+- [x] Urheberrechtsvermerk für Name und Logo in AGB-Screen einbauen
