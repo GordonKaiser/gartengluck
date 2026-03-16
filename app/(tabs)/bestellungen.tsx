@@ -29,7 +29,8 @@ export interface BestellHistorieEintrag {
   shopLink: string | null;
   gesamtpreis?: number;
   anzahlProdukte?: number;
-  status?: "neu" | "bestaetigt" | "abholbereit" | "abgeholt" | "storniert";
+  // HofSpot v1.2: "bereit" ist Alias für "abholbereit", "abgelehnt" ist neu
+  status?: "neu" | "bestaetigt" | "abholbereit" | "bereit" | "abgeholt" | "storniert" | "abgelehnt";
   bewertungAbgegeben?: boolean;
 }
 
@@ -70,8 +71,10 @@ export default function BestellungenScreen() {
     neu:         { label: "Neu",         farbe: colors.warning,  emoji: "⏳" },
     bestaetigt:  { label: "Bestätigt",   farbe: colors.success,  emoji: "✅" },
     abholbereit: { label: "Abholbereit", farbe: colors.primary,  emoji: "📦" },
+    bereit:      { label: "Abholbereit", farbe: colors.primary,  emoji: "📦" }, // HofSpot v1.2 Alias
     abgeholt:    { label: "Abgeholt",    farbe: colors.muted,    emoji: "🎉" },
     storniert:   { label: "Storniert",   farbe: colors.error,    emoji: "❌" },
+    abgelehnt:   { label: "Abgelehnt",   farbe: colors.error,    emoji: "🚫" }, // HofSpot v1.2
   };
 
   const renderBestellung = ({

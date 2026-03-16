@@ -237,7 +237,8 @@ export default function RootLayout() {
       if (typeof url === "string") {
         router.push(url as never);
       } else {
-        router.push("/(tabs)/favoriten" as never);
+        // Fallback: Bestellungen-Tab öffnen (passt zu Bestellstatus-Benachrichtigungen)
+        router.push("/(tabs)/bestellungen" as never);
       }
     });
     return () => { foregroundSub.remove(); tapSub.remove(); };

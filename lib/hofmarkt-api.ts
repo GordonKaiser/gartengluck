@@ -145,7 +145,13 @@ export async function suchHoefe(
  * @param userId  userId des Hofes (aus der Suche)
  */
 export async function ladeHofProdukte(userId: number): Promise<HofProdukteAntwort> {
-  return batchGet<HofProdukteAntwort>("hofmarkt.produkte", { userId });
+  // HofSpot v1.2: hofProdukte ist der neue Name, produkte ist der Legacy-Alias
+  // Wir versuchen zuerst hofProdukte, dann produkte als Fallback
+  try {
+    return await batchGet<HofProdukteAntwort>("hofmarkt.hofProdukte", { userId });
+  } catch {
+    return batchGet<HofProdukteAntwort>("hofmarkt.produkte", { userId });
+  }
 }
 
 /**
@@ -169,7 +175,8 @@ export async function sendeBestellung(bestellung: BestellungSenden): Promise<Bes
 
 export interface BestellungStatusAntwort {
   id: number;
-  status: "neu" | "bestaetigt" | "abholbereit" | "abgeholt" | "storniert";
+  // HofSpot v1.2: "bereit" ist Alias für "abholbereit"
+  status: "neu" | "bestaetigt" | "abholbereit" | "bereit" | "abgeholt" | "storniert" | "abgelehnt";
 }
 
 /**

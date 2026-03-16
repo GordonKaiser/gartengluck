@@ -197,3 +197,9 @@
 - [x] app.config.ts mit updates.url, runtimeVersion und extra.eas.projectId ergänzt
 - [x] Update-Kanal "production" bei Expo angelegt
 - [ ] Ersten OTA-Update nach APK-Build veröffentlichen (eas update --channel production --message "...")
+
+## HofSpot API v1.2 Kompatibilität (16.03.2026)
+- [x] hofmarkt-api.ts: ladeHofProdukte nutzt hofProdukte zuerst, produkte als Fallback
+- [x] BestellungStatusAntwort-Typ: bereit + abgelehnt ergänzt
+- [x] Bestellungen-Screen: statusInfo für bereit (Alias) und abgelehnt (neu) eingebaut
+- [x] Push-Handler Fallback: navigiert jetzt auf /(tabs)/bestellungen statt Favoriten
