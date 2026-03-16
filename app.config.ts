@@ -125,6 +125,17 @@ const config: ExpoConfig = {
     typedRoutes: true,
     reactCompiler: true,
   },
+  updates: {
+    url: "https://u.expo.dev/8f7f574b-415d-4912-9c4f-be79e1eb8d6f",
+  },
+  runtimeVersion: {
+    policy: "appVersion",
+  },
+  extra: {
+    eas: {
+      projectId: "8f7f574b-415d-4912-9c4f-be79e1eb8d6f",
+    },
+  },
 };
 
 export default config;
