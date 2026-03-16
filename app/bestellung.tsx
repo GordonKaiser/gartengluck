@@ -1,5 +1,5 @@
 /**
- * Gartenglück – Bestellformular-Screen
+ * LocaBuy – Bestellformular-Screen
  * Zeigt Warenkorb-Übersicht, vorausgefüllte Kundendaten und sendet Bestellung via API.
  */
 

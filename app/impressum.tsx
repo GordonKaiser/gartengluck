@@ -1,5 +1,5 @@
 /**
- * Gartenglück – Impressum
+ * LocaBuy – Impressum
  * Anbieterkennzeichnung gemäß § 5 TMG
  */
 
@@ -55,7 +55,7 @@ export default function ImpressumScreen() {
           <Text style={s.label}>Hinweis</Text>
           <Text style={s.text}>
             Diese App wird von einer Privatperson ohne eingetragenes Gewerbe
-            betrieben. Gartenglück ist eine nicht-kommerzielle Vermittlungsplattform
+            betrieben. LocaBuy ist eine nicht-kommerzielle Vermittlungsplattform
             für Produkte aus privatem Hobby-Anbau und Hobby-Haltung.
           </Text>
         </View>

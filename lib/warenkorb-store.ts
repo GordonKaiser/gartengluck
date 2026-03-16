@@ -1,5 +1,5 @@
 /**
- * Gartenglück – Warenkorb-State
+ * LocaBuy – Warenkorb-State
  * Pro Hof ein eigener Warenkorb (userId als Schlüssel).
  * Wird im React-Context gehalten, kein AsyncStorage (flüchtig).
  */

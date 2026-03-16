@@ -1,5 +1,5 @@
 /**
- * Gartenglück – Nutzungsbedingungen
+ * LocaBuy – Nutzungsbedingungen
  * Vollständige Nutzungsbedingungen mit Haftungsausschluss als In-App-Screen.
  */
 
@@ -30,17 +30,17 @@ export default function NutzungsbedingungenScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Section title="1. Geltungsbereich" colors={colors}>
-          {`Diese Nutzungsbedingungen gelten für die Nutzung der mobilen App Gartenglück. Mit der Registrierung erkennst du diese Bedingungen an.\n\nGartenglück ist eine Vermittlungsplattform für Produkte aus Hobby-Anbau und Hobby-Haltung. Die App ermöglicht es, lokale Anbieter zu entdecken und Bestellanfragen zu stellen.`}
+          {`Diese Nutzungsbedingungen gelten für die Nutzung der mobilen App LocaBuy. Mit der Registrierung erkennst du diese Bedingungen an.\n\nLocaBuy ist eine Vermittlungsplattform für Produkte aus Hobby-Anbau und Hobby-Haltung. Die App ermöglicht es, lokale Anbieter zu entdecken und Bestellanfragen zu stellen.`}
         </Section>
 
         <Section title="2. Vermittlungscharakter" colors={colors}>
-          {`Gartenglück ist kein Händler und wird nicht Vertragspartei des zwischen Käufer und Anbieter geschlossenen Kaufvertrags.\n\nDer Kaufvertrag kommt ausschließlich zwischen dem Käufer und dem jeweiligen Anbieter zustande. Gartenglück übernimmt keine Verantwortung für die Vertragserfüllung.\n\nGartenglück übernimmt keine Gewähr für die Richtigkeit, Vollständigkeit oder Aktualität der von Anbietern eingestellten Produktinformationen, Preise oder Verfügbarkeiten.`}
+          {`LocaBuy ist kein Händler und wird nicht Vertragspartei des zwischen Käufer und Anbieter geschlossenen Kaufvertrags.\n\nDer Kaufvertrag kommt ausschließlich zwischen dem Käufer und dem jeweiligen Anbieter zustande. LocaBuy übernimmt keine Verantwortung für die Vertragserfüllung.\n\nLocaBuy übernimmt keine Gewähr für die Richtigkeit, Vollständigkeit oder Aktualität der von Anbietern eingestellten Produktinformationen, Preise oder Verfügbarkeiten.`}
         </Section>
 
         <View style={s.warnBox}>
           <Text style={s.warnTitel}>⚠️ Wichtiger Haftungshinweis</Text>
           <Text style={s.warnText}>
-            {`Gartenglück haftet nicht für:\n\n• Produktqualität, Frische oder Sicherheit der angebotenen Waren\n• Nicht-Lieferung oder verspätete Lieferung durch Anbieter\n• Schäden, die aus dem Kauf von Produkten entstehen\n• Lebensmittelrechtliche Mängel der vermittelten Produkte\n\nAnbieter auf der Plattform sind private Hobbyhalter und Hobbyanbauer. Die Produkte unterliegen nicht zwingend den Kontrollen des gewerblichen Lebensmittelhandels. Der Käufer trägt die Verantwortung für die Prüfung der Produktqualität bei der Abholung.`}
+            {`LocaBuy haftet nicht für:\n\n• Produktqualität, Frische oder Sicherheit der angebotenen Waren\n• Nicht-Lieferung oder verspätete Lieferung durch Anbieter\n• Schäden, die aus dem Kauf von Produkten entstehen\n• Lebensmittelrechtliche Mängel der vermittelten Produkte\n\nAnbieter auf der Plattform sind private Hobbyhalter und Hobbyanbauer. Die Produkte unterliegen nicht zwingend den Kontrollen des gewerblichen Lebensmittelhandels. Der Käufer trägt die Verantwortung für die Prüfung der Produktqualität bei der Abholung.`}
           </Text>
         </View>
 

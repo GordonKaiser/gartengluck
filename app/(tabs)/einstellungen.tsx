@@ -1,5 +1,5 @@
 /**
- * Gartenglück – Einstellungen
+ * LocaBuy – Einstellungen
  * Admin-Bereich vollständig entfernt (kein Angriffspunkt für Nutzer).
  */
 
@@ -157,7 +157,7 @@ export default function EinstellungenScreen() {
           </View>
         </View>
 
-        <Text style={s.versionText}>Gartenglück v{version}</Text>
+        <Text style={s.versionText}>LocaBuy v{version}</Text>
       </ScrollView>
     </ScreenContainer>
   );

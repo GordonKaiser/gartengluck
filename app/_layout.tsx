@@ -172,7 +172,7 @@ export default function RootLayout() {
         // Android-Kanal einrichten
         if (Platform.OS === "android") {
           await Notifications.setNotificationChannelAsync("gartengluck", {
-            name: "Gartenglück Bestellungen",
+            name: "LocaBuy Bestellungen",
             importance: Notifications.AndroidImportance.MAX,
             vibrationPattern: [0, 250, 250, 250],
           });

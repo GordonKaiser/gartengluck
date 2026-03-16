@@ -343,7 +343,7 @@ export default function EntdeckenScreen() {
 
   const ListHeader = (
     <View style={styles.header}>
-      <Text style={styles.titel}>Gartenglück</Text>
+      <Text style={styles.titel}>LocaBuy</Text>
       <Text style={styles.untertitel}>Produkte aus Hobby-Anbau & -Haltung</Text>
 
       {/* PLZ-Eingabe + Suche-Button */}

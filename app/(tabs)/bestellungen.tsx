@@ -1,5 +1,5 @@
 /**
- * Gartenglück – Meine Bestellungen
+ * LocaBuy – Meine Bestellungen
  * Separater Tab für die Bestellhistorie mit Status-Anzeige.
  */
 

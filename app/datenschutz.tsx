@@ -1,5 +1,5 @@
 /**
- * Gartenglück – Datenschutzerklärung
+ * LocaBuy – Datenschutzerklärung
  * Vollständige DSGVO-konforme Datenschutzerklärung als In-App-Screen.
  */
 
@@ -30,7 +30,7 @@ export default function DatenschutzScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Section title="1. Verantwortlicher" colors={colors}>
-          {`Verantwortlicher im Sinne der DSGVO ist der Betreiber der App Gartenglück. Kontaktdaten sind in den Einstellungen unter „Impressum" hinterlegt.`}
+          {`Verantwortlicher im Sinne der DSGVO ist der Betreiber der App LocaBuy. Kontaktdaten sind in den Einstellungen unter „Impressum" hinterlegt.`}
         </Section>
 
         <Section title="2. Welche Daten wir erheben" colors={colors}>
@@ -38,7 +38,7 @@ export default function DatenschutzScreen() {
         </Section>
 
         <Section title="3. Bestelldaten" colors={colors}>
-          {`Wenn du eine Bestellanfrage absendest, werden dein Name, deine Telefonnummer, deine Adresse sowie die bestellten Produkte an den jeweiligen Anbieter übermittelt.\n\nGartenglück ist eine Vermittlungsplattform. Der Kaufvertrag kommt ausschließlich zwischen dir und dem jeweiligen Anbieter zustande. Gartenglück ist nicht Vertragspartei.\n\nBestelldaten werden lokal auf deinem Gerät gespeichert und können von dir jederzeit gelöscht werden.`}
+          {`Wenn du eine Bestellanfrage absendest, werden dein Name, deine Telefonnummer, deine Adresse sowie die bestellten Produkte an den jeweiligen Anbieter übermittelt.\n\nLocaBuy ist eine Vermittlungsplattform. Der Kaufvertrag kommt ausschließlich zwischen dir und dem jeweiligen Anbieter zustande. LocaBuy ist nicht Vertragspartei.\n\nBestelldaten werden lokal auf deinem Gerät gespeichert und können von dir jederzeit gelöscht werden.`}
         </Section>
 
         <Section title="4. Push-Benachrichtigungen" colors={colors}>

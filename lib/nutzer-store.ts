@@ -1,5 +1,5 @@
 /**
- * Gartenglück – Nutzer-Store
+ * LocaBuy – Nutzer-Store
  * Speichert das registrierte Nutzerprofil lokal in AsyncStorage.
  * Kein Passwort, kein OAuth — Identität = Telefonnummer.
  */

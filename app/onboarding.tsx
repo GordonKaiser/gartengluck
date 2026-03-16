@@ -1,5 +1,5 @@
 /**
- * Gartenglück – Onboarding-Screen
+ * LocaBuy – Onboarding-Screen
  * Wird beim ersten App-Start angezeigt.
  * Nutzer gibt Telefonnummer, Name und Adresse ein.
  */
@@ -89,7 +89,7 @@ export default function OnboardingScreen() {
           {/* Logo-Bereich */}
           <View style={s.header}>
             <Text style={s.logo}>🌻</Text>
-            <Text style={s.titel}>Gartenglück</Text>
+            <Text style={s.titel}>LocaBuy</Text>
             <Text style={s.untertitel}>Produkte aus Hobby-Anbau & -Haltung</Text>
           </View>
 
@@ -193,9 +193,9 @@ export default function OnboardingScreen() {
               <View style={s.dsgvoBox}>
                 <Text style={s.dsgvoTitel}>Datenschutz & Nutzungsbedingungen</Text>
                 <Text style={s.dsgvoHinweis}>
-                  Gartenglück ist eine Vermittlungsplattform. Kaufverträge kommen
+                  LocaBuy ist eine Vermittlungsplattform. Kaufverträge kommen
                   ausschließlich zwischen dir und dem jeweiligen Anbieter zustande.
-                  Gartenglück übernimmt keine Haftung für Produktqualität oder
+                  LocaBuy übernimmt keine Haftung für Produktqualität oder
                   Vertragserfüllung durch Anbieter.
                 </Text>
                 <Pressable

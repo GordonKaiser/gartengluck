@@ -1,5 +1,5 @@
 /**
- * Gartenglück – API-Client für die Hobbyanbau Suite
+ * LocaBuy – API-Client für die Hobbyanbau Suite
  * Alle Endpunkte sind öffentlich (kein Login nötig).
  * Format: HTTP GET mit ?batch=1&input={"0":{"json": ... }}
  */

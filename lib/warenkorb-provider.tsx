@@ -1,5 +1,5 @@
 /**
- * Gartenglück – WarenkorbProvider
+ * LocaBuy – WarenkorbProvider
  * Stellt den Warenkorb-State für die gesamte App bereit.
  */
 

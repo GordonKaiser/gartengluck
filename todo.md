@@ -211,3 +211,6 @@
 - [x] Neues LocaBuy-Logo generieren
 - [x] App-Name in app.config.ts auf LocaBuy setzen
 - [x] Logo-Dateien ersetzen (icon.png, splash-icon.png, favicon.png, android-icon-foreground.png)
+
+## Gartenglück → LocaBuy Texte (16.03.2026)
+- [x] Alle "Gartenglück"-Texte in App-Screens durch "LocaBuy" ersetzen
