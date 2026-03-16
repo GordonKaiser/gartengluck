@@ -217,3 +217,7 @@
 
 ## Slogan-Änderung (16.03.2026)
 - [x] Untertitel auf "Lokal kaufen. Direkt vom Erzeuger." ändern
+
+## Bewertungs-Screen (16.03.2026)
+- [x] app/bewertung.tsx erstellen (Sterne-Auswahl, Kommentar, Absenden)
+- [x] API-Endpunkt hofmarkt.bewertungSenden in hofmarkt-api.ts prüfen/einbauen

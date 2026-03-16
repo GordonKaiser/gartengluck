@@ -38,3 +38,30 @@ export async function speichereNutzerProfil(profil: NutzerProfil): Promise<void>
 export async function loescheNutzerProfil(): Promise<void> {
   await AsyncStorage.removeItem(NUTZER_KEY);
 }
+
+const BEWERTUNGEN_KEY = "locabuy_bewertungen_abgegeben";
+
+/** Bestellindex als bewertet markieren (lokal gespeichert). */
+export async function markiereBewertungAbgegeben(bestellIndex: number): Promise<void> {
+  try {
+    const raw = await AsyncStorage.getItem(BEWERTUNGEN_KEY);
+    const liste: number[] = raw ? JSON.parse(raw) : [];
+    if (!liste.includes(bestellIndex)) {
+      liste.push(bestellIndex);
+      await AsyncStorage.setItem(BEWERTUNGEN_KEY, JSON.stringify(liste));
+    }
+  } catch {
+    // Fehler ignorieren – Bewertung wurde bereits gesendet
+  }
+}
+
+/** Prüfen ob eine Bestellung bereits bewertet wurde. */
+export async function istBewertungAbgegeben(bestellIndex: number): Promise<boolean> {
+  try {
+    const raw = await AsyncStorage.getItem(BEWERTUNGEN_KEY);
+    const liste: number[] = raw ? JSON.parse(raw) : [];
+    return liste.includes(bestellIndex);
+  } catch {
+    return false;
+  }
+}

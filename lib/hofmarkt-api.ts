@@ -231,3 +231,19 @@ export const GEWERBE_KATEGORIEN = KATEGORIEN.filter((k) => k.typ === "gewerbe");
 export const KATEGORIE_MAP = Object.fromEntries(
   KATEGORIEN.map((k) => [k.id, k])
 ) as Record<Kategorie, { id: Kategorie; label: string; emoji: string; typ: "hobby" | "gewerbe" }>;
+
+// ── Bewertungen ──────────────────────────────────────────────────────────────
+
+export interface BewertungInput {
+  userId: number;
+  sterne: 1 | 2 | 3 | 4 | 5;
+  kommentar?: string;
+}
+
+/**
+ * Sterne-Bewertung für einen Hof an HofSpot senden.
+ * HofSpot benötigt dafür den Endpunkt hofmarkt.bewertungSenden.
+ */
+export async function sendeHofBewertung(input: BewertungInput): Promise<void> {
+  await batchPost<void>("hofmarkt.bewertungSenden", input as unknown as Record<string, unknown>);
+}
