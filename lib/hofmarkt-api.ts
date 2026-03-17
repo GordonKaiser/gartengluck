@@ -127,17 +127,33 @@ async function batchGet<T>(endpunkt: string, input: Record<string, unknown>): Pr
  * @param plz          5-stellige Postleitzahl
  * @param umkreisKm    Suchradius in km (z.B. 10, 25, 50)
  * @param kategorien   Optionaler Filter (z.B. ["eier", "pilze"])
+ * @param nurHobby     Wenn true: nur Hobby-Anbieter (kein Gewerbe)
  */
 export async function suchHoefe(
   plz: string,
   umkreisKm: number,
-  kategorien?: Kategorie[]
+  kategorien?: Kategorie[],
+  nurHobby?: boolean
 ): Promise<HofSucheErgebnis[]> {
   const input: Record<string, unknown> = { plz, umkreisKm };
   if (kategorien && kategorien.length > 0) {
     input.kategorien = kategorien;
   }
-  return batchGet<HofSucheErgebnis[]>("hofmarkt.suche", input);
+  // nurHobby=true filtert gewerbliche Anbieter heraus (sofern LocaFarm den Parameter unterstützt)
+  if (nurHobby === true) {
+    input.nurHobby = true;
+  }
+  const ergebnisse = await batchGet<HofSucheErgebnis[]>("hofmarkt.suche", input);
+  // Client-seitiger Fallback: Wenn LocaFarm nurHobby noch nicht unterstützt,
+  // filtern wir anhand des hobbyAnbau-Flags im Ergebnis (falls vorhanden)
+  if (nurHobby === true) {
+    return ergebnisse.filter((h) => {
+      // Wenn das Feld fehlt (ältere API), alle anzeigen (sicherer Fallback)
+      if ((h as any).hobbyAnbau === undefined) return true;
+      return (h as any).hobbyAnbau === true;
+    });
+  }
+  return ergebnisse;
 }
 
 /**

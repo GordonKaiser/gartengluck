@@ -247,3 +247,7 @@
 - [x] Bilder-Vollbild-Ansicht mit Swipe-Navigation (Tap auf Hof-Bild)
 - [x] Vorbestellungs-System: bereits korrekt implementiert (kannBestellen = verfuegbar || vorbestellung)
 - [x] Admin-Nutzerverwaltung: Admin-Bereich bereits vollständig entfernt
+
+## Feature-Umsetzung v8 (17.03.2026)
+- [x] PIN vergessen / zurücksetzen: bereits vollständig implementiert (Telefonnummer-Verifizierung in _layout.tsx)
+- [x] Gewerblich/Hobby-Filter-Toggle: nurHobby-Parameter in suchHoefe(), UI-Label verbessert, Ergebniszeile zeigt Filter-Status

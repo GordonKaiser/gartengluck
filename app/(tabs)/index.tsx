@@ -92,7 +92,8 @@ export default function EntdeckenScreen() {
       const ergebnisse = await suchHoefe(
         plz.trim(),
         radius,
-        aktiveKategorien.length > 0 ? aktiveKategorien : undefined
+        aktiveKategorien.length > 0 ? aktiveKategorien : undefined,
+        anbieterTyp === "hobby"
       );
       setHoefen(ergebnisse);
     } catch (err: any) {
@@ -416,7 +417,7 @@ export default function EntdeckenScreen() {
 
       {/* Hobby/Gewerbe-Filter */}
       <Text style={styles.filterLabel}>Anbieter-Typ</Text>
-      <View style={styles.radiusContainer}>
+      <View style={[styles.radiusContainer, { marginBottom: 4 }]}>
         <Pressable
           style={[
             styles.radiusChip,
@@ -428,7 +429,7 @@ export default function EntdeckenScreen() {
           onPress={() => setAnbieterTyp("hobby")}
         >
           <Text style={[styles.radiusChipText, { color: anbieterTyp === "hobby" ? "#fff" : colors.muted }]}>
-            🌿 Hobby
+            🌿 Nur Hobby-Anbieter
           </Text>
         </Pressable>
         <Pressable
@@ -442,10 +443,15 @@ export default function EntdeckenScreen() {
           onPress={() => setAnbieterTyp("alle")}
         >
           <Text style={[styles.radiusChipText, { color: anbieterTyp === "alle" ? "#fff" : colors.muted }]}>
-            Alle
+            Alle Anbieter
           </Text>
         </Pressable>
       </View>
+      <Text style={[styles.filterLabel, { fontSize: 11, marginBottom: 12, textTransform: "none", letterSpacing: 0 }]}>
+        {anbieterTyp === "hobby"
+          ? "Zeigt nur Privatpersonen & Hobbybauern"
+          : "Zeigt alle Anbieter inkl. Gewerbliche"}
+      </Text>
 
       {/* Kategorie-Filter */}
       <Text style={styles.filterLabel}>Produkt-Filter</Text>
@@ -539,8 +545,9 @@ export default function EntdeckenScreen() {
                 <Text style={styles.ergebnisText}>
                   {hoefen.length} {hoefen.length === 1 ? "Hof" : "Höfe"} in der Nähe von{" "}
                   {sucheOrt}
+                  {anbieterTyp === "hobby" ? " · Nur Hobby" : ""}
                   {aktiveKategorien.length > 0
-                    ? ` · Filter: ${aktiveKategorien.map((k) => KATEGORIE_MAP[k]?.label).join(", ")}`
+                    ? ` · ${aktiveKategorien.map((k) => KATEGORIE_MAP[k]?.label).join(", ")}`
                     : ""}
                 </Text>
               </View>
