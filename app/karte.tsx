@@ -18,14 +18,9 @@ import { ScreenContainer } from "@/components/screen-container";
 import { useColors } from "@/hooks/use-colors";
 import { type HofSucheErgebnis } from "@/lib/hofmarkt-api";
 
-// react-native-maps ist nicht auf Web verfügbar
+// react-native-maps wird nur auf nativen Plattformen geladen (nicht auf Web)
 let MapView: any = null;
 let Marker: any = null;
-if (Platform.OS !== "web") {
-  const maps = require("react-native-maps");
-  MapView = maps.default;
-  Marker = maps.Marker;
-}
 
 export default function KarteScreen() {
   const colors = useColors();
@@ -37,7 +32,19 @@ export default function KarteScreen() {
 
   const [hoefen, setHoefen] = useState<HofSucheErgebnis[]>([]);
   const [ausgewaehlt, setAusgewaehlt] = useState<HofSucheErgebnis | null>(null);
+  const [mapsGeladen, setMapsGeladen] = useState(false);
   const mapRef = useRef<any>(null);
+
+  // react-native-maps lazy laden (nur auf nativen Plattformen)
+  useEffect(() => {
+    if (Platform.OS !== "web") {
+      import("react-native-maps").then((maps) => {
+        MapView = maps.default;
+        Marker = maps.Marker;
+        setMapsGeladen(true);
+      }).catch(() => {});
+    }
+  }, []);
 
   useEffect(() => {
     if (daten) {
