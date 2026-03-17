@@ -19,6 +19,7 @@ export interface HofSucheErgebnis {
   shopLink: string | null;
   distanzKm: number;
   produkte?: Kategorie[]; // nur wenn Kategorie-Filter aktiv
+  hobbyAnbau?: boolean;   // LocaFarm v2.0: true = Privatperson/Hobbybauer, false = Gewerblich
 }
 
 export interface HofProdukt {
@@ -144,13 +145,13 @@ export async function suchHoefe(
     input.nurHobby = true;
   }
   const ergebnisse = await batchGet<HofSucheErgebnis[]>("hofmarkt.suche", input);
-  // Client-seitiger Fallback: Wenn LocaFarm nurHobby noch nicht unterstützt,
-  // filtern wir anhand des hobbyAnbau-Flags im Ergebnis (falls vorhanden)
+  // Client-seitiger Fallback: Falls LocaFarm nurHobby serverseitig nicht filtert,
+  // filtern wir anhand des hobbyAnbau-Flags im Ergebnis (LocaFarm v2.0+)
   if (nurHobby === true) {
     return ergebnisse.filter((h) => {
       // Wenn das Feld fehlt (ältere API), alle anzeigen (sicherer Fallback)
-      if ((h as any).hobbyAnbau === undefined) return true;
-      return (h as any).hobbyAnbau === true;
+      if (h.hobbyAnbau === undefined) return true;
+      return h.hobbyAnbau === true;
     });
   }
   return ergebnisse;
@@ -258,10 +259,15 @@ export interface BewertungInput {
 
 /**
  * Sterne-Bewertung für einen Hof an HofSpot senden.
- * HofSpot benötigt dafür den Endpunkt hofmarkt.bewertungSenden.
+ * LocaFarm v2.0: Antwort ist { success: boolean } (vorher { ok: boolean })
  */
 export async function sendeHofBewertung(input: BewertungInput): Promise<void> {
-  await batchPost<void>("hofmarkt.bewertungSenden", input as unknown as Record<string, unknown>);
+  // LocaFarm v2.0 gibt { success: boolean } zurück
+  // Wir ignorieren den Rückgabewert – ein HTTP-Fehler wird als Exception geworfen
+  await batchPost<{ success?: boolean; ok?: boolean }>(
+    "hofmarkt.bewertungSenden",
+    input as unknown as Record<string, unknown>
+  );
 }
 
 export interface HofBewertung {

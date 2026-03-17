@@ -251,3 +251,9 @@
 ## Feature-Umsetzung v8 (17.03.2026)
 - [x] PIN vergessen / zurücksetzen: bereits vollständig implementiert (Telefonnummer-Verifizierung in _layout.tsx)
 - [x] Gewerblich/Hobby-Filter-Toggle: nurHobby-Parameter in suchHoefe(), UI-Label verbessert, Ergebniszeile zeigt Filter-Status
+
+## LocaFarm v2.0 Kompatibilität (17.03.2026)
+- [x] bewertungSenden: result.ok → result.success anpassen (hofmarkt-api.ts, beide Felder akzeptiert)
+- [x] hobbyAnbau-Feld: client-seitigen Filter in suchHoefe() aktivieren
+- [x] hobbyAnbau-Badge in Hof-Karte (index.tsx) anzeigen (🌿 Hobby / 🏪 Gewerbe)
+- [x] PLZ 38889 fehlt in LocaFarm-Koordinatentabelle → Hinweis für LocaFarm-Tab dokumentiert (locabuy-an-locafarm-v9.md)
