@@ -4,7 +4,7 @@
  * Format: HTTP GET mit ?batch=1&input={"0":{"json": ... }}
  */
 
-const BASIS_URL = "https://hofspot-production.up.railway.app/api/trpc";
+const BASIS_URL = "https://gefluegel-app-ghkbktmv.manus.space/api/trpc";
 
 // ── TypeScript-Typen ─────────────────────────────────────────────────────────
 
@@ -18,6 +18,7 @@ export interface HofSucheErgebnis {
   beschreibung: string | null;
   shopLink: string | null;
   distanzKm: number;
+  hobbyAnbau?: boolean;   // true = Hobby-Anbieter, false = Gewerblich
   produkte?: Kategorie[]; // nur wenn Kategorie-Filter aktiv
 }
 
@@ -144,13 +145,13 @@ export async function suchHoefe(
     input.nurHobby = true;
   }
   const ergebnisse = await batchGet<HofSucheErgebnis[]>("hofmarkt.suche", input);
-  // Client-seitiger Fallback: Wenn LocaFarm nurHobby noch nicht unterstützt,
+  // Client-seitiger Fallback: Wenn der Server nurHobby noch nicht unterstützt,
   // filtern wir anhand des hobbyAnbau-Flags im Ergebnis (falls vorhanden)
   if (nurHobby === true) {
     return ergebnisse.filter((h) => {
       // Wenn das Feld fehlt (ältere API), alle anzeigen (sicherer Fallback)
-      if ((h as any).hobbyAnbau === undefined) return true;
-      return (h as any).hobbyAnbau === true;
+      if (h.hobbyAnbau === undefined) return true;
+      return h.hobbyAnbau === true;
     });
   }
   return ergebnisse;
@@ -254,6 +255,8 @@ export interface BewertungInput {
   userId: number;
   sterne: 1 | 2 | 3 | 4 | 5;
   kommentar?: string;
+  kaeuferTelefon?: string;
+  kaeuferName?: string;
 }
 
 /**
@@ -288,4 +291,15 @@ export async function ladeHofBewertungen(userId: number): Promise<HofBewertungen
   } catch {
     return null;
   }
+}
+
+// ── Push-Token-Registrierung ─────────────────────────────────────────────────
+
+/**
+ * Push-Token mit Telefonnummer verknüpfen (HofSpot v2.0).
+ * Muss beim App-Start aufgerufen werden, nachdem Push-Berechtigung erteilt wurde.
+ * Ersetzt den bisherigen direkten Datenbank-Zugriff.
+ */
+export async function registrierePushToken(telefon: string, pushToken: string): Promise<void> {
+  await batchPost<{ success: boolean }>("hofmarkt.registrierePushToken", { telefon, pushToken });
 }

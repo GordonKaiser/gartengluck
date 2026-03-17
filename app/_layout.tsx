@@ -193,16 +193,12 @@ export default function RootLayout() {
         if (!projectId) return;
         const { data: pushToken } = await Notifications.getExpoPushTokenAsync({ projectId });
         if (!pushToken) return;
-        // Im Backend speichern
+        // Push-Token mit Telefonnummer verknüpfen (HofSpot v2.0 API)
         const { ladeNutzerProfil } = await import("@/lib/nutzer-store");
         const profil = await ladeNutzerProfil();
         if (!profil?.telefon) return;
-        const apiBase = process.env.EXPO_PUBLIC_API_BASE_URL ?? "";
-        await fetch(`${apiBase}/api/trpc/nutzer.pushTokenSpeichern?batch=1`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ "0": { json: { telefon: profil.telefon, pushToken } } }),
-        });
+        const { registrierePushToken } = await import("@/lib/hofmarkt-api");
+        await registrierePushToken(profil.telefon, pushToken);
       } catch {
         // Ignorieren – Push-Token ist optional
       }

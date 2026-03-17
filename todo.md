@@ -256,3 +256,7 @@
 - [x] Onboarding verbessern: 3 Intro-Slides (Direkt vom Erzeuger / Einfach bestellen / Lokal & persönlich) vor Registrierung, mit Skip-Button
 - [x] Bewertungen im Hof-Detail anzeigen: bereits vollständig implementiert (Sterne + Kommentare, wartet auf LocaFarm-Daten)
 - [x] Bilder-Galerie im Hof-Detail: bereits vollständig implementiert (horizontaler Scroll + Vollbild-Modal, wartet auf LocaFarm-Daten)
+
+## HofSpot API v2.0 Anpassungen (17.03.2026)
+- [x] API-Basis-URL auf https://gefluegel-app-ghkbktmv.manus.space/api/trpc aktualisiert
+- [x] Push-Token-Registrierung auf hofmarkt.registrierePushToken umgestellt (_layout.tsx + hofmarkt-api.ts)
