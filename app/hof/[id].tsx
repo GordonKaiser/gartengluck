@@ -1,17 +1,20 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
 import { router, useLocalSearchParams } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
   FlatList,
   Image,
+  Modal,
   Platform,
   Pressable,
   ScrollView,
+  StatusBar,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 
@@ -53,6 +56,8 @@ export default function HofDetailScreen() {
   const [istFavorit, setIstFavorit] = useState(false);
   const [aufgeklappteProdukte, setAufgeklappteProdukte] = useState<Set<string>>(new Set());
   const [bewertungen, setBewertungen] = useState<HofBewertungenAntwort | null>(null);
+  const [vollbildIndex, setVollbildIndex] = useState<number | null>(null);
+  const vollbildRef = useRef<FlatList>(null);
 
   const { warenkorb, gesamtpreis, gesamtAnzahl, setzeHof, setze, erhoehe, verringere } = useWarenkorb();
 
@@ -406,6 +411,45 @@ export default function HofDetailScreen() {
       color: colors.foreground,
       lineHeight: 18,
     },
+    vollbildOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.95)",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    vollbildSchliessen: {
+      position: "absolute",
+      top: 50,
+      right: 20,
+      zIndex: 10,
+      backgroundColor: "rgba(255,255,255,0.15)",
+      borderRadius: 20,
+      width: 40,
+      height: 40,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    vollbildSchliessenText: {
+      color: "#fff",
+      fontSize: 18,
+      fontWeight: "600",
+    },
+    vollbildSeite: {
+      width: Dimensions.get("window").width,
+      height: Dimensions.get("window").height,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    vollbildBild: {
+      width: Dimensions.get("window").width,
+      height: Dimensions.get("window").height * 0.8,
+    },
+    vollbildZaehler: {
+      position: "absolute",
+      bottom: 50,
+      color: "rgba(255,255,255,0.7)",
+      fontSize: 14,
+    },
   });
 
   if (profilLaed) {
@@ -617,15 +661,72 @@ export default function HofDetailScreen() {
               showsHorizontalScrollIndicator={false}
               keyExtractor={(item, idx) => `bild-${idx}`}
               contentContainerStyle={{ paddingHorizontal: 16, gap: 10 }}
-              renderItem={({ item }) => (
-                <Image
-                  source={{ uri: item }}
-                  style={styles.galerieBild}
-                  resizeMode="cover"
-                />
+              renderItem={({ item, index }) => (
+                <Pressable
+                  onPress={() => {
+                    if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    setVollbildIndex(index);
+                  }}
+                  style={({ pressed }) => [{ opacity: pressed ? 0.85 : 1 }]}
+                >
+                  <Image
+                    source={{ uri: item }}
+                    style={styles.galerieBild}
+                    resizeMode="cover"
+                  />
+                </Pressable>
               )}
             />
           </View>
+        )}
+
+        {/* Vollbild-Modal */}
+        {profil?.bilder && profil.bilder.length > 0 && (
+          <Modal
+            visible={vollbildIndex !== null}
+            transparent
+            animationType="fade"
+            onRequestClose={() => setVollbildIndex(null)}
+            statusBarTranslucent
+          >
+            <View style={styles.vollbildOverlay}>
+              <StatusBar hidden />
+              <TouchableOpacity
+                style={styles.vollbildSchliessen}
+                onPress={() => setVollbildIndex(null)}
+              >
+                <Text style={styles.vollbildSchliessenText}>✕</Text>
+              </TouchableOpacity>
+              <FlatList
+                ref={vollbildRef}
+                data={profil.bilder}
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                keyExtractor={(item, idx) => `vb-${idx}`}
+                initialScrollIndex={vollbildIndex ?? 0}
+                getItemLayout={(_, index) => ({
+                  length: Dimensions.get("window").width,
+                  offset: Dimensions.get("window").width * index,
+                  index,
+                })}
+                renderItem={({ item }) => (
+                  <View style={styles.vollbildSeite}>
+                    <Image
+                      source={{ uri: item }}
+                      style={styles.vollbildBild}
+                      resizeMode="contain"
+                    />
+                  </View>
+                )}
+              />
+              {profil.bilder.length > 1 && (
+                <Text style={styles.vollbildZaehler}>
+                  {(vollbildIndex ?? 0) + 1} / {profil.bilder.length}
+                </Text>
+              )}
+            </View>
+          </Modal>
         )}
 
         {/* Produkte */}

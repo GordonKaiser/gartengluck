@@ -162,7 +162,7 @@
 - [ ] Passwort vergessen / PIN zurücksetzen
 - [x] Bewertungs-System: Sterne + Text nach Bestellabwicklung (Status = abgeholt)
 - [x] Produkt-Filter: Hobby/Alle-Toggle in der Suche
-- [ ] Vorbestellungs-System: Verfügbarkeit-Flag aus API, Bestellung sperren wenn nicht verfügbar
+- [x] Vorbestellungs-System: bereits korrekt implementiert (kannBestellen = verfuegbar || vorbestellung)
 - [x] Aktualisierte Integrations-Doku für anderen Tab
 - [x] Admin-Bereich komplett aus der App entfernen (kein Angriffspunkt für Nutzer)
 
@@ -238,3 +238,12 @@
 ## Impressum prüfen und ergänzen (16.03.2026)
 - [x] Bestehendes Impressum auf Vollständigkeit prüfen (§ 5 TMG, § 55 RStV)
 - [x] Fehlende Pflichtangaben ergänzen: Verantwortlicher für Inhalt (§ 18 MStV) und Umsatzsteuer-Hinweis
+
+## Bug: API-Fehler 500 bei Suche (17.03.2026)
+- [x] Fehlerursache bei hofmarkt.suche (PLZ 37115) identifizieren (lag am LocaFarm-Server)
+- [x] Fehler behoben (LocaFarm-seitig korrigiert)
+
+## Feature-Umsetzung v7 (17.03.2026)
+- [x] Bilder-Vollbild-Ansicht mit Swipe-Navigation (Tap auf Hof-Bild)
+- [x] Vorbestellungs-System: bereits korrekt implementiert (kannBestellen = verfuegbar || vorbestellung)
+- [x] Admin-Nutzerverwaltung: Admin-Bereich bereits vollständig entfernt
