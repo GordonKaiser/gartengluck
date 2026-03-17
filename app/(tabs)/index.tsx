@@ -312,27 +312,12 @@ export default function EntdeckenScreen() {
           <Text style={styles.hofName} numberOfLines={1}>
             {item.hofName}
           </Text>
-          <View style={{ flexDirection: "row", gap: 6, alignItems: "center" }}>
-            {item.hobbyAnbau !== undefined && (
-              <View style={[
-                styles.distanzBadge,
-                { backgroundColor: item.hobbyAnbau ? colors.success + "20" : colors.primary + "15" }
-              ]}>
-                <Text style={[
-                  styles.distanzText,
-                  { color: item.hobbyAnbau ? colors.success : colors.primary }
-                ]}>
-                  {item.hobbyAnbau ? "🌿 Hobby" : "🏪 Gewerbe"}
-                </Text>
-              </View>
-            )}
-            <View style={styles.distanzBadge}>
-              <Text style={styles.distanzText}>
-                {item.distanzKm < 1
-                  ? `${Math.round(item.distanzKm * 1000)} m`
-                  : `${item.distanzKm.toFixed(1)} km`}
-              </Text>
-            </View>
+          <View style={styles.distanzBadge}>
+            <Text style={styles.distanzText}>
+              {item.distanzKm < 1
+                ? `${Math.round(item.distanzKm * 1000)} m`
+                : `${item.distanzKm.toFixed(1)} km`}
+            </Text>
           </View>
         </View>
         <Text style={styles.hofOrt}>

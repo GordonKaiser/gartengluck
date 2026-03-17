@@ -1,10 +1,11 @@
 /**
  * LocaBuy – Onboarding-Screen
- * Wird beim ersten App-Start angezeigt.
- * Nutzer gibt Telefonnummer, Name und Adresse ein.
+ * Phase 0: 3 Intro-Slides (was ist LocaBuy?)
+ * Phase 1: Telefonnummer eingeben
+ * Phase 2: Name + Adresse + DSGVO
  */
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   View,
   Text,
@@ -14,9 +15,9 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  Alert,
+  Dimensions,
+  FlatList,
   StyleSheet,
-  Linking,
 } from "react-native";
 import { router } from "expo-router";
 import { ScreenContainer } from "@/components/screen-container";
@@ -24,9 +25,40 @@ import { trpc } from "@/lib/trpc";
 import { speichereNutzerProfil } from "@/lib/nutzer-store";
 import { useColors } from "@/hooks/use-colors";
 
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
+
+// ── Intro-Slides ──────────────────────────────────────────────────────────────
+
+const SLIDES = [
+  {
+    emoji: "🌿",
+    titel: "Direkt vom Erzeuger",
+    text: "Entdecke Hobby-Anbieter und kleine Bauernhöfe in deiner Nähe. Frische Produkte – ohne Zwischenhändler.",
+  },
+  {
+    emoji: "📦",
+    titel: "Einfach bestellen",
+    text: "Schreib dem Anbieter direkt. Kein Konto, keine Wartezeit – du bestellst, der Anbieter packt ein.",
+  },
+  {
+    emoji: "🤝",
+    titel: "Lokal & persönlich",
+    text: "Stärke die Region. Jede Bestellung geht direkt an Menschen in deiner Nachbarschaft.",
+  },
+];
+
+// ── Hauptkomponente ───────────────────────────────────────────────────────────
+
 export default function OnboardingScreen() {
   const colors = useColors();
-  const [schritt, setSchritt] = useState<1 | 2>(1);
+  const s = styles(colors);
+
+  // 0 = Intro-Slides, 1 = Telefon, 2 = Name/Adresse
+  const [phase, setPhase] = useState<0 | 1 | 2>(0);
+  const [slideIndex, setSlideIndex] = useState(0);
+  const flatListRef = useRef<FlatList>(null);
+
+  // Formular-State
   const [telefon, setTelefon] = useState("");
   const [name, setName] = useState("");
   const [strasse, setStrasse] = useState("");
@@ -45,14 +77,33 @@ export default function OnboardingScreen() {
     },
   });
 
-  const weiterZuSchritt2 = () => {
+  // ── Slide-Navigation ──────────────────────────────────────────────────────
+
+  const naechsterSlide = () => {
+    if (slideIndex < SLIDES.length - 1) {
+      const next = slideIndex + 1;
+      flatListRef.current?.scrollToIndex({ index: next, animated: true });
+      setSlideIndex(next);
+    } else {
+      setPhase(1);
+    }
+  };
+
+  const onSlideScroll = (e: any) => {
+    const idx = Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH);
+    setSlideIndex(idx);
+  };
+
+  // ── Formular-Logik ────────────────────────────────────────────────────────
+
+  const weiterZuPhase2 = () => {
     const tel = telefon.trim().replace(/\s/g, "");
     if (tel.length < 6) {
       setFehler("Bitte gib eine gültige Telefonnummer ein.");
       return;
     }
     setFehler(null);
-    setSchritt(2);
+    setPhase(2);
   };
 
   const abschliessen = () => {
@@ -74,7 +125,70 @@ export default function OnboardingScreen() {
     });
   };
 
-  const s = styles(colors);
+  // ── Intro-Slides ──────────────────────────────────────────────────────────
+
+  if (phase === 0) {
+    return (
+      <ScreenContainer containerClassName="bg-background">
+        {/* Skip-Button */}
+        <Pressable
+          style={({ pressed }) => [s.skipButton, pressed && { opacity: 0.6 }]}
+          onPress={() => setPhase(1)}
+        >
+          <Text style={s.skipText}>Überspringen</Text>
+        </Pressable>
+
+        {/* Logo */}
+        <View style={s.slideHeader}>
+          <Text style={s.slideLogo}>🌻</Text>
+          <Text style={s.slideAppName}>LocaBuy</Text>
+        </View>
+
+        {/* Slides */}
+        <FlatList
+          ref={flatListRef}
+          data={SLIDES}
+          keyExtractor={(_, i) => String(i)}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onMomentumScrollEnd={onSlideScroll}
+          style={{ flexGrow: 0 }}
+          renderItem={({ item }) => (
+            <View style={s.slide}>
+              <Text style={s.slideEmoji}>{item.emoji}</Text>
+              <Text style={s.slideTitel}>{item.titel}</Text>
+              <Text style={s.slideText}>{item.text}</Text>
+            </View>
+          )}
+        />
+
+        {/* Punkte-Indikator */}
+        <View style={s.punkteReihe}>
+          {SLIDES.map((_, i) => (
+            <View
+              key={i}
+              style={[s.punktSlide, i === slideIndex && s.punktSlideAktiv]}
+            />
+          ))}
+        </View>
+
+        {/* Weiter-Button */}
+        <View style={s.slideFooter}>
+          <Pressable
+            style={({ pressed }) => [s.button, pressed && s.buttonPressed]}
+            onPress={naechsterSlide}
+          >
+            <Text style={s.buttonText}>
+              {slideIndex < SLIDES.length - 1 ? "Weiter →" : "Los geht's 🌱"}
+            </Text>
+          </Pressable>
+        </View>
+      </ScreenContainer>
+    );
+  }
+
+  // ── Registrierungs-Formular ───────────────────────────────────────────────
 
   return (
     <ScreenContainer>
@@ -95,12 +209,12 @@ export default function OnboardingScreen() {
 
           {/* Fortschrittsanzeige */}
           <View style={s.fortschritt}>
-            <View style={[s.punkt, schritt >= 1 && s.punktAktiv]} />
+            <View style={[s.punkt, s.punktAktiv]} />
             <View style={s.linie} />
-            <View style={[s.punkt, schritt >= 2 && s.punktAktiv]} />
+            <View style={[s.punkt, phase === 2 && s.punktAktiv]} />
           </View>
 
-          {schritt === 1 ? (
+          {phase === 1 ? (
             <View style={s.formular}>
               <Text style={s.schrittTitel}>Willkommen!</Text>
               <Text style={s.schrittText}>
@@ -118,16 +232,23 @@ export default function OnboardingScreen() {
                 keyboardType="phone-pad"
                 autoComplete="tel"
                 returnKeyType="next"
-                onSubmitEditing={weiterZuSchritt2}
+                onSubmitEditing={weiterZuPhase2}
               />
 
               {fehler && <Text style={s.fehlerText}>{fehler}</Text>}
 
               <Pressable
                 style={({ pressed }) => [s.button, pressed && s.buttonPressed]}
-                onPress={weiterZuSchritt2}
+                onPress={weiterZuPhase2}
               >
                 <Text style={s.buttonText}>Weiter →</Text>
+              </Pressable>
+
+              <Pressable
+                style={s.zurueckButton}
+                onPress={() => { setFehler(null); setPhase(0); setSlideIndex(SLIDES.length - 1); }}
+              >
+                <Text style={s.zurueckText}>← Zurück</Text>
               </Pressable>
             </View>
           ) : (
@@ -254,7 +375,7 @@ export default function OnboardingScreen() {
 
               <Pressable
                 style={s.zurueckButton}
-                onPress={() => { setFehler(null); setSchritt(1); }}
+                onPress={() => { setFehler(null); setPhase(1); }}
               >
                 <Text style={s.zurueckText}>← Zurück</Text>
               </Pressable>
@@ -271,8 +392,84 @@ export default function OnboardingScreen() {
   );
 }
 
+// ── Styles ────────────────────────────────────────────────────────────────────
+
 const styles = (colors: ReturnType<typeof useColors>) =>
   StyleSheet.create({
+    // Intro-Slide Styles
+    skipButton: {
+      position: "absolute",
+      top: 16,
+      right: 20,
+      zIndex: 10,
+      padding: 8,
+    },
+    skipText: {
+      fontSize: 14,
+      color: colors.muted,
+    },
+    slideHeader: {
+      alignItems: "center",
+      marginTop: 56,
+      marginBottom: 16,
+    },
+    slideLogo: {
+      fontSize: 56,
+      marginBottom: 4,
+    },
+    slideAppName: {
+      fontSize: 28,
+      fontWeight: "700",
+      color: colors.foreground,
+    },
+    slide: {
+      width: SCREEN_WIDTH,
+      paddingHorizontal: 40,
+      alignItems: "center",
+      paddingTop: 24,
+      paddingBottom: 16,
+    },
+    slideEmoji: {
+      fontSize: 72,
+      marginBottom: 20,
+    },
+    slideTitel: {
+      fontSize: 24,
+      fontWeight: "700",
+      color: colors.foreground,
+      textAlign: "center",
+      marginBottom: 12,
+    },
+    slideText: {
+      fontSize: 16,
+      color: colors.muted,
+      textAlign: "center",
+      lineHeight: 24,
+    },
+    punkteReihe: {
+      flexDirection: "row",
+      justifyContent: "center",
+      gap: 8,
+      marginTop: 24,
+      marginBottom: 8,
+    },
+    punktSlide: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: colors.border,
+    },
+    punktSlideAktiv: {
+      width: 24,
+      backgroundColor: colors.primary,
+    },
+    slideFooter: {
+      paddingHorizontal: 24,
+      paddingBottom: 40,
+      marginTop: 16,
+    },
+
+    // Formular Styles
     scroll: {
       flexGrow: 1,
       padding: 24,
@@ -332,7 +529,7 @@ const styles = (colors: ReturnType<typeof useColors>) =>
       fontSize: 14,
       color: colors.muted,
       lineHeight: 20,
-      marginBottom: 24,
+      marginBottom: 20,
     },
     label: {
       fontSize: 13,
@@ -346,14 +543,13 @@ const styles = (colors: ReturnType<typeof useColors>) =>
       borderWidth: 1,
       borderColor: colors.border,
       borderRadius: 12,
-      paddingHorizontal: 16,
-      paddingVertical: 14,
+      padding: 14,
       fontSize: 16,
       color: colors.foreground,
     },
     zeile: {
       flexDirection: "row",
-      alignItems: "flex-start",
+      gap: 0,
     },
     fehlerText: {
       color: colors.error,
@@ -363,30 +559,30 @@ const styles = (colors: ReturnType<typeof useColors>) =>
     button: {
       backgroundColor: colors.primary,
       borderRadius: 14,
-      paddingVertical: 16,
+      padding: 16,
       alignItems: "center",
-      marginTop: 24,
+      marginTop: 20,
     },
     buttonPressed: {
       opacity: 0.85,
       transform: [{ scale: 0.98 }],
     },
     buttonDisabled: {
-      opacity: 0.6,
+      opacity: 0.5,
     },
     buttonText: {
       color: "#fff",
-      fontSize: 17,
+      fontSize: 16,
       fontWeight: "700",
     },
     zurueckButton: {
       alignItems: "center",
-      paddingVertical: 12,
-      marginTop: 8,
+      padding: 12,
+      marginTop: 4,
     },
     zurueckText: {
       color: colors.muted,
-      fontSize: 15,
+      fontSize: 14,
     },
     hinweis: {
       fontSize: 11,
@@ -395,11 +591,31 @@ const styles = (colors: ReturnType<typeof useColors>) =>
       marginTop: 32,
       lineHeight: 16,
     },
+    // DSGVO
+    dsgvoBox: {
+      backgroundColor: colors.surface,
+      borderRadius: 12,
+      padding: 16,
+      marginTop: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    dsgvoTitel: {
+      fontSize: 13,
+      fontWeight: "700",
+      color: colors.foreground,
+      marginBottom: 8,
+    },
+    dsgvoHinweis: {
+      fontSize: 12,
+      color: colors.muted,
+      lineHeight: 18,
+      marginBottom: 12,
+    },
     dsgvoZeile: {
       flexDirection: "row",
+      gap: 10,
       alignItems: "flex-start",
-      marginTop: 20,
-      gap: 12,
     },
     checkbox: {
       width: 22,
@@ -407,11 +623,10 @@ const styles = (colors: ReturnType<typeof useColors>) =>
       borderRadius: 6,
       borderWidth: 2,
       borderColor: colors.border,
-      backgroundColor: colors.surface,
       alignItems: "center",
       justifyContent: "center",
-      marginTop: 1,
       flexShrink: 0,
+      marginTop: 1,
     },
     checkboxAktiv: {
       backgroundColor: colors.primary,
@@ -424,32 +639,12 @@ const styles = (colors: ReturnType<typeof useColors>) =>
     },
     dsgvoText: {
       flex: 1,
-      fontSize: 13,
+      fontSize: 12,
       color: colors.muted,
-      lineHeight: 19,
+      lineHeight: 18,
     },
     dsgvoLink: {
       color: colors.primary,
       textDecorationLine: "underline",
-    },
-    dsgvoBox: {
-      backgroundColor: colors.surface,
-      borderRadius: 12,
-      borderWidth: 1,
-      borderColor: colors.border,
-      padding: 14,
-      marginTop: 20,
-    },
-    dsgvoTitel: {
-      fontSize: 13,
-      fontWeight: "700",
-      color: colors.foreground,
-      marginBottom: 6,
-    },
-    dsgvoHinweis: {
-      fontSize: 12,
-      color: colors.muted,
-      lineHeight: 17,
-      marginBottom: 4,
     },
   });
