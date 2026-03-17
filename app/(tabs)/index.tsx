@@ -320,9 +320,21 @@ export default function EntdeckenScreen() {
             </Text>
           </View>
         </View>
-        <Text style={styles.hofOrt}>
-          📍 {item.ort}{item.plz ? ` · ${item.plz}` : ""}
-        </Text>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 6, flexWrap: "wrap", marginBottom: 4 }}>
+          <Text style={styles.hofOrt}>
+            📍 {item.ort}{item.plz ? ` · ${item.plz}` : ""}
+          </Text>
+          {item.hobbyAnbau !== undefined && (
+            <View style={[
+              styles.distanzBadge,
+              { backgroundColor: item.hobbyAnbau ? "#22C55E20" : colors.primary + "20" }
+            ]}>
+              <Text style={[styles.distanzText, { color: item.hobbyAnbau ? "#22C55E" : colors.primary }]}>
+                {item.hobbyAnbau ? "🌿 Hobby-Anbieter" : "🏪 Gewerblich"}
+              </Text>
+            </View>
+          )}
+        </View>
         {kategorien.length > 0 && (
           <View style={styles.kategorienContainer}>
             {kategorien.map((kat) => {

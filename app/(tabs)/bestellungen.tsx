@@ -3,7 +3,6 @@
  * Separater Tab für die Bestellhistorie mit Status-Anzeige.
  */
 
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import { ladeBestellungStatus } from "@/lib/hofmarkt-api";
@@ -18,22 +17,12 @@ import {
 
 import { ScreenContainer } from "@/components/screen-container";
 import { useColors } from "@/hooks/use-colors";
-
-const BESTELLHISTORIE_KEY = "gartengluck_bestellhistorie";
-
-export interface BestellHistorieEintrag {
-  id?: number;
-  userId: number;
-  hofName: string;
-  ort: string | null;
-  datum: string;
-  shopLink: string | null;
-  gesamtpreis?: number;
-  anzahlProdukte?: number;
-  // HofSpot v1.2: "bereit" ist Alias für "abholbereit", "abgelehnt" ist neu
-  status?: "neu" | "bestaetigt" | "abholbereit" | "bereit" | "abgeholt" | "storniert" | "abgelehnt";
-  bewertungAbgegeben?: boolean;
-}
+import {
+  ladeBestellHistorie,
+  aktualisiereBestellStatusInHistorie,
+  speichereBestellungInHistorie,
+  type BestellHistorieEintrag,
+} from "@/lib/nutzer-store";
 
 export default function BestellungenScreen() {
   const colors = useColors();
@@ -44,9 +33,8 @@ export default function BestellungenScreen() {
   useFocusEffect(
     useCallback(() => {
       (async () => {
-        // 1. Lokale Historie laden
-        const raw = await AsyncStorage.getItem(BESTELLHISTORIE_KEY);
-        const liste: BestellHistorieEintrag[] = raw ? JSON.parse(raw) : [];
+        // 1. Lokale Historie laden (neueste zuerst)
+        const liste = await ladeBestellHistorie();
         setBestellungen(liste);
         setAktualisiert(false);
 
@@ -55,17 +43,13 @@ export default function BestellungenScreen() {
         if (mitId.length === 0) return;
 
         let geaendert = false;
-        const aktualisiert = [...liste];
         await Promise.all(
           mitId.map(async (eintrag) => {
             try {
               const serverStatus = await ladeBestellungStatus(eintrag.id!);
               if (serverStatus && serverStatus.status !== eintrag.status) {
-                const idx = aktualisiert.findIndex((e) => e.id === eintrag.id);
-                if (idx !== -1) {
-                  aktualisiert[idx] = { ...aktualisiert[idx], status: serverStatus.status };
-                  geaendert = true;
-                }
+                await aktualisiereBestellStatusInHistorie(eintrag.id!, serverStatus.status);
+                geaendert = true;
               }
             } catch {
               // Ignorieren – lokaler Status bleibt
@@ -74,8 +58,8 @@ export default function BestellungenScreen() {
         );
 
         if (geaendert) {
-          setBestellungen([...aktualisiert]);
-          await AsyncStorage.setItem(BESTELLHISTORIE_KEY, JSON.stringify(aktualisiert));
+          const aktualisiert = await ladeBestellHistorie();
+          setBestellungen(aktualisiert);
           setAktualisiert(true);
         }
       })();
@@ -83,16 +67,18 @@ export default function BestellungenScreen() {
   );
 
   const handleLoeschen = useCallback(
-    async (index: number) => {
+    async (bestellId: number) => {
       Alert.alert("Eintrag löschen", "Diesen Eintrag aus der Historie entfernen?", [
         { text: "Abbrechen", style: "cancel" },
         {
           text: "Löschen",
           style: "destructive",
           onPress: async () => {
-            const aktualisiert = bestellungen.filter((_, i) => i !== index);
+            const aktualisiert = bestellungen.filter((e) => e.id !== bestellId);
             setBestellungen(aktualisiert);
-            await AsyncStorage.setItem(BESTELLHISTORIE_KEY, JSON.stringify(aktualisiert));
+            // Direkt in AsyncStorage schreiben (ohne neue Funktion für Löschen)
+            const AsyncStorage = (await import("@react-native-async-storage/async-storage")).default;
+            await AsyncStorage.setItem("gartengluck_bestellhistorie", JSON.stringify(aktualisiert));
           },
         },
       ]);
@@ -144,7 +130,12 @@ export default function BestellungenScreen() {
           </View>
         </View>
 
-        {item.ort && <Text style={s.ort}>📍 {item.ort}</Text>}
+        {/* Produkte anzeigen */}
+        {item.produkte && item.produkte.length > 0 && (
+          <Text style={s.produkte} numberOfLines={2}>
+            {item.produkte.map((p) => `${p.menge}× ${p.name}`).join(" · ")}
+          </Text>
+        )}
 
         <Text style={s.datum}>
           {datumText} um {zeitText} Uhr
@@ -157,25 +148,22 @@ export default function BestellungenScreen() {
           <Text style={s.bestellnr}>Bestellnr. #{item.id}</Text>
         )}
 
-        {item.status === "abgeholt" && !item.bewertungAbgegeben && (
+        {item.status === "abgeholt" && (
           <Pressable
             style={({ pressed }) => [s.bewertungButton, pressed && { opacity: 0.8 }]}
             onPress={() =>
               router.push({
                 pathname: "/bewertung" as any,
                 params: {
-                  bestellIndex: String(realIndex),
+                  bestellIndex: String(item.id ?? 0),
                   hofName: item.hofName,
-                  userId: String(item.userId),
+                  userId: String(item.hofUserId),
                 },
               })
             }
           >
             <Text style={s.bewertungButtonText}>⭐ Bewertung abgeben</Text>
           </Pressable>
-        )}
-        {item.bewertungAbgegeben && (
-          <Text style={s.bewertungAbgegeben}>✔️ Bewertung abgegeben</Text>
         )}
 
         <View style={s.aktionen}>
@@ -184,7 +172,7 @@ export default function BestellungenScreen() {
             onPress={() =>
               router.push({
                 pathname: "/hof/[id]" as any,
-                params: { id: item.userId, userId: item.userId, hofName: item.hofName },
+                params: { id: item.hofUserId, userId: item.hofUserId, hofName: item.hofName },
               })
             }
           >
@@ -192,7 +180,7 @@ export default function BestellungenScreen() {
           </Pressable>
           <Pressable
             style={({ pressed }) => [s.loeschenButton, pressed && { opacity: 0.7 }]}
-            onPress={() => handleLoeschen(realIndex)}
+            onPress={() => handleLoeschen(item.id)}
           >
             <Text style={s.loeschenText}>✕</Text>
           </Pressable>
@@ -388,5 +376,11 @@ const styles = (colors: ReturnType<typeof useColors>) =>
       color: colors.success,
       marginBottom: 8,
       marginTop: 4,
+    },
+    produkte: {
+      fontSize: 13,
+      color: colors.muted,
+      marginBottom: 4,
+      lineHeight: 18,
     },
   });

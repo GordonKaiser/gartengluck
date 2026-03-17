@@ -24,10 +24,8 @@ import { ScreenContainer } from "@/components/screen-container";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useColors } from "@/hooks/use-colors";
 import { sendeBestellung, formatPreis, type BestellProdukt } from "@/lib/hofmarkt-api";
-import { ladeNutzerProfil, type NutzerProfil } from "@/lib/nutzer-store";
+import { ladeNutzerProfil, speichereBestellungInHistorie, type NutzerProfil } from "@/lib/nutzer-store";
 import { useWarenkorb } from "@/lib/warenkorb-store";
-
-const BESTELLHISTORIE_KEY = "gartengluck_bestellhistorie";
 
 type Phase = "formular" | "bestaetigung";
 
@@ -110,25 +108,22 @@ export default function BestellungScreen() {
       if (antwort.success) {
         setBestellId(antwort.id);
 
-        // Bestellhistorie speichern
-        try {
-          const raw = await AsyncStorage.getItem(BESTELLHISTORIE_KEY);
-          const historie = raw ? JSON.parse(raw) : [];
-          historie.push({
-            id: antwort.id,
-            userId: hofUserId,
-            hofName,
-            ort: ort.trim() || null,
-            datum: new Date().toISOString(),
-            gesamtpreis,
-            anzahlProdukte: warenkorb.positionen.length,
-            status: "neu",
-          });
-          if (historie.length > 50) historie.splice(0, historie.length - 50);
-          await AsyncStorage.setItem(BESTELLHISTORIE_KEY, JSON.stringify(historie));
-        } catch {
-          // Ignorieren
-        }
+        // Bestellhistorie lokal speichern (vollständig mit Produkten)
+        await speichereBestellungInHistorie({
+          id: antwort.id,
+          hofName,
+          hofUserId,
+          produkte: warenkorb.positionen.map((pos) => ({
+            name: pos.produkt.name,
+            menge: pos.menge,
+            preis: pos.produkt.preis ?? "0",
+            einheit: pos.produkt.einheit,
+          })),
+          status: "neu",
+          kundeTelefon: telefon.trim(),
+          gesamtpreis,
+          datum: new Date().toISOString(),
+        });
 
         leere();
         if (Platform.OS !== "web") {

@@ -265,3 +265,8 @@
 - [x] Bewertung: kaeuferTelefon + kaeuferName aus Nutzerprofil mitschicken (bewertung.tsx)
 - [x] Karte mit Hof-Pins einbauen (react-native-maps, Modal via /karte, Karte-Button in Ergebnisliste, grün=Hobby/rot=Gewerbe)
 - [x] Übergabeprotokoll für HofSpot erstellt (locabuy-an-hofspot-v12.md)
+
+## Feature-Umsetzung v13 (17.03.2026)
+- [x] Bewertungs-Dialog nach Abholung: Push-Benachrichtigung neuerStatus=abgeholt löst Dialog aus (BewertungsDialogModal in _layout.tsx, leitet zu /bewertung weiter)
+- [x] Bestellhistorie lokal in AsyncStorage speichern: speichereBestellungInHistorie() in nutzer-store.ts, vollständig mit Produkten, Bestellungen-Tab zeigt Produktliste
+- [x] Hobby-Anbieter-Badge in der Hof-Karte der Suchliste: grün=Hobby-Anbieter, rot=Gewerblich, erscheint wenn hobbyAnbau-Feld verfügbar

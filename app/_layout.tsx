@@ -104,6 +104,13 @@ export default function RootLayout() {
   const [pinVergessenTelefon, setPinVergessenTelefon] = useState("");
   const [pinVergessenFehler, setPinVergessenFehler] = useState("");
 
+  // Bewertungs-Dialog nach Abholung
+  const [bewertungDialog, setBewertungDialog] = useState<{
+    bestellId: number;
+    hofName: string;
+    userId: number;
+  } | null>(null);
+
   useEffect(() => {
     (async () => {
       const gespeicherterPin = await AsyncStorage.getItem(APP_PIN_KEY);
@@ -216,24 +223,40 @@ export default function RootLayout() {
         shouldShowList: true,
       }),
     });
-    // Benachrichtigung im Vordergrund empfangen → Status lokal aktualisieren
+    // Benachrichtigung im Vordergrund empfangen → Status lokal aktualisieren + Bewertungs-Dialog
     const foregroundSub = Notifications.addNotificationReceivedListener(async (notification) => {
       const data = notification.request.content.data;
       if (data?.bestellId && data?.neuerStatus) {
         await aktualisiereBestellStatus(Number(data.bestellId), String(data.neuerStatus));
+        // Bei Abholung: Bewertungs-Dialog anzeigen
+        if (String(data.neuerStatus) === "abgeholt" && data.hofName && data.hofUserId) {
+          setBewertungDialog({
+            bestellId: Number(data.bestellId),
+            hofName: String(data.hofName),
+            userId: Number(data.hofUserId),
+          });
+        }
       }
     });
-    // Tap auf Benachrichtigung → Status aktualisieren + Favoriten-Tab öffnen
+    // Tap auf Benachrichtigung → Status aktualisieren + Bewertungs-Dialog oder Navigation
     const tapSub = Notifications.addNotificationResponseReceivedListener(async (response) => {
       const data = response.notification.request.content.data;
       if (data?.bestellId && data?.neuerStatus) {
         await aktualisiereBestellStatus(Number(data.bestellId), String(data.neuerStatus));
+        // Bei Abholung: Bewertungs-Dialog anzeigen
+        if (String(data.neuerStatus) === "abgeholt" && data.hofName && data.hofUserId) {
+          setBewertungDialog({
+            bestellId: Number(data.bestellId),
+            hofName: String(data.hofName),
+            userId: Number(data.hofUserId),
+          });
+          return;
+        }
       }
       const url = data?.url;
       if (typeof url === "string") {
         router.push(url as never);
       } else {
-        // Fallback: Bestellungen-Tab öffnen (passt zu Bestellstatus-Benachrichtigungen)
         router.push("/(tabs)/bestellungen" as never);
       }
     });
@@ -252,6 +275,28 @@ export default function RootLayout() {
       },
     };
   }, [initialInsets, initialFrame]);
+
+  // Bewertungs-Dialog-Modal (erscheint nach "abgeholt"-Push)
+  const bewertungModal = bewertungDialog ? (
+    <BewertungsDialogModal
+      hofName={bewertungDialog.hofName}
+      userId={bewertungDialog.userId}
+      bestellId={bewertungDialog.bestellId}
+      onClose={() => setBewertungDialog(null)}
+      onBewerten={() => {
+        const { bestellId, hofName, userId } = bewertungDialog;
+        setBewertungDialog(null);
+        router.push({
+          pathname: "/bewertung" as any,
+          params: {
+            bestellIndex: String(bestellId),
+            hofName,
+            userId: String(userId),
+          },
+        });
+      }}
+    />
+  ) : null;
 
   const pinModal = pinAbfrageOffen ? (
     <Modal visible transparent animationType="fade">
@@ -338,6 +383,8 @@ export default function RootLayout() {
             <Stack.Screen name="hof/[id]" />
             <Stack.Screen name="onboarding" options={{ presentation: "fullScreenModal" }} />
             <Stack.Screen name="bestellung" options={{ presentation: "modal" }} />
+            <Stack.Screen name="bewertung" options={{ presentation: "modal" }} />
+            <Stack.Screen name="karte" options={{ presentation: "modal" }} />
             <Stack.Screen name="oauth/callback" />
           </Stack>
           <StatusBar style="auto" />
@@ -368,10 +415,97 @@ export default function RootLayout() {
       <SafeAreaProvider initialMetrics={providerInitialMetrics}>
         {content}
         {pinModal}
+      {bewertungModal}
       </SafeAreaProvider>
     </ThemeProvider>
   );
 }
+
+// ── Bewertungs-Dialog-Komponente ─────────────────────────────────────────────
+
+function BewertungsDialogModal({
+  hofName,
+  onClose,
+  onBewerten,
+}: {
+  hofName: string;
+  userId: number;
+  bestellId: number;
+  onClose: () => void;
+  onBewerten: () => void;
+}) {
+  return (
+    <Modal visible transparent animationType="fade">
+      <View style={bewertungStyles.overlay}>
+        <View style={bewertungStyles.box}>
+          <Text style={bewertungStyles.emoji}>🎉</Text>
+          <Text style={bewertungStyles.titel}>Bestellung abgeholt!</Text>
+          <Text style={bewertungStyles.hinweis}>
+            Wie war deine Bestellung bei{"\n"}
+            <Text style={{ fontWeight: "700" }}>{hofName}</Text>?
+          </Text>
+          <Pressable
+            style={({ pressed }) => [bewertungStyles.button, pressed && { opacity: 0.85 }]}
+            onPress={onBewerten}
+          >
+            <Text style={bewertungStyles.buttonText}>⭐ Jetzt bewerten</Text>
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [bewertungStyles.spaeter, pressed && { opacity: 0.6 }]}
+            onPress={onClose}
+          >
+            <Text style={bewertungStyles.spaeterText}>Später</Text>
+          </Pressable>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+const bewertungStyles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 24,
+  },
+  box: {
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    padding: 28,
+    width: "100%",
+    maxWidth: 360,
+    alignItems: "center",
+  },
+  emoji: { fontSize: 48, marginBottom: 12 },
+  titel: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#11181C",
+    marginBottom: 8,
+    textAlign: "center",
+  },
+  hinweis: {
+    fontSize: 15,
+    color: "#687076",
+    textAlign: "center",
+    marginBottom: 24,
+    lineHeight: 22,
+  },
+  button: {
+    backgroundColor: "#4a7c59",
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    alignItems: "center",
+    width: "100%",
+    marginBottom: 12,
+  },
+  buttonText: { color: "#fff", fontSize: 16, fontWeight: "700" },
+  spaeter: { alignItems: "center", paddingVertical: 8 },
+  spaeterText: { fontSize: 14, color: "#687076" },
+});
 
 const pinStyles = StyleSheet.create({
   overlay: {
