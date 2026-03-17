@@ -23,7 +23,7 @@ import * as Haptics from "expo-haptics";
 import { ScreenContainer } from "@/components/screen-container";
 import { useColors } from "@/hooks/use-colors";
 import { sendeHofBewertung } from "@/lib/hofmarkt-api";
-import { markiereBewertungAbgegeben } from "@/lib/nutzer-store";
+import { markiereBewertungAbgegeben, ladeNutzerProfil } from "@/lib/nutzer-store";
 
 export default function BewertungScreen() {
   const colors = useColors();
@@ -52,10 +52,14 @@ export default function BewertungScreen() {
 
     setIsLoading(true);
     try {
+      // Nutzerprofil laden um Käuferdaten mitzuschicken (HofSpot v2.0)
+      const profil = await ladeNutzerProfil();
       await sendeHofBewertung({
         userId: Number(userId),
         sterne: sterne as 1 | 2 | 3 | 4 | 5,
         kommentar: kommentar.trim() || undefined,
+        kaeuferTelefon: profil?.telefon ?? undefined,
+        kaeuferName: profil?.name ?? undefined,
       });
 
       // Bewertung lokal als abgegeben markieren

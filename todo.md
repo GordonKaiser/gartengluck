@@ -260,3 +260,8 @@
 ## HofSpot API v2.0 Anpassungen (17.03.2026)
 - [x] API-Basis-URL auf https://gefluegel-app-ghkbktmv.manus.space/api/trpc aktualisiert
 - [x] Push-Token-Registrierung auf hofmarkt.registrierePushToken umgestellt (_layout.tsx + hofmarkt-api.ts)
+
+## Feature-Umsetzung v12 (17.03.2026)
+- [x] Bewertung: kaeuferTelefon + kaeuferName aus Nutzerprofil mitschicken (bewertung.tsx)
+- [x] Karte mit Hof-Pins einbauen (react-native-maps, Modal via /karte, Karte-Button in Ergebnisliste, grün=Hobby/rot=Gewerbe)
+- [x] Übergabeprotokoll für HofSpot erstellt (locabuy-an-hofspot-v12.md)

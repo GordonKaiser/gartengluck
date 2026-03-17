@@ -19,6 +19,8 @@ export interface HofSucheErgebnis {
   shopLink: string | null;
   distanzKm: number;
   hobbyAnbau?: boolean;   // true = Hobby-Anbieter, false = Gewerblich
+  lat?: string | null;    // Breitengrad (für Kartenansicht)
+  lon?: string | null;    // Längengrad (für Kartenansicht)
   produkte?: Kategorie[]; // nur wenn Kategorie-Filter aktiv
 }
 

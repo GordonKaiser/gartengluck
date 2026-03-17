@@ -31,6 +31,8 @@ const MAPPING = {
   "location.fill": "location-on",
   "location": "location-on",
   "map.fill": "map",
+  "map.circle.fill": "map",
+  "list.bullet.rectangle": "view-list",
   // Shop / Markt
   "cart.fill": "shopping-cart",
   "cart": "shopping-cart",

@@ -532,6 +532,7 @@ export default function EntdeckenScreen() {
   }
 
   if (gesucht && hoefen.length > 0) {
+    const mitKoords = hoefen.filter((h) => h.lat && h.lon);
     return (
       <ScreenContainer className="flex-1">
         <FlatList
@@ -541,15 +542,43 @@ export default function EntdeckenScreen() {
           ListHeaderComponent={
             <>
               {ListHeader}
-              <View style={styles.ergebnisHeader}>
+              <View style={[styles.ergebnisHeader, { flexDirection: "row", alignItems: "center", justifyContent: "space-between" }]}>
                 <Text style={styles.ergebnisText}>
-                  {hoefen.length} {hoefen.length === 1 ? "Hof" : "Höfe"} in der Nähe von{" "}
-                  {sucheOrt}
+                  {hoefen.length} {hoefen.length === 1 ? "Hof" : "Höfe"} bei {sucheOrt}
                   {anbieterTyp === "hobby" ? " · Nur Hobby" : ""}
                   {aktiveKategorien.length > 0
                     ? ` · ${aktiveKategorien.map((k) => KATEGORIE_MAP[k]?.label).join(", ")}`
                     : ""}
                 </Text>
+                {mitKoords.length > 0 && Platform.OS !== "web" && (
+                  <Pressable
+                    style={({ pressed }) => [{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 4,
+                      backgroundColor: colors.surface,
+                      borderRadius: 8,
+                      borderWidth: 1,
+                      borderColor: colors.border,
+                      paddingHorizontal: 10,
+                      paddingVertical: 5,
+                      opacity: pressed ? 0.7 : 1,
+                    }]}
+                    onPress={() =>
+                      router.push({
+                        pathname: "/karte" as any,
+                        params: {
+                          daten: JSON.stringify(hoefen),
+                          plz: plz.trim(),
+                          ort: sucheOrt,
+                        },
+                      })
+                    }
+                  >
+                    <IconSymbol name="map.fill" size={14} color={colors.primary} />
+                    <Text style={{ fontSize: 12, fontWeight: "600", color: colors.primary }}>Karte</Text>
+                  </Pressable>
+                )}
               </View>
             </>
           }
