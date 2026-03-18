@@ -80,6 +80,28 @@ export default function EinstellungenScreen() {
           </View>
         </View>
 
+        {/* Community */}
+        <View style={s.sektion}>
+          <Text style={s.sektionTitel}>Community</Text>
+          <View style={s.sektionKarte}>
+            <Pressable
+              style={({ pressed }) => [s.zeile, pressed && { opacity: 0.7 }]}
+              onPress={() => router.push("/freunde-einladen" as any)}
+            >
+              <Text style={s.zeileTitel}>🌟 Freunde einladen</Text>
+              <Text style={s.zeileWert}>›</Text>
+            </Pressable>
+            <View style={s.trennlinie} />
+            <Pressable
+              style={({ pressed }) => [s.zeile, pressed && { opacity: 0.7 }]}
+              onPress={() => router.push("/wunschliste" as any)}
+            >
+              <Text style={s.zeileTitel}>❤️ Wunschliste</Text>
+              <Text style={s.zeileWert}>›</Text>
+            </Pressable>
+          </View>
+        </View>
+
         {/* Sicherheit */}
         <View style={s.sektion}>
           <Text style={s.sektionTitel}>Sicherheit</Text>

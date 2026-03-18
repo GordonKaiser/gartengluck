@@ -66,10 +66,20 @@ export default function OnboardingScreen() {
   const [plz, setPlz] = useState("");
   const [fehler, setFehler] = useState<string | null>(null);
   const [dsgvoAkzeptiert, setDsgvoAkzeptiert] = useState(false);
+  const [inviteCode, setInviteCode] = useState("");
+
+  const referralMutation = trpc.nutzer.referralBeiRegistrierung.useMutation();
 
   const registrierenMutation = trpc.nutzer.registrieren.useMutation({
     onSuccess: async (profil) => {
       await speichereNutzerProfil(profil);
+      // Referral-Code generieren und ggf. einlösen
+      try {
+        await referralMutation.mutateAsync({
+          nutzerId: profil.id,
+          inviteCode: inviteCode.trim() || undefined,
+        });
+      } catch (_) { /* Referral ist optional */ }
       router.replace("/(tabs)");
     },
     onError: (err) => {
@@ -309,6 +319,23 @@ export default function OnboardingScreen() {
                   />
                 </View>
               </View>
+
+              {/* Einladungscode (optional) */}
+              <Text style={s.label}>Einladungscode (optional)</Text>
+              <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 4 }}>
+                <TextInput
+                  style={[s.input, { flex: 1, marginBottom: 0 }]}
+                  value={inviteCode}
+                  onChangeText={(t) => setInviteCode(t.toUpperCase())}
+                  placeholder="z.B. MARKT42"
+                  placeholderTextColor={colors.muted}
+                  autoCapitalize="characters"
+                  returnKeyType="done"
+                />
+              </View>
+              <Text style={[s.hinweis, { marginBottom: 16, marginTop: 2 }]}>
+                🌟 Wurdest du von jemandem eingeladen? Gib hier den Code ein und schalte nach 3 Einladungen die Wunschliste frei.
+              </Text>
 
               {/* DSGVO-Einwilligung */}
               <View style={s.dsgvoBox}>

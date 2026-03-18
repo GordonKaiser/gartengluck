@@ -34,6 +34,9 @@ import {
   ladeHofBewertungen,
 } from "@/lib/hofmarkt-api";
 import { useWarenkorb } from "@/lib/warenkorb-store";
+import { aufWunschlisteSetzen, vonWunschlisteEntfernen, istAufWunschliste } from "@/lib/wunschliste-store";
+import { ladeNutzerProfil } from "@/lib/nutzer-store";
+import { trpc } from "@/lib/trpc";
 
 const FAVORITEN_KEY = "gartengluck_favoriten";
 
@@ -55,6 +58,14 @@ export default function HofDetailScreen() {
   const [produkteLaden, setProdukteLaden] = useState(true);
   const [istFavorit, setIstFavorit] = useState(false);
   const [aufgeklappteProdukte, setAufgeklappteProdukte] = useState<Set<string>>(new Set());
+  const [istAufWunschlisteState, setIstAufWunschlisteState] = useState(false);
+  const [nutzerId, setNutzerId] = useState<number | null>(null);
+  const [hatWunschliste, setHatWunschliste] = useState(false);
+
+  const wunschlisteStatusQuery = trpc.referral.meinStatus.useQuery(
+    { nutzerId: nutzerId ?? 0 },
+    { enabled: !!nutzerId }
+  );
   const [bewertungen, setBewertungen] = useState<HofBewertungenAntwort | null>(null);
   const [vollbildIndex, setVollbildIndex] = useState<number | null>(null);
   const vollbildRef = useRef<FlatList>(null);
@@ -113,6 +124,33 @@ export default function HofDetailScreen() {
       setIstFavorit(favoriten.some((f) => f.userId === userId));
     })();
   }, [userId]);
+
+  // Nutzer-ID und Wunschliste-Status laden
+  useEffect(() => {
+    ladeNutzerProfil().then((p) => { if (p?.id) setNutzerId(p.id); });
+    istAufWunschliste(`hof_${userId}`).then(setIstAufWunschlisteState);
+  }, [userId]);
+
+  useEffect(() => {
+    if (wunschlisteStatusQuery.data) {
+      setHatWunschliste(wunschlisteStatusQuery.data.hatWunschliste);
+    }
+  }, [wunschlisteStatusQuery.data]);
+
+  const toggleWunschliste = useCallback(async () => {
+    if (!profil) return;
+    if (Platform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    }
+    const id = `hof_${userId}`;
+    if (istAufWunschlisteState) {
+      await vonWunschlisteEntfernen(id);
+      setIstAufWunschlisteState(false);
+    } else {
+      await aufWunschlisteSetzen({ id, typ: "hof", hofUserId: userId, hofName: profil.hofName });
+      setIstAufWunschlisteState(true);
+    }
+  }, [istAufWunschlisteState, userId, profil]);
 
   const toggleFavorit = useCallback(async () => {
     if (Platform.OS !== "web") {
@@ -587,6 +625,14 @@ export default function HofDetailScreen() {
         <Text style={styles.headerTitel} numberOfLines={1}>
           {profil?.hofName ?? params.hofName ?? "Hof"}
         </Text>
+        {hatWunschliste && (
+          <Pressable
+            style={({ pressed }) => [styles.favButton, { marginRight: 6 }, pressed && { opacity: 0.7 }]}
+            onPress={toggleWunschliste}
+          >
+            <Text style={{ fontSize: 20 }}>{istAufWunschlisteState ? "❤️" : "🤍"}</Text>
+          </Pressable>
+        )}
         <Pressable
           style={({ pressed }) => [styles.favButton, pressed && { opacity: 0.7 }]}
           onPress={toggleFavorit}

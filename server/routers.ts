@@ -11,6 +11,10 @@ import {
   sperrNutzer,
   entsperrNutzer,
   updateNutzerPushToken,
+  getReferralCode,
+  generateReferralCode,
+  einloesenReferralCode,
+  getReferralStatus,
 } from "./db";
 
 // Externe Hobbyanbau-Suite API
@@ -154,6 +158,46 @@ export const appRouter = router({
           sperrGrund: n.sperrGrund,
           erstelltAm: n.createdAt?.toISOString() ?? null,
         }));
+      }),
+
+    /** Referral-Code bei Registrierung generieren und optional einlösen. */
+    referralBeiRegistrierung: publicProcedure
+      .input(z.object({ nutzerId: z.number(), inviteCode: z.string().optional() }))
+      .mutation(async ({ input }) => {
+        await generateReferralCode(input.nutzerId);
+        if (input.inviteCode?.trim()) {
+          try {
+            await einloesenReferralCode(input.inviteCode.trim(), input.nutzerId);
+          } catch (_) { /* Referral optional */ }
+        }
+        return { success: true };
+      }),
+  }),
+
+  // ── Referral-System ───────────────────────────────────────────────────
+  referral: router({
+    /** Eigenen Referral-Code abrufen (wird automatisch generiert falls nicht vorhanden). */
+    meinCode: publicProcedure
+      .input(z.object({ nutzerId: z.number() }))
+      .query(async ({ input }) => {
+        let code = await getReferralCode(input.nutzerId);
+        if (!code) code = await generateReferralCode(input.nutzerId);
+        return { code };
+      }),
+
+    /** Referral-Status: Anzahl Einladungen, Badge, Wunschliste freigeschaltet. */
+    meinStatus: publicProcedure
+      .input(z.object({ nutzerId: z.number() }))
+      .query(async ({ input }) => {
+        return await getReferralStatus(input.nutzerId);
+      }),
+
+    /** Einladungscode einlösen. */
+    codeEinloesen: publicProcedure
+      .input(z.object({ code: z.string().min(3).max(20), nutzerId: z.number() }))
+      .mutation(async ({ input }) => {
+        await einloesenReferralCode(input.code, input.nutzerId);
+        return { success: true };
       }),
   }),
 

@@ -483,3 +483,74 @@ export async function updateNutzerPushToken(telefon: string, pushToken: string) 
     .set({ pushToken })
     .where(eq(gartengluckNutzer.telefon, telefon));
 }
+
+// ── Referral-System (LocaBuy) ─────────────────────────────────────────
+
+import { referralCodes, referralRewards } from "../drizzle/schema";
+
+const REFERRAL_WOERTER = [
+  "MARKT", "FRISCH", "REGIONAL", "LOKAL", "ERNTE", "FELD", "WIESE",
+  "LAND", "NATUR", "GARTEN", "BLUME", "BAUM", "BACH", "KORN", "SAAT",
+  "BIENE", "HONIG", "PILZ", "KRAUT", "BEERE", "APFEL", "BIRNE",
+];
+
+function generiereReferralCode(): string {
+  const wort = REFERRAL_WOERTER[Math.floor(Math.random() * REFERRAL_WOERTER.length)];
+  const zahl = Math.floor(10 + Math.random() * 90);
+  return `${wort}${zahl}`;
+}
+
+export async function getReferralCode(userId: number): Promise<string | null> {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(referralCodes).where(eq(referralCodes.userId, userId)).limit(1);
+  return result.length > 0 ? result[0].code : null;
+}
+
+export async function generateReferralCode(userId: number): Promise<string> {
+  const db = await getDb();
+  if (!db) throw new Error("DB nicht verfügbar");
+  const existing = await getReferralCode(userId);
+  if (existing) return existing;
+  for (let i = 0; i < 10; i++) {
+    const code = generiereReferralCode();
+    try {
+      await db.insert(referralCodes).values({ userId, code });
+      return code;
+    } catch (e: any) {
+      if (e?.code === "ER_DUP_ENTRY") continue;
+      throw e;
+    }
+  }
+  const fallback = `MARKT${Date.now().toString(36).toUpperCase().slice(-6)}`;
+  await db.insert(referralCodes).values({ userId, code: fallback });
+  return fallback;
+}
+
+export async function einloesenReferralCode(code: string, referredUserId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("DB nicht verfügbar");
+  const codeResult = await db.select().from(referralCodes).where(eq(referralCodes.code, code.toUpperCase())).limit(1);
+  if (codeResult.length === 0) throw new Error("Ungültiger Einladungscode");
+  const referrerId = codeResult[0].userId;
+  if (referrerId === referredUserId) throw new Error("Du kannst deinen eigenen Code nicht verwenden");
+  const existing = await db.select().from(referralRewards).where(eq(referralRewards.referredId, referredUserId)).limit(1);
+  if (existing.length > 0) throw new Error("Du hast bereits einen Einladungscode verwendet");
+  await db.insert(referralRewards).values({ referrerId, referredId: referredUserId, eingeloest: false });
+}
+
+export async function getReferralStatus(userId: number) {
+  const db = await getDb();
+  if (!db) return { code: null, anzahlEinladungen: 0, hatStammkundeBadge: false, hatWunschliste: false, einladungen: [] };
+  const code = await getReferralCode(userId);
+  const alsEinlader = await db.select().from(referralRewards).where(eq(referralRewards.referrerId, userId));
+  return {
+    code,
+    anzahlEinladungen: alsEinlader.length,
+    // Stammkunde-Badge: ab 1 eingeladenen Freund
+    hatStammkundeBadge: alsEinlader.length >= 1,
+    // Wunschliste: ab 3 eingeladenen Freunden
+    hatWunschliste: alsEinlader.length >= 3,
+    einladungen: alsEinlader.map(r => ({ referredId: r.referredId, eingeloest: r.eingeloest, createdAt: r.createdAt })),
+  };
+}

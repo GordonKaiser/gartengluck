@@ -1,0 +1,9 @@
+{
+  "query": "\nCREATE TABLE IF NOT EXISTS `referral_codes` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `user_id` int NOT NULL,\n  `code` varchar(20) NOT NULL,\n  `created_at` timestamp NOT NULL DEFAULT (now()),\n  CONSTRAINT `referral_codes_id` PRIMARY KEY(`id`),\n  CONSTRAINT `referral_codes_user_id_unique` UNIQUE(`user_id`),\n  CONSTRAINT `referral_codes_code_unique` UNIQUE(`code`)\n);\n\nCREATE TABLE IF NOT EXISTS `referral_rewards` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `referrer_id` int NOT NULL,\n  `referred_id` int NOT NULL,\n  `eingeloest` boolean NOT NULL DEFAULT false,\n  `eingeloest_at` timestamp,\n  `created_at` timestamp NOT NULL DEFAULT (now()),\n  CONSTRAINT `referral_rewards_id` PRIMARY KEY(`id`),\n  CONSTRAINT `referral_rewards_referred_id_unique` UNIQUE(`referred_id`)\n);\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2To2D9UzzTKA2Dw.41d30386b88a --database WNedjZEAh55HEwZrLbvRkH --execute \nCREATE TABLE IF NOT EXISTS `referral_codes` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `user_id` int NOT NULL,\n  `code` varchar(20) NOT NULL,\n  `created_at` timestamp NOT NULL DEFAULT (now()),\n  CONSTRAINT `referral_codes_id` PRIMARY KEY(`id`),\n  CONSTRAINT `referral_codes_user_id_unique` UNIQUE(`user_id`),\n  CONSTRAINT `referral_codes_code_unique` UNIQUE(`code`)\n);\n\nCREATE TABLE IF NOT EXISTS `referral_rewards` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `referrer_id` int NOT NULL,\n  `referred_id` int NOT NULL,\n  `eingeloest` boolean NOT NULL DEFAULT false,\n  `eingeloest_at` timestamp,\n  `created_at` timestamp NOT NULL DEFAULT (now()),\n  CONSTRAINT `referral_rewards_id` PRIMARY KEY(`id`),\n  CONSTRAINT `referral_rewards_referred_id_unique` UNIQUE(`referred_id`)\n);\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 964
+}

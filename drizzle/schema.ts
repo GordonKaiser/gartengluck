@@ -200,6 +200,25 @@ export const gartengluckNutzer = mysqlTable("gartengluck_nutzer", {
 export type GartengluckNutzer = typeof gartengluckNutzer.$inferSelect;
 export type InsertGartengluckNutzer = typeof gartengluckNutzer.$inferInsert;
 
+// ── Referral-System (LocaBuy) ───────────────────────────────────
+export const referralCodes = mysqlTable("referral_codes", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull().unique(),
+  code: varchar("code", { length: 20 }).notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type ReferralCode = typeof referralCodes.$inferSelect;
+
+export const referralRewards = mysqlTable("referral_rewards", {
+  id: int("id").autoincrement().primaryKey(),
+  referrerId: int("referrer_id").notNull(),
+  referredId: int("referred_id").notNull().unique(),
+  eingeloest: boolean("eingeloest").notNull().default(false),
+  eingeloestAt: timestamp("eingeloest_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type ReferralReward = typeof referralRewards.$inferSelect;
+
 // ── Pilz-Einstellungen ────────────────────────────────────────
 export const pilzEinstellungen = mysqlTable("pilz_einstellungen", {
   id: int("id").autoincrement().primaryKey(),

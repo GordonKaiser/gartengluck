@@ -270,3 +270,16 @@
 - [x] Bewertungs-Dialog nach Abholung: Push-Benachrichtigung neuerStatus=abgeholt löst Dialog aus (BewertungsDialogModal in _layout.tsx, leitet zu /bewertung weiter)
 - [x] Bestellhistorie lokal in AsyncStorage speichern: speichereBestellungInHistorie() in nutzer-store.ts, vollständig mit Produkten, Bestellungen-Tab zeigt Produktliste
 - [x] Hobby-Anbieter-Badge in der Hof-Karte der Suchliste: grün=Hobby-Anbieter, rot=Gewerblich, erscheint wenn hobbyAnbau-Feld verfügbar
+
+## Referral-System v15 (18.03.2026)
+- [x] DB-Migration: referral_codes + referral_einloesungen Tabellen angelegt
+- [x] Drizzle-Schema: referralCodes + referralEinloesungen ergänzt
+- [x] DB-Funktionen: getReferralCode, generateReferralCode, einloesenReferralCode, getReferralStatus
+- [x] tRPC-Router: referral.meinCode, referral.meinStatus, referral.codeEinloesen, nutzer.referralBeiRegistrierung
+- [x] Registrierung: inviteCode-Feld + Referral-Code generieren bei Neuregistrierung
+- [x] Registrierungs-Screen: Einladungscode-Eingabefeld (optional, auto-uppercase, Bonus-Hinweis)
+- [x] Freunde-einladen-Screen: Code anzeigen, Share-Sheet, Fortschrittsbalken, Stammkunde-Badge + Wunschliste-Belohnungen
+- [x] Einstellungen: Community-Sektion mit "Freunde einladen" + "Wunschliste"
+- [x] Wunschliste-Store: ladeWunschliste, aufWunschlisteSetzen, vonWunschlisteEntfernen, istAufWunschliste
+- [x] Wunschliste-Screen: gesperrt-Ansicht (mit Link zu Freunde-einladen), freigeschaltet-Ansicht mit FlatList
+- [x] Hof-Detail: Wunschliste-Herz-Button im Header (nur wenn hatWunschliste, toggle mit Haptics)
