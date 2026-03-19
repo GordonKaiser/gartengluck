@@ -2,6 +2,7 @@ import {
   and, eq, gte, lte, sql
 } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
+import mysql from "mysql2/promise";
 import {
   InsertUser,
   users,
@@ -21,6 +22,27 @@ import {
 import { ENV } from "./_core/env";
 
 let _db: ReturnType<typeof drizzle> | null = null;
+
+/**
+ * Entfernt auto-generierte Felder damit TiDB keine DEFAULT-Keywords erhält.
+ * TiDB akzeptiert DEFAULT nicht in VALUES-Klauseln.
+ */
+function cleanInsert<T extends object>(
+  data: T
+): Omit<T, 'id' | 'erstelltAm' | 'aktualisiertAm' | 'createdAt' | 'updatedAt'> {
+  const { id: _id, erstelltAm: _ea, aktualisiertAm: _ua, createdAt: _ca, updatedAt: _ua2, ...rest } = data as any;
+  return rest;
+}
+
+/**
+ * Erstellt eine direkte MySQL-Verbindung für Raw-SQL-Inserts.
+ * Nötig wenn Drizzle DEFAULT-Keywords generiert die TiDB nicht akzeptiert.
+ */
+async function getRawConn(): Promise<mysql.Connection> {
+  const dbUrl = process.env.DATABASE_URL || process.env.MYSQL_URL || process.env.MYSQL_PUBLIC_URL;
+  if (!dbUrl) throw new Error('Keine Datenbank-URL konfiguriert');
+  return mysql.createConnection(dbUrl);
+}
 
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
@@ -416,8 +438,18 @@ export async function registriereNutzer(data: InsertGartengluckNutzer) {
     // Bereits registriert — Profil zurückgeben
     return existing[0];
   }
-  const result = await db.insert(gartengluckNutzer).values(data);
-  const insertId = (result as any)[0]?.insertId ?? (result as any).insertId;
+  // Raw SQL Insert um TiDB DEFAULT-Keyword-Bug zu vermeiden
+  const conn = await getRawConn();
+  let insertId: number;
+  try {
+    const [res] = await conn.execute(
+      'INSERT INTO gartengluck_nutzer (telefon, name, strasse, ort, plz, push_token, gesperrt) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [data.telefon, data.name, data.strasse ?? null, data.ort ?? null, data.plz ?? null, data.pushToken ?? null, false]
+    );
+    insertId = (res as any).insertId;
+  } finally {
+    await conn.end();
+  }
   const neu = await db
     .select()
     .from(gartengluckNutzer)
@@ -508,23 +540,34 @@ export async function getReferralCode(userId: number): Promise<string | null> {
 }
 
 export async function generateReferralCode(userId: number): Promise<string> {
-  const db = await getDb();
-  if (!db) throw new Error("DB nicht verfügbar");
   const existing = await getReferralCode(userId);
   if (existing) return existing;
-  for (let i = 0; i < 10; i++) {
-    const code = generiereReferralCode();
-    try {
-      await db.insert(referralCodes).values({ userId, code });
-      return code;
-    } catch (e: any) {
-      if (e?.code === "ER_DUP_ENTRY") continue;
-      throw e;
+
+  // Raw SQL Insert um TiDB DEFAULT-Keyword-Bug zu vermeiden
+  const conn = await getRawConn();
+  try {
+    for (let i = 0; i < 10; i++) {
+      const code = generiereReferralCode();
+      try {
+        await conn.execute(
+          'INSERT INTO referral_codes (user_id, code, created_at) VALUES (?, ?, NOW())',
+          [userId, code]
+        );
+        return code;
+      } catch (e: any) {
+        if (e?.code === 'ER_DUP_ENTRY') continue;
+        throw e;
+      }
     }
+    const fallback = `MARKT${Date.now().toString(36).toUpperCase().slice(-6)}`;
+    await conn.execute(
+      'INSERT INTO referral_codes (user_id, code, created_at) VALUES (?, ?, NOW())',
+      [userId, fallback]
+    );
+    return fallback;
+  } finally {
+    await conn.end();
   }
-  const fallback = `MARKT${Date.now().toString(36).toUpperCase().slice(-6)}`;
-  await db.insert(referralCodes).values({ userId, code: fallback });
-  return fallback;
 }
 
 export async function einloesenReferralCode(code: string, referredUserId: number): Promise<void> {
@@ -536,7 +579,16 @@ export async function einloesenReferralCode(code: string, referredUserId: number
   if (referrerId === referredUserId) throw new Error("Du kannst deinen eigenen Code nicht verwenden");
   const existing = await db.select().from(referralRewards).where(eq(referralRewards.referredId, referredUserId)).limit(1);
   if (existing.length > 0) throw new Error("Du hast bereits einen Einladungscode verwendet");
-  await db.insert(referralRewards).values({ referrerId, referredId: referredUserId, eingeloest: false });
+  // Raw SQL Insert um TiDB DEFAULT-Keyword-Bug zu vermeiden
+  const conn = await getRawConn();
+  try {
+    await conn.execute(
+      'INSERT INTO referral_rewards (referrer_id, referred_id, eingeloest, created_at) VALUES (?, ?, 0, NOW())',
+      [referrerId, referredUserId]
+    );
+  } finally {
+    await conn.end();
+  }
 }
 
 export async function getReferralStatus(userId: number) {

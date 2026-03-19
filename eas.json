@@ -17,15 +17,20 @@
       "channel": "production",
       "ios": {
         "credentialsSource": "remote"
+      },
+      "android": {
+        "buildType": "app-bundle"
       }
     }
   },
   "submit": {
     "production": {
       "ios": {
-        "ascAppId": "HIER_APP_ID_EINTRAGEN",
-        "appleApiKeyId": "4823S5ACL7",
-        "appleApiIssuerId": "a11b882b-d13a-45dc-8e0d-fbe16f0b038b"
+        "ascAppId": "6760811268"
+      },
+      "android": {
+        "serviceAccountKeyPath": "/home/ubuntu/.google/solar-sylph-386404-2108fb3e473d.json",
+        "track": "internal"
       }
     }
   }
