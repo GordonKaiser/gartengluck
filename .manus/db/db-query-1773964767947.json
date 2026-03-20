@@ -1,0 +1,25 @@
+{
+  "query": "SHOW TABLES;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2To2D9UzzTKA2Dw.41d30386b88a --database WNedjZEAh55HEwZrLbvRkH --execute SHOW TABLES;",
+  "rows": [
+    {
+      "Tables_in_WNedjZEAh55HEwZrLbvRkH": "__drizzle_migrations"
+    },
+    {
+      "Tables_in_WNedjZEAh55HEwZrLbvRkH": "gartengluck_nutzer"
+    },
+    {
+      "Tables_in_WNedjZEAh55HEwZrLbvRkH": "referral_codes"
+    },
+    {
+      "Tables_in_WNedjZEAh55HEwZrLbvRkH": "referral_rewards"
+    },
+    {
+      "Tables_in_WNedjZEAh55HEwZrLbvRkH": "users"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_WNedjZEAh55HEwZrLbvRkH\n__drizzle_migrations\ngartengluck_nutzer\nreferral_codes\nreferral_rewards\nusers\n",
+  "stderr": "",
+  "execution_time_ms": 446
+}
