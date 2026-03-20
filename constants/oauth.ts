@@ -45,7 +45,12 @@ export function getApiBaseUrl(): string {
     }
   }
 
-  // Fallback to empty (will use relative URL)
+  // On native (iOS/Android), fall back to the production Railway server
+  if (ReactNative.Platform.OS !== "web") {
+    return "https://gartengluck-production.up.railway.app";
+  }
+
+  // Fallback to empty (will use relative URL on web dev)
   return "";
 }
 
