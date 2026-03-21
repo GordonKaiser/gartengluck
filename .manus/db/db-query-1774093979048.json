@@ -1,0 +1,9 @@
+{
+  "query": "\nCREATE TABLE IF NOT EXISTS locabuy_bestellhistorie (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  nutzer_id INT NOT NULL,\n  bestell_id INT NOT NULL,\n  hof_name VARCHAR(200) NOT NULL,\n  hof_user_id INT NOT NULL,\n  produkte JSON NOT NULL,\n  status VARCHAR(50) NOT NULL DEFAULT 'neu',\n  kunden_telefon VARCHAR(30) NOT NULL,\n  gesamtpreis DECIMAL(10,2),\n  bestellt_am TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  aktualisiert_am TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  INDEX idx_nutzer_id (nutzer_id),\n  INDEX idx_bestell_id (bestell_id),\n  UNIQUE KEY uk_bestell_id (bestell_id)\n);\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2To2D9UzzTKA2Dw.41d30386b88a --database WNedjZEAh55HEwZrLbvRkH --execute \nCREATE TABLE IF NOT EXISTS locabuy_bestellhistorie (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  nutzer_id INT NOT NULL,\n  bestell_id INT NOT NULL,\n  hof_name VARCHAR(200) NOT NULL,\n  hof_user_id INT NOT NULL,\n  produkte JSON NOT NULL,\n  status VARCHAR(50) NOT NULL DEFAULT 'neu',\n  kunden_telefon VARCHAR(30) NOT NULL,\n  gesamtpreis DECIMAL(10,2),\n  bestellt_am TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  aktualisiert_am TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  INDEX idx_nutzer_id (nutzer_id),\n  INDEX idx_bestell_id (bestell_id),\n  UNIQUE KEY uk_bestell_id (bestell_id)\n);\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 498
+}

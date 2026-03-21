@@ -22,8 +22,10 @@ import {
   ladeBestellHistorie,
   aktualisiereBestellStatusInHistorie,
   speichereBestellungInHistorie,
+  ladeNutzerProfil,
   type BestellHistorieEintrag,
 } from "@/lib/nutzer-store";
+import { createTRPCClient } from "@/lib/trpc";
 
 export default function BestellungenScreen() {
   const colors = useColors();
@@ -36,14 +38,50 @@ export default function BestellungenScreen() {
     setAktualisiert(false);
     try {
       // 1. Lokale Historie laden (neueste zuerst)
-      const liste = await ladeBestellHistorie();
+      let liste = await ladeBestellHistorie();
+
+      // 2. Server-Bestellhistorie laden und mit lokaler zusammenführen
+      try {
+        const profil = await ladeNutzerProfil();
+        if (profil?.id) {
+          const client = createTRPCClient();
+          const serverListe = await (client as any).bestellhistorie.laden.query({ nutzerId: profil.id });
+          if (serverListe && serverListe.length > 0) {
+            // Server-Einträge in lokale Historie übernehmen (fehlende ergänzen)
+            const lokaleIds = new Set(liste.map((e: BestellHistorieEintrag) => e.id));
+            let geaendert = false;
+            for (const serverEintrag of serverListe) {
+              if (!lokaleIds.has(serverEintrag.bestellId)) {
+                await speichereBestellungInHistorie({
+                  id: serverEintrag.bestellId,
+                  hofName: serverEintrag.hofName,
+                  hofUserId: serverEintrag.hofUserId,
+                  produkte: serverEintrag.produkte,
+                  status: serverEintrag.status,
+                  kundeTelefon: serverEintrag.kundenTelefon,
+                  gesamtpreis: serverEintrag.gesamtpreis ?? undefined,
+                  datum: serverEintrag.bestelltAm,
+                });
+                geaendert = true;
+              }
+            }
+            if (geaendert) {
+              liste = await ladeBestellHistorie();
+            }
+          }
+        }
+      } catch {
+        // Ignorieren – Server nicht erreichbar, lokale Daten verwenden
+      }
+
       setBestellungen(liste);
-      // 2. Status aller Bestellungen mit ID vom Server abrufen
-      const mitId = liste.filter((e) => e.id !== undefined);
+
+      // 3. Status aller Bestellungen mit ID vom HofSpot-Server abrufen
+      const mitId = liste.filter((e: BestellHistorieEintrag) => e.id !== undefined);
       if (mitId.length === 0) return;
       let geaendert = false;
       await Promise.all(
-        mitId.map(async (eintrag) => {
+        mitId.map(async (eintrag: BestellHistorieEintrag) => {
           try {
             const serverStatus = await ladeBestellungStatus(eintrag.id!);
             if (serverStatus && serverStatus.status !== eintrag.status) {

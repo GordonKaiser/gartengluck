@@ -25,6 +25,7 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useColors } from "@/hooks/use-colors";
 import { sendeBestellung, formatPreis, type BestellProdukt } from "@/lib/hofmarkt-api";
 import { ladeNutzerProfil, ladePushToken, speichereBestellungInHistorie, type NutzerProfil } from "@/lib/nutzer-store";
+import { createTRPCClient } from "@/lib/trpc";
 import { useWarenkorb } from "@/lib/warenkorb-store";
 
 type Phase = "formular" | "bestaetigung";
@@ -110,6 +111,31 @@ export default function BestellungScreen() {
 
       if (antwort.success) {
         setBestellId(antwort.id);
+
+        // Bestellhistorie server-seitig speichern (für Gerätewechsel)
+        try {
+          const profil = await ladeNutzerProfil();
+          if (profil?.id) {
+            const client = createTRPCClient();
+            await (client as any).bestellhistorie.speichern.mutate({
+              nutzerId: profil.id,
+              bestellId: antwort.id,
+              hofName,
+              hofUserId,
+              produkte: warenkorb.positionen.map((pos) => ({
+                name: pos.produkt.name,
+                menge: pos.menge,
+                preis: pos.produkt.preis ?? "0",
+                einheit: pos.produkt.einheit,
+              })),
+              status: "neu",
+              kundenTelefon: telefon.trim(),
+              gesamtpreis: Math.round(gesamtpreis * 100) / 100,
+            });
+          }
+        } catch {
+          // Ignorieren – lokale Speicherung ist Fallback
+        }
 
         // Bestellhistorie lokal speichern (vollständig mit Produkten)
         await speichereBestellungInHistorie({

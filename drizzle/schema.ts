@@ -219,6 +219,23 @@ export const referralRewards = mysqlTable("referral_rewards", {
 });
 export type ReferralReward = typeof referralRewards.$inferSelect;
 
+// ── LocaBuy Bestellhistorie (server-seitig) ──────────────────
+export const locabuyBestellhistorie = mysqlTable("locabuy_bestellhistorie", {
+  id: int("id").autoincrement().primaryKey(),
+  nutzerId: int("nutzer_id").notNull(),
+  bestellId: int("bestell_id").notNull().unique(),
+  hofName: varchar("hof_name", { length: 200 }).notNull(),
+  hofUserId: int("hof_user_id").notNull(),
+  produkte: text("produkte").notNull(), // JSON-String
+  status: varchar("status", { length: 50 }).notNull().default("neu"),
+  kundenTelefon: varchar("kunden_telefon", { length: 30 }).notNull(),
+  gesamtpreis: decimal("gesamtpreis", { precision: 10, scale: 2 }),
+  bestelltAm: timestamp("bestellt_am").defaultNow().notNull(),
+  aktualisiertAm: timestamp("aktualisiert_am").defaultNow().onUpdateNow().notNull(),
+});
+export type LocabuyBestellhistorie = typeof locabuyBestellhistorie.$inferSelect;
+export type InsertLocabuyBestellhistorie = typeof locabuyBestellhistorie.$inferInsert;
+
 // ── Pilz-Einstellungen ────────────────────────────────────────
 export const pilzEinstellungen = mysqlTable("pilz_einstellungen", {
   id: int("id").autoincrement().primaryKey(),

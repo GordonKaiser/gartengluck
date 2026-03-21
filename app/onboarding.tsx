@@ -2,7 +2,9 @@
  * LocaBuy – Onboarding-Screen
  * Phase 0: 3 Intro-Slides (was ist LocaBuy?)
  * Phase 1: Telefonnummer eingeben
- * Phase 2: Name + Adresse + DSGVO
+ *   → Wenn Nummer bereits vorhanden: Login (Profil laden)
+ *   → Wenn neu: weiter zu Phase 2
+ * Phase 2: Name + Adresse + DSGVO (nur bei Neu-Registrierung)
  */
 
 import { useRef, useState } from "react";
@@ -21,7 +23,7 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import { ScreenContainer } from "@/components/screen-container";
-import { trpc } from "@/lib/trpc";
+import { trpc, createTRPCClient } from "@/lib/trpc";
 import { speichereNutzerProfil } from "@/lib/nutzer-store";
 import { useColors } from "@/hooks/use-colors";
 
@@ -68,6 +70,9 @@ export default function OnboardingScreen() {
   const [dsgvoAkzeptiert, setDsgvoAkzeptiert] = useState(false);
   const [inviteCode, setInviteCode] = useState("");
 
+  // Login-State (Telefon bereits vorhanden)
+  const [pruefeNummer, setPruefeNummer] = useState(false);
+
   const referralMutation = trpc.nutzer.referralBeiRegistrierung.useMutation();
 
   const registrierenMutation = trpc.nutzer.registrieren.useMutation({
@@ -106,13 +111,44 @@ export default function OnboardingScreen() {
 
   // ── Formular-Logik ────────────────────────────────────────────────────────
 
-  const weiterZuPhase2 = () => {
+  /**
+   * Prüft ob die Telefonnummer bereits registriert ist.
+   * Falls ja → Login (Profil laden + direkt einloggen).
+   * Falls nein → weiter zu Phase 2 (Registrierung).
+   */
+  const weiterZuPhase2 = async () => {
     const tel = telefon.trim().replace(/\s/g, "");
     if (tel.length < 6) {
       setFehler("Bitte gib eine gültige Telefonnummer ein.");
       return;
     }
     setFehler(null);
+    setPruefeNummer(true);
+
+    try {
+      // Prüfen ob Nummer bereits vorhanden (Login-Versuch)
+      const client = createTRPCClient();
+      const profil = await (client as any).nutzer.einloggen.mutate({ telefon: tel });
+
+      if (profil) {
+        // Nutzer existiert bereits → direkt einloggen
+        await speichereNutzerProfil(profil);
+        router.replace("/(tabs)");
+        return;
+      }
+    } catch (err: any) {
+      // Gesperrter Nutzer
+      if (err?.message?.includes("gesperrt")) {
+        setFehler(err.message);
+        setPruefeNummer(false);
+        return;
+      }
+      // Andere Fehler ignorieren → weiter zur Registrierung
+    } finally {
+      setPruefeNummer(false);
+    }
+
+    // Nummer nicht vorhanden → Registrierung
     setPhase(2);
   };
 
@@ -228,8 +264,7 @@ export default function OnboardingScreen() {
             <View style={s.formular}>
               <Text style={s.schrittTitel}>Willkommen!</Text>
               <Text style={s.schrittText}>
-                Damit wir dich als Käufer kennen, gib bitte deine Telefonnummer an.
-                So können Anbieter dich bei Bestellungen erreichen.
+                Gib deine Telefonnummer ein. Falls du bereits ein Konto hast, wirst du automatisch eingeloggt.
               </Text>
 
               <Text style={s.label}>Telefonnummer *</Text>
@@ -243,15 +278,32 @@ export default function OnboardingScreen() {
                 autoComplete="tel"
                 returnKeyType="next"
                 onSubmitEditing={weiterZuPhase2}
+                editable={!pruefeNummer}
               />
+
+              {/* Login-Hinweis */}
+              <View style={s.loginHinweisBox}>
+                <Text style={s.loginHinweisText}>
+                  🔄 Bereits registriert? Gib einfach deine Telefonnummer ein – dein Konto und deine Bestellungen werden automatisch wiederhergestellt.
+                </Text>
+              </View>
 
               {fehler && <Text style={s.fehlerText}>{fehler}</Text>}
 
               <Pressable
-                style={({ pressed }) => [s.button, pressed && s.buttonPressed]}
+                style={({ pressed }) => [
+                  s.button,
+                  pressed && s.buttonPressed,
+                  pruefeNummer && s.buttonDisabled,
+                ]}
                 onPress={weiterZuPhase2}
+                disabled={pruefeNummer}
               >
-                <Text style={s.buttonText}>Weiter →</Text>
+                {pruefeNummer ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={s.buttonText}>Weiter →</Text>
+                )}
               </Pressable>
 
               <Pressable
@@ -617,6 +669,19 @@ const styles = (colors: ReturnType<typeof useColors>) =>
       textAlign: "center",
       marginTop: 32,
       lineHeight: 16,
+    },
+    loginHinweisBox: {
+      backgroundColor: colors.primary + "15",
+      borderRadius: 10,
+      padding: 12,
+      marginTop: 12,
+      borderWidth: 1,
+      borderColor: colors.primary + "30",
+    },
+    loginHinweisText: {
+      fontSize: 13,
+      color: colors.primary,
+      lineHeight: 18,
     },
     // DSGVO
     dsgvoBox: {

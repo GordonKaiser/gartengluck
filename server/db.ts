@@ -591,6 +591,90 @@ export async function einloesenReferralCode(code: string, referredUserId: number
   }
 }
 
+// ── LocaBuy Bestellhistorie (server-seitig) ────────────────────
+
+import { locabuyBestellhistorie } from "../drizzle/schema";
+
+export interface BestellHistorieEintragDB {
+  id: number;
+  bestellId: number;
+  hofName: string;
+  hofUserId: number;
+  produkte: Array<{ name: string; menge: number; preis: string; einheit: string }>;
+  status: string;
+  kundenTelefon: string;
+  gesamtpreis: number | null;
+  bestelltAm: string;
+}
+
+/** Bestellung in der server-seitigen Historie speichern. */
+export async function speichereBestellungServerSeitig(eintrag: {
+  nutzerId: number;
+  bestellId: number;
+  hofName: string;
+  hofUserId: number;
+  produkte: Array<{ name: string; menge: number; preis: string; einheit: string }>;
+  status: string;
+  kundenTelefon: string;
+  gesamtpreis: number | null;
+}): Promise<void> {
+  const conn = await getRawConn();
+  try {
+    await conn.execute(
+      `INSERT INTO locabuy_bestellhistorie
+        (nutzer_id, bestell_id, hof_name, hof_user_id, produkte, status, kunden_telefon, gesamtpreis, bestellt_am)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+       ON DUPLICATE KEY UPDATE
+        status = VALUES(status),
+        aktualisiert_am = NOW()`,
+      [
+        eintrag.nutzerId,
+        eintrag.bestellId,
+        eintrag.hofName,
+        eintrag.hofUserId,
+        JSON.stringify(eintrag.produkte),
+        eintrag.status,
+        eintrag.kundenTelefon,
+        eintrag.gesamtpreis ?? null,
+      ]
+    );
+  } finally {
+    await conn.end();
+  }
+}
+
+/** Bestellhistorie eines Nutzers vom Server laden. */
+export async function ladeBestellHistorieVomServer(nutzerId: number): Promise<BestellHistorieEintragDB[]> {
+  const db = await getDb();
+  if (!db) return [];
+  const rows = await db
+    .select()
+    .from(locabuyBestellhistorie)
+    .where(eq(locabuyBestellhistorie.nutzerId, nutzerId))
+    .orderBy(locabuyBestellhistorie.bestelltAm);
+  return rows.map((r) => ({
+    id: r.id,
+    bestellId: r.bestellId,
+    hofName: r.hofName,
+    hofUserId: r.hofUserId,
+    produkte: (() => { try { return JSON.parse(r.produkte); } catch { return []; } })(),
+    status: r.status,
+    kundenTelefon: r.kundenTelefon,
+    gesamtpreis: r.gesamtpreis ? parseFloat(String(r.gesamtpreis)) : null,
+    bestelltAm: r.bestelltAm.toISOString(),
+  }));
+}
+
+/** Status einer Bestellung in der server-seitigen Historie aktualisieren. */
+export async function aktualisiereBestellStatusServerSeitig(bestellId: number, neuerStatus: string): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  await db
+    .update(locabuyBestellhistorie)
+    .set({ status: neuerStatus })
+    .where(eq(locabuyBestellhistorie.bestellId, bestellId));
+}
+
 export async function getReferralStatus(userId: number) {
   const db = await getDb();
   if (!db) return { code: null, anzahlEinladungen: 0, hatStammkundeBadge: false, hatWunschliste: false, einladungen: [] };

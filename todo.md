@@ -283,3 +283,11 @@
 - [x] Wunschliste-Store: ladeWunschliste, aufWunschlisteSetzen, vonWunschlisteEntfernen, istAufWunschliste
 - [x] Wunschliste-Screen: gesperrt-Ansicht (mit Link zu Freunde-einladen), freigeschaltet-Ansicht mit FlatList
 - [x] Hof-Detail: Wunschliste-Herz-Button im Header (nur wenn hatWunschliste, toggle mit Haptics)
+
+## Account & Login (Gerätewechsel-Unterstützung)
+- [x] Login-Screen: Telefonnummer eingeben → Profil vom Server laden (Wiedereinstieg nach App-Löschung)
+- [x] Onboarding: Unterscheidung zwischen Neu-Registrierung und Login (Telefonnummer bereits vorhanden)
+- [x] Bestellhistorie server-seitig speichern (neue DB-Tabelle locabuy_bestellhistorie)
+- [x] Bestellhistorie vom Server laden beim Login/App-Start
+- [x] Einstellungen: Profil-Karte mit Name, Telefon, Adresse anzeigen
+- [x] Einstellungen: Abmelden-Funktion (Profil lokal löschen, nicht vom Server)

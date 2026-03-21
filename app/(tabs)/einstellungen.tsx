@@ -20,6 +20,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ScreenContainer } from "@/components/screen-container";
 import { useColors } from "@/hooks/use-colors";
 import { useThemeContext } from "@/lib/theme-provider";
+import { ladeNutzerProfil, loescheNutzerProfil, type NutzerProfil } from "@/lib/nutzer-store";
 
 const FAVORITEN_KEY = "gartengluck_favoriten";
 const STORAGE_PLZ_KEY = "gartengluck_letzte_plz";
@@ -29,6 +30,7 @@ export default function EinstellungenScreen() {
   const { colorScheme, setColorScheme } = useThemeContext();
   const [gespeichertePlz, setGespeichertePlz] = useState<string | null>(null);
   const [favoritenAnzahl, setFavoritenAnzahl] = useState(0);
+  const [profil, setProfil] = useState<NutzerProfil | null>(null);
   const isDark = colorScheme === "dark";
 
   useEffect(() => {
@@ -37,7 +39,27 @@ export default function EinstellungenScreen() {
       setGespeichertePlz(plz);
       const raw = await AsyncStorage.getItem(FAVORITEN_KEY);
       setFavoritenAnzahl(raw ? JSON.parse(raw).length : 0);
+      const p = await ladeNutzerProfil();
+      setProfil(p);
     })();
+  }, []);
+
+  const handleAbmelden = useCallback(() => {
+    Alert.alert(
+      "Abmelden",
+      "Dein Konto bleibt gespeichert. Du kannst dich jederzeit mit deiner Telefonnummer wieder einloggen und deine Bestellhistorie abrufen.",
+      [
+        { text: "Abbrechen", style: "cancel" },
+        {
+          text: "Abmelden",
+          style: "destructive",
+          onPress: async () => {
+            await loescheNutzerProfil();
+            router.replace("/onboarding" as any);
+          },
+        },
+      ]
+    );
   }, []);
 
   const handleFavoritenLoeschen = useCallback(() => {
@@ -64,6 +86,49 @@ export default function EinstellungenScreen() {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Profil */}
+        {profil && (
+          <View style={s.sektion}>
+            <Text style={s.sektionTitel}>Mein Konto</Text>
+            <View style={s.sektionKarte}>
+              <View style={s.profilHeader}>
+                <View style={s.profilAvatar}>
+                  <Text style={s.profilAvatarText}>
+                    {profil.name?.charAt(0)?.toUpperCase() ?? "?"}
+                  </Text>
+                </View>
+                <View style={s.profilInfo}>
+                  <Text style={s.profilName}>{profil.name}</Text>
+                  <Text style={s.profilTelefon}>{profil.telefon}</Text>
+                </View>
+              </View>
+              {(profil.strasse || profil.plz || profil.ort) && (
+                <>
+                  <View style={s.trennlinie} />
+                  <View style={s.zeile}>
+                    <Text style={s.zeileTitel}>Adresse</Text>
+                    <Text style={s.zeileWert} numberOfLines={2}>
+                      {[profil.strasse, [profil.plz, profil.ort].filter(Boolean).join(" ")]
+                        .filter(Boolean)
+                        .join(", ")}
+                    </Text>
+                  </View>
+                </>
+              )}
+              <View style={s.trennlinie} />
+              <Pressable
+                style={({ pressed }) => [s.zeile, pressed && { opacity: 0.7 }]}
+                onPress={handleAbmelden}
+              >
+                <Text style={s.destructiveText}>Abmelden</Text>
+              </Pressable>
+            </View>
+            <Text style={s.profilHinweis}>
+              Dein Konto bleibt erhalten. Du kannst dich jederzeit mit deiner Telefonnummer wieder einloggen.
+            </Text>
+          </View>
+        )}
+
         {/* Darstellung */}
         <View style={s.sektion}>
           <Text style={s.sektionTitel}>Darstellung</Text>
@@ -214,5 +279,46 @@ const styles = (colors: ReturnType<typeof useColors>) =>
     destructiveText: { fontSize: 15, color: colors.error },
     versionText: {
       textAlign: "center", fontSize: 12, color: colors.muted, marginTop: 32, marginBottom: 16,
+    },
+    // Profil-Styles
+    profilHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: 16,
+      paddingVertical: 16,
+      gap: 14,
+    },
+    profilAvatar: {
+      width: 52,
+      height: 52,
+      borderRadius: 26,
+      backgroundColor: colors.primary,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    profilAvatarText: {
+      fontSize: 22,
+      fontWeight: "700",
+      color: "#fff",
+    },
+    profilInfo: {
+      flex: 1,
+    },
+    profilName: {
+      fontSize: 17,
+      fontWeight: "700",
+      color: colors.foreground,
+      marginBottom: 2,
+    },
+    profilTelefon: {
+      fontSize: 14,
+      color: colors.muted,
+    },
+    profilHinweis: {
+      fontSize: 12,
+      color: colors.muted,
+      marginTop: 8,
+      marginLeft: 4,
+      lineHeight: 16,
     },
   });

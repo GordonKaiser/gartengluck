@@ -15,6 +15,9 @@ import {
   generateReferralCode,
   einloesenReferralCode,
   getReferralStatus,
+  speichereBestellungServerSeitig,
+  ladeBestellHistorieVomServer,
+  aktualisiereBestellStatusServerSeitig,
 } from "./db";
 
 // Externe Hobbyanbau-Suite API
@@ -160,6 +163,31 @@ export const appRouter = router({
         }));
       }),
 
+    /**
+     * Nutzer per Telefonnummer einloggen (Wiedereinstieg nach App-Neuinstallation).
+     * Gibt das Profil zurück wenn vorhanden, sonst null.
+     */
+    einloggen: publicProcedure
+      .input(z.object({ telefon: z.string().min(6).max(30) }))
+      .mutation(async ({ input }) => {
+        const nutzer = await getNutzerByTelefon(input.telefon.trim());
+        if (!nutzer) return null;
+        if (nutzer.gesperrt) {
+          throw new Error(
+            `Dein Konto wurde gesperrt.${nutzer.sperrGrund ? " Grund: " + nutzer.sperrGrund : ""}`
+          );
+        }
+        return {
+          id: nutzer.id,
+          telefon: nutzer.telefon,
+          name: nutzer.name,
+          strasse: nutzer.strasse,
+          ort: nutzer.ort,
+          plz: nutzer.plz,
+          gesperrt: nutzer.gesperrt,
+        };
+      }),
+
     /** Referral-Code bei Registrierung generieren und optional einlösen. */
     referralBeiRegistrierung: publicProcedure
       .input(z.object({ nutzerId: z.number(), inviteCode: z.string().optional() }))
@@ -297,6 +325,58 @@ export const appRouter = router({
         // hofmarkt.hofProdukte ist in der externen API noch nicht implementiert.
         // Sobald verfügbar: externeAbfrage("hofmarkt.hofProdukte", { userId: input.userId })
         return [];
+      }),
+  }),
+
+  // ── LocaBuy Bestellhistorie (server-seitig) ────────────────────
+  bestellhistorie: router({
+    /** Neue Bestellung in der server-seitigen Historie speichern. */
+    speichern: publicProcedure
+      .input(z.object({
+        nutzerId: z.number().int().positive(),
+        bestellId: z.number().int().positive(),
+        hofName: z.string().min(1).max(200),
+        hofUserId: z.number().int().positive(),
+        produkte: z.array(z.object({
+          name: z.string(),
+          menge: z.number(),
+          preis: z.string(),
+          einheit: z.string(),
+        })),
+        status: z.string().default("neu"),
+        kundenTelefon: z.string().min(6).max(30),
+        gesamtpreis: z.number().nullable().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        await speichereBestellungServerSeitig({
+          nutzerId: input.nutzerId,
+          bestellId: input.bestellId,
+          hofName: input.hofName,
+          hofUserId: input.hofUserId,
+          produkte: input.produkte,
+          status: input.status,
+          kundenTelefon: input.kundenTelefon,
+          gesamtpreis: input.gesamtpreis ?? null,
+        });
+        return { success: true };
+      }),
+
+    /** Bestellhistorie eines Nutzers laden. */
+    laden: publicProcedure
+      .input(z.object({ nutzerId: z.number().int().positive() }))
+      .query(async ({ input }) => {
+        return await ladeBestellHistorieVomServer(input.nutzerId);
+      }),
+
+    /** Status einer Bestellung aktualisieren. */
+    statusAktualisieren: publicProcedure
+      .input(z.object({
+        bestellId: z.number().int().positive(),
+        neuerStatus: z.string().min(1),
+      }))
+      .mutation(async ({ input }) => {
+        await aktualisiereBestellStatusServerSeitig(input.bestellId, input.neuerStatus);
+        return { success: true };
       }),
   }),
 });
