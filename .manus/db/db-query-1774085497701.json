@@ -1,0 +1,97 @@
+{
+  "query": "SELECT * FROM gartengluck_nutzer;\nSELECT * FROM hofmarkt_bestellungen;\nSELECT * FROM referral_codes;\nSELECT * FROM referral_rewards;\nSELECT * FROM users;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2To2D9UzzTKA2Dw.41d30386b88a --database WNedjZEAh55HEwZrLbvRkH --execute SELECT * FROM gartengluck_nutzer;\nSELECT * FROM hofmarkt_bestellungen;\nSELECT * FROM referral_codes;\nSELECT * FROM referral_rewards;\nSELECT * FROM users;",
+  "rows": [
+    {
+      "id": "1",
+      "telefon": "+491737483298",
+      "name": "Gordon Kaiser",
+      "strasse": "Bahnhofstr.10",
+      "ort": "Blankenburg",
+      "plz": "38889",
+      "push_token": "NULL",
+      "gesperrt": "0",
+      "sperr_grund": "NULL",
+      "createdAt": "2026-03-15 12:25:01",
+      "updatedAt": "2026-03-15 12:25:01",
+      "updated_at": "2026-03-21 09:27:32"
+    },
+    {
+      "id": "2",
+      "telefon": "+491718305048",
+      "name": "Andreas Hainsch",
+      "strasse": "Blankenburgerstraße 3",
+      "ort": "NULL",
+      "plz": "NULL",
+      "push_token": "NULL",
+      "gesperrt": "0",
+      "sperr_grund": "NULL",
+      "createdAt": "2026-03-15 12:28:35",
+      "updatedAt": "2026-03-15 12:28:35",
+      "updated_at": "2026-03-21 09:27:32"
+    },
+    {
+      "id": "30001",
+      "telefon": "015223346510",
+      "name": "Florian Tugendheim",
+      "strasse": "Hoher Weg 14D",
+      "ort": "Halberstadt",
+      "plz": "38820",
+      "push_token": "NULL",
+      "gesperrt": "0",
+      "sperr_grund": "NULL",
+      "createdAt": "2026-03-16 08:08:31",
+      "updatedAt": "2026-03-16 08:08:31",
+      "updated_at": "2026-03-21 09:27:32"
+    },
+    {
+      "id": "60001",
+      "telefon": "015122331991",
+      "name": "Selina Bode",
+      "strasse": "Am Kreuztal 8",
+      "ort": "Duderstadt",
+      "plz": "37115",
+      "push_token": "NULL",
+      "gesperrt": "0",
+      "sperr_grund": "NULL",
+      "createdAt": "2026-03-17 07:48:56",
+      "updatedAt": "2026-03-17 07:48:56",
+      "updated_at": "2026-03-21 09:27:32"
+    },
+    {
+      "id": "90001",
+      "telefon": "+491754583353",
+      "name": "Steffen martinke",
+      "strasse": "Bahnhofstraße 18",
+      "ort": "NULL",
+      "plz": "NULL",
+      "push_token": "NULL",
+      "gesperrt": "0",
+      "sperr_grund": "NULL",
+      "createdAt": "2026-03-17 14:46:01",
+      "updatedAt": "2026-03-17 14:46:01",
+      "updated_at": "2026-03-21 09:27:32"
+    },
+    {
+      "id": "120001",
+      "telefon": "+4915172329522",
+      "name": "Gordon Test",
+      "strasse": "Teststr 7",
+      "ort": "NULL",
+      "plz": "NULL",
+      "push_token": "NULL",
+      "gesperrt": "0",
+      "sperr_grund": "NULL",
+      "createdAt": "2026-03-20 16:58:50",
+      "updatedAt": "2026-03-20 16:58:50",
+      "updated_at": "2026-03-21 09:27:32"
+    }
+  ],
+  "messages": [
+    "id\tuser_id\tcode\tcreated_at",
+    "1\t120001\tBEERE66\t2026-03-20 16:58:50"
+  ],
+  "stdout": "id\ttelefon\tname\tstrasse\tort\tplz\tpush_token\tgesperrt\tsperr_grund\tcreatedAt\tupdatedAt\tupdated_at\n1\t+491737483298\tGordon Kaiser\tBahnhofstr.10\tBlankenburg\t38889\tNULL\t0\tNULL\t2026-03-15 12:25:01\t2026-03-15 12:25:01\t2026-03-21 09:27:32\n2\t+491718305048\tAndreas Hainsch\tBlankenburgerstraße 3\tNULL\tNULL\tNULL\t0\tNULL\t2026-03-15 12:28:35\t2026-03-15 12:28:35\t2026-03-21 09:27:32\n30001\t015223346510\tFlorian Tugendheim\tHoher Weg 14D\tHalberstadt\t38820\tNULL\t0\tNULL\t2026-03-16 08:08:31\t2026-03-16 08:08:31\t2026-03-21 09:27:32\n60001\t015122331991\tSelina Bode\tAm Kreuztal 8\tDuderstadt\t37115\tNULL\t0\tNULL\t2026-03-17 07:48:56\t2026-03-17 07:48:56\t2026-03-21 09:27:32\n90001\t+491754583353\tSteffen martinke\tBahnhofstraße 18\tNULL\tNULL\tNULL\t0\tNULL\t2026-03-17 14:46:01\t2026-03-17 14:46:01\t2026-03-21 09:27:32\n120001\t+4915172329522\tGordon Test\tTeststr 7\tNULL\tNULL\tNULL\t0\tNULL\t2026-03-20 16:58:50\t2026-03-20 16:58:50\t2026-03-21 09:27:32\nid\tuser_id\tcode\tcreated_at\n1\t120001\tBEERE66\t2026-03-20 16:58:50\n",
+  "stderr": "",
+  "execution_time_ms": 622
+}

@@ -1,0 +1,110 @@
+{
+  "query": "SHOW CREATE TABLE gartengluck_nutzer;\nSHOW CREATE TABLE hofmarkt_bestellungen;\nSHOW CREATE TABLE referral_codes;\nSHOW CREATE TABLE referral_rewards;\nSHOW CREATE TABLE users;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2To2D9UzzTKA2Dw.41d30386b88a --database WNedjZEAh55HEwZrLbvRkH --execute SHOW CREATE TABLE gartengluck_nutzer;\nSHOW CREATE TABLE hofmarkt_bestellungen;\nSHOW CREATE TABLE referral_codes;\nSHOW CREATE TABLE referral_rewards;\nSHOW CREATE TABLE users;",
+  "rows": [
+    {
+      "Table": "gartengluck_nutzer",
+      "Create Table": "CREATE TABLE `gartengluck_nutzer` ("
+    },
+    {
+      "Table": "Table",
+      "Create Table": "Create Table"
+    },
+    {
+      "Table": "hofmarkt_bestellungen",
+      "Create Table": "CREATE TABLE `hofmarkt_bestellungen` ("
+    },
+    {
+      "Table": "Table",
+      "Create Table": "Create Table"
+    },
+    {
+      "Table": "referral_codes",
+      "Create Table": "CREATE TABLE `referral_codes` ("
+    },
+    {
+      "Table": "Table",
+      "Create Table": "Create Table"
+    },
+    {
+      "Table": "referral_rewards",
+      "Create Table": "CREATE TABLE `referral_rewards` ("
+    },
+    {
+      "Table": "Table",
+      "Create Table": "Create Table"
+    },
+    {
+      "Table": "users",
+      "Create Table": "CREATE TABLE `users` ("
+    }
+  ],
+  "messages": [
+    "  `id` int NOT NULL AUTO_INCREMENT,",
+    "  `telefon` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `name` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `strasse` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `ort` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `plz` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `push_token` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `gesperrt` tinyint(1) NOT NULL DEFAULT '0',",
+    "  `sperr_grund` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,",
+    "  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,",
+    "  UNIQUE KEY `telefon` (`telefon`)",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=150001",
+    "  `id` int NOT NULL AUTO_INCREMENT,",
+    "  `hof_user_id` int NOT NULL,",
+    "  `kunde_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `kunde_telefon` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `kunde_email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `kunde_strasse` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `kunde_plz` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `kunde_ort` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `produkte` json NOT NULL,",
+    "  `gesamtpreis` decimal(10,2) DEFAULT NULL,",
+    "  `nachricht` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `status` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'neu',",
+    "  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,",
+    "  KEY `idx_hof_user_id` (`hof_user_id`),",
+    "  KEY `idx_status` (`status`),",
+    "  KEY `idx_kunde_telefon` (`kunde_telefon`)",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+    "  `id` int NOT NULL AUTO_INCREMENT,",
+    "  `user_id` int NOT NULL,",
+    "  `code` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,",
+    "  UNIQUE KEY `referral_codes_user_id_unique` (`user_id`),",
+    "  UNIQUE KEY `referral_codes_code_unique` (`code`)",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=30001",
+    "  `id` int NOT NULL AUTO_INCREMENT,",
+    "  `referrer_id` int NOT NULL,",
+    "  `referred_id` int NOT NULL,",
+    "  `eingeloest` tinyint(1) NOT NULL DEFAULT '0',",
+    "  `eingeloest_at` timestamp NULL DEFAULT NULL,",
+    "  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,",
+    "  UNIQUE KEY `referral_rewards_referred_id_unique` (`referred_id`)",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+    "  `id` int NOT NULL AUTO_INCREMENT,",
+    "  `openId` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `name` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `email` varchar(320) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `loginMethod` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `role` enum('user','admin') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'user',",
+    "  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,",
+    "  `lastSignedIn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,",
+    "  UNIQUE KEY `users_openId_unique` (`openId`)",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+  ],
+  "stdout": "Table\tCreate Table\ngartengluck_nutzer\tCREATE TABLE `gartengluck_nutzer` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `telefon` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `name` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `strasse` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `ort` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `plz` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `push_token` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `gesperrt` tinyint(1) NOT NULL DEFAULT '0',\n  `sperr_grund` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,\n  UNIQUE KEY `telefon` (`telefon`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=150001\nTable\tCreate Table\nhofmarkt_bestellungen\tCREATE TABLE `hofmarkt_bestellungen` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `hof_user_id` int NOT NULL,\n  `kunde_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `kunde_telefon` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `kunde_email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `kunde_strasse` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `kunde_plz` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `kunde_ort` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `produkte` json NOT NULL,\n  `gesamtpreis` decimal(10,2) DEFAULT NULL,\n  `nachricht` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `status` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'neu',\n  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,\n  KEY `idx_hof_user_id` (`hof_user_id`),\n  KEY `idx_status` (`status`),\n  KEY `idx_kunde_telefon` (`kunde_telefon`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci\nTable\tCreate Table\nreferral_codes\tCREATE TABLE `referral_codes` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `user_id` int NOT NULL,\n  `code` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,\n  UNIQUE KEY `referral_codes_user_id_unique` (`user_id`),\n  UNIQUE KEY `referral_codes_code_unique` (`code`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=30001\nTable\tCreate Table\nreferral_rewards\tCREATE TABLE `referral_rewards` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `referrer_id` int NOT NULL,\n  `referred_id` int NOT NULL,\n  `eingeloest` tinyint(1) NOT NULL DEFAULT '0',\n  `eingeloest_at` timestamp NULL DEFAULT NULL,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,\n  UNIQUE KEY `referral_rewards_referred_id_unique` (`referred_id`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci\nTable\tCreate Table\nusers\tCREATE TABLE `users` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `openId` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `name` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `email` varchar(320) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `loginMethod` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `role` enum('user','admin') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'user',\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  `lastSignedIn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,\n  UNIQUE KEY `users_openId_unique` (`openId`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci\n",
+  "stderr": "",
+  "execution_time_ms": 689
+}
