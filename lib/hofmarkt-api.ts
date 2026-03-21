@@ -4,7 +4,7 @@
  * Format: HTTP GET mit ?batch=1&input={"0":{"json": ... }}
  */
 
-const BASIS_URL = "https://gefluegel-app-ghkbktmv.manus.space/api/trpc";
+const BASIS_URL = "https://backend-production-02ba.up.railway.app/api/trpc";
 
 // ── TypeScript-Typen ─────────────────────────────────────────────────────────
 

@@ -18,7 +18,7 @@ import {
 } from "./db";
 
 // Externe Hobbyanbau-Suite API
-const EXTERNE_API = "https://gefluegel-app-ghkbktmv.manus.space/api/trpc";
+const EXTERNE_API = "https://backend-production-02ba.up.railway.app/api/trpc";
 
 async function externeAbfrage<T>(
   endpunkt: string,
