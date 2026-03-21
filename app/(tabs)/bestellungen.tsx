@@ -7,6 +7,7 @@ import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import { ladeBestellungStatus } from "@/lib/hofmarkt-api";
 import {
+  ActivityIndicator,
   FlatList,
   Pressable,
   StyleSheet,
@@ -27,43 +28,47 @@ import {
 export default function BestellungenScreen() {
   const colors = useColors();
   const [bestellungen, setBestellungen] = useState<BestellHistorieEintrag[]>([]);
-
   const [aktualisiert, setAktualisiert] = useState(false);
+  const [laedt, setLaedt] = useState(false);
+
+  const aktualisiereStatus = useCallback(async () => {
+    setLaedt(true);
+    setAktualisiert(false);
+    try {
+      // 1. Lokale Historie laden (neueste zuerst)
+      const liste = await ladeBestellHistorie();
+      setBestellungen(liste);
+      // 2. Status aller Bestellungen mit ID vom Server abrufen
+      const mitId = liste.filter((e) => e.id !== undefined);
+      if (mitId.length === 0) return;
+      let geaendert = false;
+      await Promise.all(
+        mitId.map(async (eintrag) => {
+          try {
+            const serverStatus = await ladeBestellungStatus(eintrag.id!);
+            if (serverStatus && serverStatus.status !== eintrag.status) {
+              await aktualisiereBestellStatusInHistorie(eintrag.id!, serverStatus.status);
+              geaendert = true;
+            }
+          } catch {
+            // Ignorieren – lokaler Status bleibt
+          }
+        })
+      );
+      if (geaendert) {
+        const neu = await ladeBestellHistorie();
+        setBestellungen(neu);
+        setAktualisiert(true);
+      }
+    } finally {
+      setLaedt(false);
+    }
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
-      (async () => {
-        // 1. Lokale Historie laden (neueste zuerst)
-        const liste = await ladeBestellHistorie();
-        setBestellungen(liste);
-        setAktualisiert(false);
-
-        // 2. Status aller Bestellungen mit ID vom Server abrufen
-        const mitId = liste.filter((e) => e.id !== undefined);
-        if (mitId.length === 0) return;
-
-        let geaendert = false;
-        await Promise.all(
-          mitId.map(async (eintrag) => {
-            try {
-              const serverStatus = await ladeBestellungStatus(eintrag.id!);
-              if (serverStatus && serverStatus.status !== eintrag.status) {
-                await aktualisiereBestellStatusInHistorie(eintrag.id!, serverStatus.status);
-                geaendert = true;
-              }
-            } catch {
-              // Ignorieren – lokaler Status bleibt
-            }
-          })
-        );
-
-        if (geaendert) {
-          const aktualisiert = await ladeBestellHistorie();
-          setBestellungen(aktualisiert);
-          setAktualisiert(true);
-        }
-      })();
-    }, [])
+      aktualisiereStatus();
+    }, [aktualisiereStatus])
   );
 
   const handleLoeschen = useCallback(
@@ -193,12 +198,31 @@ export default function BestellungenScreen() {
     <ScreenContainer>
       <View style={s.header}>
         <Text style={s.titel}>Meine Bestellungen</Text>
-        <View style={{ alignItems: "flex-end" }}>
+        <View style={{ alignItems: "flex-end", gap: 4 }}>
           {bestellungen.length > 0 && (
             <Text style={s.anzahl}>{bestellungen.length} Bestellung{bestellungen.length !== 1 ? "en" : ""}</Text>
           )}
+          <Pressable
+            onPress={laedt ? undefined : aktualisiereStatus}
+            style={({ pressed }) => ({
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 4,
+              paddingHorizontal: 10,
+              paddingVertical: 5,
+              borderRadius: 8,
+              backgroundColor: laedt ? colors.border : colors.primary + "18",
+              opacity: pressed ? 0.7 : 1,
+            })}
+          >
+            {laedt ? (
+              <ActivityIndicator size="small" color={colors.primary} />
+            ) : (
+              <Text style={{ fontSize: 13, color: colors.primary, fontWeight: "600" }}>↻ Aktualisieren</Text>
+            )}
+          </Pressable>
           {aktualisiert && (
-            <Text style={{ fontSize: 11, color: colors.success, marginTop: 2 }}>✓ Status aktualisiert</Text>
+            <Text style={{ fontSize: 11, color: colors.success }}>✓ Status aktualisiert</Text>
           )}
         </View>
       </View>
