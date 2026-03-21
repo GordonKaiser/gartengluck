@@ -24,7 +24,7 @@ import { ScreenContainer } from "@/components/screen-container";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useColors } from "@/hooks/use-colors";
 import { sendeBestellung, formatPreis, type BestellProdukt } from "@/lib/hofmarkt-api";
-import { ladeNutzerProfil, speichereBestellungInHistorie, type NutzerProfil } from "@/lib/nutzer-store";
+import { ladeNutzerProfil, ladePushToken, speichereBestellungInHistorie, type NutzerProfil } from "@/lib/nutzer-store";
 import { useWarenkorb } from "@/lib/warenkorb-store";
 
 type Phase = "formular" | "bestaetigung";
@@ -92,6 +92,8 @@ export default function BestellungScreen() {
         einheit: pos.produkt.einheit,
       }));
 
+      // Push-Token des Käufers laden (HofSpot sendet damit Status-Updates)
+      const kundePushToken = await ladePushToken();
       const antwort = await sendeBestellung({
         hofUserId,
         kundeName: name.trim(),
@@ -103,6 +105,7 @@ export default function BestellungScreen() {
         produkte,
         gesamtpreis: Math.round(gesamtpreis * 100) / 100,
         nachricht: nachricht.trim() || undefined,
+        kundePushToken: kundePushToken ?? undefined,
       });
 
       if (antwort.success) {

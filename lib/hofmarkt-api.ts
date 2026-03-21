@@ -75,6 +75,8 @@ export interface BestellungSenden {
   produkte: BestellProdukt[];
   gesamtpreis?: number;
   nachricht?: string;
+  /** Expo Push-Token des Käufers – HofSpot nutzt ihn um den Käufer bei Statusänderungen zu benachrichtigen. */
+  kundePushToken?: string;
 }
 
 export interface BestellungAntwort {

@@ -200,12 +200,16 @@ export default function RootLayout() {
         if (!projectId) return;
         const { data: pushToken } = await Notifications.getExpoPushTokenAsync({ projectId });
         if (!pushToken) return;
-        // Push-Token mit Telefonnummer verknüpfen (HofSpot v2.0 API)
-        const { ladeNutzerProfil } = await import("@/lib/nutzer-store");
+        // Push-Token lokal speichern (wird bei jeder Bestellung mitgesendet)
+        const { ladeNutzerProfil, speicherePushToken } = await import("@/lib/nutzer-store");
+        await speicherePushToken(pushToken);
+        // Push-Token mit Telefonnummer verknüpfen (HofSpot v2.0 API – Fallback)
         const profil = await ladeNutzerProfil();
         if (!profil?.telefon) return;
         const { registrierePushToken } = await import("@/lib/hofmarkt-api");
-        await registrierePushToken(profil.telefon, pushToken);
+        await registrierePushToken(profil.telefon, pushToken).catch(() => {
+          // Ignorieren – Endpunkt noch nicht auf HofSpot implementiert
+        });
       } catch {
         // Ignorieren – Push-Token ist optional
       }

@@ -39,6 +39,28 @@ export async function loescheNutzerProfil(): Promise<void> {
   await AsyncStorage.removeItem(NUTZER_KEY);
 }
 
+// ── Push-Token ──────────────────────────────────────────────────────────────
+
+const PUSH_TOKEN_KEY = "locabuy_push_token";
+
+/** Eigenen Expo Push-Token lokal speichern (wird beim Bestellvorgang mitgesendet). */
+export async function speicherePushToken(token: string): Promise<void> {
+  try {
+    await AsyncStorage.setItem(PUSH_TOKEN_KEY, token);
+  } catch {
+    // Ignorieren
+  }
+}
+
+/** Gespeicherten Push-Token laden (null wenn nicht vorhanden). */
+export async function ladePushToken(): Promise<string | null> {
+  try {
+    return await AsyncStorage.getItem(PUSH_TOKEN_KEY);
+  } catch {
+    return null;
+  }
+}
+
 const BEWERTUNGEN_KEY = "locabuy_bewertungen_abgegeben";
 
 /** Bestellindex als bewertet markieren (lokal gespeichert). */

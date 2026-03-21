@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS hofmarkt_bestellungen (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  hof_user_id INT NOT NULL,\n  kunde_name VARCHAR(255) NOT NULL,\n  kunde_telefon VARCHAR(50) NOT NULL,\n  kunde_email VARCHAR(255),\n  kunde_strasse VARCHAR(255),\n  kunde_plz VARCHAR(10),\n  kunde_ort VARCHAR(100),\n  produkte JSON NOT NULL,\n  gesamtpreis DECIMAL(10,2),\n  nachricht TEXT,\n  status VARCHAR(50) NOT NULL DEFAULT 'neu',\n  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  INDEX idx_hof_user_id (hof_user_id),\n  INDEX idx_status (status),\n  INDEX idx_kunde_telefon (kunde_telefon)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2To2D9UzzTKA2Dw.41d30386b88a --database WNedjZEAh55HEwZrLbvRkH --execute CREATE TABLE IF NOT EXISTS hofmarkt_bestellungen (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  hof_user_id INT NOT NULL,\n  kunde_name VARCHAR(255) NOT NULL,\n  kunde_telefon VARCHAR(50) NOT NULL,\n  kunde_email VARCHAR(255),\n  kunde_strasse VARCHAR(255),\n  kunde_plz VARCHAR(10),\n  kunde_ort VARCHAR(100),\n  produkte JSON NOT NULL,\n  gesamtpreis DECIMAL(10,2),\n  nachricht TEXT,\n  status VARCHAR(50) NOT NULL DEFAULT 'neu',\n  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  INDEX idx_hof_user_id (hof_user_id),\n  INDEX idx_status (status),\n  INDEX idx_kunde_telefon (kunde_telefon)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 570
+}
