@@ -193,6 +193,8 @@ export const gartengluckNutzer = mysqlTable("gartengluck_nutzer", {
   ort: varchar("ort", { length: 100 }),
   plz: varchar("plz", { length: 10 }),
   pushToken: varchar("push_token", { length: 500 }),
+  profilbildUrl: varchar("profilbild_url", { length: 1000 }),
+  pushBenachrichtigungen: boolean("push_benachrichtigungen").notNull().default(true),
   gesperrt: boolean("gesperrt").notNull().default(false),
   sperrGrund: text("sperr_grund"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),

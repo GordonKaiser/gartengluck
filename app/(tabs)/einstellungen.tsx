@@ -4,10 +4,11 @@
  */
 
 import Constants from "expo-constants";
-import { router } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Alert,
+  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -33,16 +34,19 @@ export default function EinstellungenScreen() {
   const [profil, setProfil] = useState<NutzerProfil | null>(null);
   const isDark = colorScheme === "dark";
 
-  useEffect(() => {
-    (async () => {
-      const plz = await AsyncStorage.getItem(STORAGE_PLZ_KEY);
-      setGespeichertePlz(plz);
-      const raw = await AsyncStorage.getItem(FAVORITEN_KEY);
-      setFavoritenAnzahl(raw ? JSON.parse(raw).length : 0);
-      const p = await ladeNutzerProfil();
-      setProfil(p);
-    })();
+  const ladeAlles = useCallback(async () => {
+    const plz = await AsyncStorage.getItem(STORAGE_PLZ_KEY);
+    setGespeichertePlz(plz);
+    const raw = await AsyncStorage.getItem(FAVORITEN_KEY);
+    setFavoritenAnzahl(raw ? JSON.parse(raw).length : 0);
+    const p = await ladeNutzerProfil();
+    setProfil(p);
   }, []);
+
+  useEffect(() => { ladeAlles(); }, []);
+
+  // Profil neu laden wenn Screen wieder fokussiert wird (nach Profil-Bearbeiten)
+  useFocusEffect(useCallback(() => { ladeAlles(); }, [ladeAlles]));
 
   const handleAbmelden = useCallback(() => {
     Alert.alert(
@@ -92,11 +96,15 @@ export default function EinstellungenScreen() {
             <Text style={s.sektionTitel}>Mein Konto</Text>
             <View style={s.sektionKarte}>
               <View style={s.profilHeader}>
-                <View style={s.profilAvatar}>
-                  <Text style={s.profilAvatarText}>
-                    {profil.name?.charAt(0)?.toUpperCase() ?? "?"}
-                  </Text>
-                </View>
+                {profil.profilbildUrl ? (
+                  <Image source={{ uri: profil.profilbildUrl }} style={s.profilAvatarBild} />
+                ) : (
+                  <View style={s.profilAvatar}>
+                    <Text style={s.profilAvatarText}>
+                      {profil.name?.charAt(0)?.toUpperCase() ?? "?"}
+                    </Text>
+                  </View>
+                )}
                 <View style={s.profilInfo}>
                   <Text style={s.profilName}>{profil.name}</Text>
                   <Text style={s.profilTelefon}>{profil.telefon}</Text>
@@ -311,6 +319,11 @@ const styles = (colors: ReturnType<typeof useColors>) =>
       fontSize: 22,
       fontWeight: "700",
       color: "#fff",
+    },
+    profilAvatarBild: {
+      width: 52,
+      height: 52,
+      borderRadius: 26,
     },
     profilInfo: {
       flex: 1,

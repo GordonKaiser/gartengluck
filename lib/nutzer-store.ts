@@ -16,6 +16,8 @@ export interface NutzerProfil {
   strasse: string | null;
   ort: string | null;
   plz: string | null;
+  profilbildUrl?: string | null;
+  pushBenachrichtigungen?: boolean;
   gesperrt: boolean;
 }
 

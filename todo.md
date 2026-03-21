@@ -301,3 +301,15 @@
 - [x] E-Mail-Feld im Onboarding (Login-Profil enthält E-Mail)
 - [x] E-Mail im Bestellformular vorausgefüllt aus Profil
 - [x] NutzerProfil-Typ um E-Mail erweitern
+## Profilbild & Benachrichtigungseinstellungen (21.03.2026)
+- [x] Expo ImagePicker + ImageManipulator Docs lesen
+- [x] DB: profilbild_url-Spalte in gartengluck_nutzer ergänzen
+- [x] Server: Datei-Upload-Endpunkt für Profilbilder (S3)
+- [x] Server: nutzer.profilAktualisieren um profilbildUrl erweitern
+- [x] Profil-Bearbeiten-Screen: Profilbild-Auswahl (Galerie/Kamera) mit Vorschau
+- [x] Einstellungen: Profilbild im Avatar anzeigen (statt Buchstabe)
+- [x] NutzerProfil-Typ um profilbildUrl erweitern
+- [x] DB: push_benachrichtigungen-Spalte (boolean) in gartengluck_nutzer
+- [x] Server: nutzer.profilAktualisieren um pushBenachrichtigungen erweitern
+- [x] Profil-Bearbeiten-Screen: Push-Benachrichtigungen Toggle
+- [x] Push-Token nur registrieren wenn Nutzer Benachrichtigungen aktiviert hat

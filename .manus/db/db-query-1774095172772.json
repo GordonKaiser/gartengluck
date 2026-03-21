@@ -1,0 +1,9 @@
+{
+  "query": "\nALTER TABLE gartengluck_nutzer \n  ADD COLUMN IF NOT EXISTS profilbild_url VARCHAR(1000) NULL,\n  ADD COLUMN IF NOT EXISTS push_benachrichtigungen TINYINT(1) NOT NULL DEFAULT 1;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2To2D9UzzTKA2Dw.41d30386b88a --database WNedjZEAh55HEwZrLbvRkH --execute \nALTER TABLE gartengluck_nutzer \n  ADD COLUMN IF NOT EXISTS profilbild_url VARCHAR(1000) NULL,\n  ADD COLUMN IF NOT EXISTS push_benachrichtigungen TINYINT(1) NOT NULL DEFAULT 1;\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 966
+}

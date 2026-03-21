@@ -206,6 +206,8 @@ export default function RootLayout() {
         // Push-Token mit Telefonnummer verknüpfen (HofSpot v2.0 API – Fallback)
         const profil = await ladeNutzerProfil();
         if (!profil?.telefon) return;
+        // Wenn Nutzer Push-Benachrichtigungen deaktiviert hat, Token nicht senden
+        if (profil.pushBenachrichtigungen === false) return;
         const { registrierePushToken } = await import("@/lib/hofmarkt-api");
         await registrierePushToken(profil.telefon, pushToken).catch(() => {
           // Ignorieren – Endpunkt noch nicht auf HofSpot implementiert

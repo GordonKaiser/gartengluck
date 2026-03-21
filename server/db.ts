@@ -518,7 +518,7 @@ export async function updateNutzerPushToken(telefon: string, pushToken: string) 
 
 export async function aktualisiereNutzerProfil(
   id: number,
-  daten: { name?: string; email?: string | null; strasse?: string | null; ort?: string | null; plz?: string | null }
+  daten: { name?: string; email?: string | null; strasse?: string | null; ort?: string | null; plz?: string | null; profilbildUrl?: string | null; pushBenachrichtigungen?: boolean }
 ) {
   const db = await getDb();
   if (!db) throw new Error("Datenbank nicht verfügbar");

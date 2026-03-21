@@ -99,7 +99,7 @@ export const appRouter = router({
         };
       }),
 
-    /** Eigenes Profil aktualisieren (Name, E-Mail, Adresse). */
+    /** Eigenes Profil aktualisieren (Name, E-Mail, Adresse, Profilbild, Push-Einstellungen). */
     profilAktualisieren: publicProcedure
       .input(
         z.object({
@@ -109,6 +109,8 @@ export const appRouter = router({
           strasse: z.string().max(200).optional().nullable(),
           ort: z.string().max(100).optional().nullable(),
           plz: z.string().max(10).optional().nullable(),
+          profilbildUrl: z.string().max(1000).optional().nullable(),
+          pushBenachrichtigungen: z.boolean().optional(),
         })
       )
       .mutation(async ({ input }) => {
@@ -126,8 +128,29 @@ export const appRouter = router({
           strasse: aktuell.strasse,
           ort: aktuell.ort,
           plz: aktuell.plz,
+          profilbildUrl: aktuell.profilbildUrl ?? null,
+          pushBenachrichtigungen: aktuell.pushBenachrichtigungen ?? true,
           gesperrt: aktuell.gesperrt,
         };
+      }),
+
+    /** Profilbild hochladen (Base64-kodiert) und URL zurückgeben. */
+    profilbildHochladen: publicProcedure
+      .input(
+        z.object({
+          nutzerId: z.number(),
+          bildBase64: z.string().max(5_000_000), // max ~3.7 MB Originalbild
+          mimeType: z.string().default("image/jpeg"),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { storagePut } = await import("./storage");
+        const buffer = Buffer.from(input.bildBase64, "base64");
+        const ext = input.mimeType === "image/png" ? "png" : "jpg";
+        const key = `locabuy/profilbilder/${input.nutzerId}-${Date.now()}.${ext}`;
+        const { url } = await storagePut(key, buffer, input.mimeType);
+        await aktualisiereNutzerProfil(input.nutzerId, { profilbildUrl: url });
+        return { url };
       }),
 
     /** Eigenes Profil per Telefonnummer abrufen (für Wiedereinstieg nach App-Neustart). */
@@ -149,6 +172,8 @@ export const appRouter = router({
           strasse: nutzer.strasse,
           ort: nutzer.ort,
           plz: nutzer.plz,
+          profilbildUrl: nutzer.profilbildUrl ?? null,
+          pushBenachrichtigungen: nutzer.pushBenachrichtigungen ?? true,
           gesperrt: nutzer.gesperrt,
         };
       }),
