@@ -443,8 +443,8 @@ export async function registriereNutzer(data: InsertGartengluckNutzer) {
   let insertId: number;
   try {
     const [res] = await conn.execute(
-      'INSERT INTO gartengluck_nutzer (telefon, name, strasse, ort, plz, push_token, gesperrt) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [data.telefon, data.name, data.strasse ?? null, data.ort ?? null, data.plz ?? null, data.pushToken ?? null, false]
+      'INSERT INTO gartengluck_nutzer (telefon, email, name, strasse, ort, plz, push_token, gesperrt) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [data.telefon, (data as any).email ?? null, data.name, data.strasse ?? null, data.ort ?? null, data.plz ?? null, data.pushToken ?? null, false]
     );
     insertId = (res as any).insertId;
   } finally {
@@ -514,6 +514,24 @@ export async function updateNutzerPushToken(telefon: string, pushToken: string) 
     .update(gartengluckNutzer)
     .set({ pushToken })
     .where(eq(gartengluckNutzer.telefon, telefon));
+}
+
+export async function aktualisiereNutzerProfil(
+  id: number,
+  daten: { name?: string; email?: string | null; strasse?: string | null; ort?: string | null; plz?: string | null }
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Datenbank nicht verfügbar");
+  await db
+    .update(gartengluckNutzer)
+    .set(daten)
+    .where(eq(gartengluckNutzer.id, id));
+  const aktuell = await db
+    .select()
+    .from(gartengluckNutzer)
+    .where(eq(gartengluckNutzer.id, id))
+    .limit(1);
+  return aktuell[0];
 }
 
 // ── Referral-System (LocaBuy) ─────────────────────────────────────────

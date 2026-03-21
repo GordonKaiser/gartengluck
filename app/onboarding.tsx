@@ -63,6 +63,7 @@ export default function OnboardingScreen() {
   // Formular-State
   const [telefon, setTelefon] = useState("");
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [strasse, setStrasse] = useState("");
   const [ort, setOrt] = useState("");
   const [plz, setPlz] = useState("");
@@ -162,8 +163,14 @@ export default function OnboardingScreen() {
       return;
     }
     setFehler(null);
+    const emailTrimmed = email.trim();
+    if (emailTrimmed && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrimmed)) {
+      setFehler("Bitte gib eine gültige E-Mail-Adresse ein oder lass das Feld leer.");
+      return;
+    }
     registrierenMutation.mutate({
       telefon: telefon.trim().replace(/\s/g, ""),
+      email: emailTrimmed || undefined,
       name: name.trim(),
       strasse: strasse.trim() || undefined,
       ort: ort.trim() || undefined,
@@ -331,6 +338,23 @@ export default function OnboardingScreen() {
                 autoComplete="name"
                 returnKeyType="next"
               />
+
+              <Text style={s.label}>E-Mail-Adresse (optional)</Text>
+              <TextInput
+                style={s.input}
+                value={email}
+                onChangeText={setEmail}
+                placeholder="deine@email.de"
+                placeholderTextColor={colors.muted}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                autoComplete="email"
+                returnKeyType="next"
+              />
+              <Text style={[s.hinweis, { marginBottom: 12 }]}>
+                📧 Optional – wird für Bestellbestätigungen und Kontakt durch Anbieter genutzt.
+              </Text>
 
               <Text style={s.label}>Straße & Hausnummer</Text>
               <TextInput

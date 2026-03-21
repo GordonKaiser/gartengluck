@@ -291,3 +291,13 @@
 - [x] Bestellhistorie vom Server laden beim Login/App-Start
 - [x] Einstellungen: Profil-Karte mit Name, Telefon, Adresse anzeigen
 - [x] Einstellungen: Abmelden-Funktion (Profil lokal löschen, nicht vom Server)
+
+## Profil-Bearbeitung & E-Mail (21.03.2026)
+- [x] DB: E-Mail-Spalte in gartengluck_nutzer ergänzen
+- [x] Server: nutzer.profilAktualisieren Endpunkt (Name, Strasse, Ort, PLZ, E-Mail)
+- [x] Profil-Bearbeiten-Screen (app/profil-bearbeiten.tsx)
+- [x] Einstellungen: "Profil bearbeiten"-Button in der Profil-Karte
+- [x] E-Mail-Feld im Onboarding (Registrierung)
+- [x] E-Mail-Feld im Onboarding (Login-Profil enthält E-Mail)
+- [x] E-Mail im Bestellformular vorausgefüllt aus Profil
+- [x] NutzerProfil-Typ um E-Mail erweitern

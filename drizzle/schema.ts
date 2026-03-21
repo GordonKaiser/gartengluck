@@ -187,6 +187,7 @@ export const holzProdukte = mysqlTable("holz_produkte", {
 export const gartengluckNutzer = mysqlTable("gartengluck_nutzer", {
   id: int("id").autoincrement().primaryKey(),
   telefon: varchar("telefon", { length: 30 }).notNull().unique(),
+  email: varchar("email", { length: 320 }),
   name: varchar("name", { length: 200 }).notNull(),
   strasse: varchar("strasse", { length: 200 }),
   ort: varchar("ort", { length: 100 }),

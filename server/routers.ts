@@ -11,6 +11,7 @@ import {
   sperrNutzer,
   entsperrNutzer,
   updateNutzerPushToken,
+  aktualisiereNutzerProfil,
   getReferralCode,
   generateReferralCode,
   einloesenReferralCode,
@@ -64,6 +65,7 @@ export const appRouter = router({
       .input(
         z.object({
           telefon: z.string().min(6).max(30),
+          email: z.string().email().optional().or(z.literal("")),
           name: z.string().min(2).max(200),
           strasse: z.string().max(200).optional(),
           ort: z.string().max(100).optional(),
@@ -77,7 +79,8 @@ export const appRouter = router({
           strasse: input.strasse?.trim() ?? null,
           ort: input.ort?.trim() ?? null,
           plz: input.plz?.trim() ?? null,
-        });
+          email: input.email?.trim() || null,
+        } as any);
         if (!nutzer) throw new Error("Registrierung fehlgeschlagen");
         if (nutzer.gesperrt) {
           throw new Error(
@@ -87,11 +90,43 @@ export const appRouter = router({
         return {
           id: nutzer.id,
           telefon: nutzer.telefon,
+          email: nutzer.email ?? null,
           name: nutzer.name,
           strasse: nutzer.strasse,
           ort: nutzer.ort,
           plz: nutzer.plz,
           gesperrt: nutzer.gesperrt,
+        };
+      }),
+
+    /** Eigenes Profil aktualisieren (Name, E-Mail, Adresse). */
+    profilAktualisieren: publicProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          name: z.string().min(2).max(200).optional(),
+          email: z.string().email().optional().or(z.literal("")),
+          strasse: z.string().max(200).optional().nullable(),
+          ort: z.string().max(100).optional().nullable(),
+          plz: z.string().max(10).optional().nullable(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { id, ...daten } = input;
+        const aktuell = await aktualisiereNutzerProfil(id, {
+          ...daten,
+          email: daten.email?.trim() || null,
+        });
+        if (!aktuell) throw new Error("Profil nicht gefunden");
+        return {
+          id: aktuell.id,
+          telefon: aktuell.telefon,
+          email: aktuell.email ?? null,
+          name: aktuell.name,
+          strasse: aktuell.strasse,
+          ort: aktuell.ort,
+          plz: aktuell.plz,
+          gesperrt: aktuell.gesperrt,
         };
       }),
 
@@ -109,6 +144,7 @@ export const appRouter = router({
         return {
           id: nutzer.id,
           telefon: nutzer.telefon,
+          email: nutzer.email ?? null,
           name: nutzer.name,
           strasse: nutzer.strasse,
           ort: nutzer.ort,
@@ -180,6 +216,7 @@ export const appRouter = router({
         return {
           id: nutzer.id,
           telefon: nutzer.telefon,
+          email: nutzer.email ?? null,
           name: nutzer.name,
           strasse: nutzer.strasse,
           ort: nutzer.ort,

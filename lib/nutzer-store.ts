@@ -11,6 +11,7 @@ const NUTZER_KEY = "gartengluck_nutzer_profil";
 export interface NutzerProfil {
   id: number;
   telefon: string;
+  email?: string | null;
   name: string;
   strasse: string | null;
   ort: string | null;

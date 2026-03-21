@@ -57,6 +57,7 @@ export default function BestellungScreen() {
       if (profil) {
         setName(profil.name ?? "");
         setTelefon(profil.telefon ?? "");
+        setEmail(profil.email ?? "");
         setStrasse(profil.strasse ?? "");
         setPlz(profil.plz ?? "");
         setOrt(profil.ort ?? "");

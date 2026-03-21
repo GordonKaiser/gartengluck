@@ -100,6 +100,9 @@ export default function EinstellungenScreen() {
                 <View style={s.profilInfo}>
                   <Text style={s.profilName}>{profil.name}</Text>
                   <Text style={s.profilTelefon}>{profil.telefon}</Text>
+                  {profil.email ? (
+                    <Text style={s.profilTelefon} numberOfLines={1}>{profil.email}</Text>
+                  ) : null}
                 </View>
               </View>
               {(profil.strasse || profil.plz || profil.ort) && (
@@ -115,6 +118,14 @@ export default function EinstellungenScreen() {
                   </View>
                 </>
               )}
+              <View style={s.trennlinie} />
+              <Pressable
+                style={({ pressed }) => [s.zeile, pressed && { opacity: 0.7 }]}
+                onPress={() => router.push("/profil-bearbeiten" as any)}
+              >
+                <Text style={s.zeileTitel}>Profil bearbeiten</Text>
+                <Text style={s.zeileWert}>›</Text>
+              </Pressable>
               <View style={s.trennlinie} />
               <Pressable
                 style={({ pressed }) => [s.zeile, pressed && { opacity: 0.7 }]}
