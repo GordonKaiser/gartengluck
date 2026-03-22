@@ -1,0 +1,28 @@
+diff --git a/node_modules/react-native-worklets/Common/cpp/worklets/NativeModules/WorkletsModuleProxy.h b/node_modules/react-native-worklets/Common/cpp/worklets/NativeModules/WorkletsModuleProxy.h
+index 0e54e9d..1cad711 100644
+--- a/node_modules/react-native-worklets/Common/cpp/worklets/NativeModules/WorkletsModuleProxy.h
++++ b/node_modules/react-native-worklets/Common/cpp/worklets/NativeModules/WorkletsModuleProxy.h
+@@ -2,7 +2,9 @@
+ 
+ #include <cxxreact/MessageQueueThread.h>
+ #include <jsi/jsi.h>
++#if REACT_NATIVE_MINOR_VERSION < 84
+ #include <jsireact/JSIExecutor.h>
++#endif
+ #include <worklets/AnimationFrameQueue/AnimationFrameBatchinator.h>
+ #include <worklets/NativeModules/JSIWorkletsModuleProxy.h>
+ #include <worklets/Tools/JSLogger.h>
+diff --git a/node_modules/react-native-worklets/Common/cpp/worklets/WorkletRuntime/WorkletRuntime.h b/node_modules/react-native-worklets/Common/cpp/worklets/WorkletRuntime/WorkletRuntime.h
+index 715c700..6e298c6 100644
+--- a/node_modules/react-native-worklets/Common/cpp/worklets/WorkletRuntime/WorkletRuntime.h
++++ b/node_modules/react-native-worklets/Common/cpp/worklets/WorkletRuntime/WorkletRuntime.h
+@@ -2,7 +2,9 @@
+ 
+ #include <cxxreact/MessageQueueThread.h>
+ #include <jsi/jsi.h>
++#if REACT_NATIVE_MINOR_VERSION < 84
+ #include <jsireact/JSIExecutor.h>
++#endif
+ #include <react/debug/react_native_assert.h>
+ 
+ #include <worklets/Public/AsyncQueue.h>
