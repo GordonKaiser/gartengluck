@@ -12,6 +12,7 @@ import {
   entsperrNutzer,
   updateNutzerPushToken,
   aktualisiereNutzerProfil,
+  loescheNutzer,
   getReferralCode,
   generateReferralCode,
   einloesenReferralCode,
@@ -197,6 +198,14 @@ export const appRouter = router({
       .input(z.object({ id: z.number() }))
       .mutation(async ({ input }) => {
         await entsperrNutzer(input.id);
+        return { success: true };
+      }),
+
+    /** Konto vollständig löschen (DSGVO). Nutzer muss seine eigene ID angeben. */
+    kontoLoeschen: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await loescheNutzer(input.id);
         return { success: true };
       }),
 

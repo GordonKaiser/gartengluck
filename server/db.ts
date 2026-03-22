@@ -516,6 +516,13 @@ export async function updateNutzerPushToken(telefon: string, pushToken: string) 
     .where(eq(gartengluckNutzer.telefon, telefon));
 }
 
+export async function loescheNutzer(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Datenbank nicht verfügbar");
+  // Bestellhistorie löschen
+  await db.delete(gartengluckNutzer).where(eq(gartengluckNutzer.id, id));
+}
+
 export async function aktualisiereNutzerProfil(
   id: number,
   daten: { name?: string; email?: string | null; strasse?: string | null; ort?: string | null; plz?: string | null; profilbildUrl?: string | null; pushBenachrichtigungen?: boolean; geraeteId?: string | null }

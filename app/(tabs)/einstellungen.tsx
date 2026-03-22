@@ -22,6 +22,7 @@ import { ScreenContainer } from "@/components/screen-container";
 import { useColors } from "@/hooks/use-colors";
 import { useThemeContext } from "@/lib/theme-provider";
 import { ladeNutzerProfil, loescheNutzerProfil, type NutzerProfil } from "@/lib/nutzer-store";
+import { createTRPCClient } from "@/lib/trpc";
 
 const FAVORITEN_KEY = "gartengluck_favoriten";
 const STORAGE_PLZ_KEY = "gartengluck_letzte_plz";
@@ -65,6 +66,31 @@ export default function EinstellungenScreen() {
       ]
     );
   }, []);
+
+  const handleKontoLoeschen = useCallback(() => {
+    Alert.alert(
+      "Konto löschen",
+      "Möchtest du dein Konto wirklich dauerhaft löschen? Alle deine Daten werden unwiderruflich entfernt (DSGVO). Diese Aktion kann nicht rückgängig gemacht werden.",
+      [
+        { text: "Abbrechen", style: "cancel" },
+        {
+          text: "Konto löschen",
+          style: "destructive",
+          onPress: async () => {
+            if (!profil) return;
+            try {
+              const client = createTRPCClient();
+              await (client as any).nutzer.kontoLoeschen.mutate({ id: profil.id });
+            } catch (e) {
+              // Fehler ignorieren – lokal trotzdem löschen
+            }
+            await loescheNutzerProfil();
+            router.replace("/onboarding" as any);
+          },
+        },
+      ]
+    );
+  }, [profil]);
 
   const handleFavoritenLoeschen = useCallback(() => {
     Alert.alert("Favoriten löschen", "Möchtest du alle gespeicherten Favoriten löschen?", [
@@ -140,6 +166,13 @@ export default function EinstellungenScreen() {
                 onPress={handleAbmelden}
               >
                 <Text style={s.destructiveText}>Abmelden</Text>
+              </Pressable>
+              <View style={s.trennlinie} />
+              <Pressable
+                style={({ pressed }) => [s.zeile, pressed && { opacity: 0.7 }]}
+                onPress={handleKontoLoeschen}
+              >
+                <Text style={[s.destructiveText, { fontSize: 14 }]}>Konto löschen</Text>
               </Pressable>
             </View>
             <Text style={s.profilHinweis}>

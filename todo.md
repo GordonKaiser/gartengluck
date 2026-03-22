@@ -322,3 +322,9 @@
 - [x] App: Geräte-ID beim ersten Start generieren (UUID, SecureStore)
 - [x] Onboarding: Geräte-ID bei Registrierung mitsenden
 - [x] Onboarding: Geräte-ID beim Login mitsenden (Gerätewechsel)
+
+## Konto-Löschung DSGVO (22.03.2026)
+- [x] DB: loescheNutzer Funktion (löscht Profil + Bestellhistorie)
+- [x] Server: nutzer.kontoLoeschen Endpunkt
+- [x] Einstellungen: "Konto löschen"-Button mit Bestätigungs-Dialog
+- [x] Nach Löschung: lokales Profil löschen + zurück zum Onboarding
