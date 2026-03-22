@@ -18,7 +18,6 @@
     "testflight": {
       "distribution": "store",
       "channel": "production",
-      "autoIncrement": true,
       "ios": {
         "credentialsSource": "remote"
       }
