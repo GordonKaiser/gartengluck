@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE gartengluck_nutzer ADD COLUMN geraete_id VARCHAR(100) NULL DEFAULT NULL AFTER push_benachrichtigungen;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2To2D9UzzTKA2Dw.41d30386b88a --database WNedjZEAh55HEwZrLbvRkH --execute ALTER TABLE gartengluck_nutzer ADD COLUMN geraete_id VARCHAR(100) NULL DEFAULT NULL AFTER push_benachrichtigungen;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 826
+}

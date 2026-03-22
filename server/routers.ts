@@ -70,6 +70,7 @@ export const appRouter = router({
           strasse: z.string().max(200).optional(),
           ort: z.string().max(100).optional(),
           plz: z.string().max(10).optional(),
+          geraeteId: z.string().max(100).optional(),
         })
       )
       .mutation(async ({ input }) => {
@@ -80,6 +81,7 @@ export const appRouter = router({
           ort: input.ort?.trim() ?? null,
           plz: input.plz?.trim() ?? null,
           email: input.email?.trim() || null,
+          geraeteId: input.geraeteId ?? null,
         } as any);
         if (!nutzer) throw new Error("Registrierung fehlgeschlagen");
         if (nutzer.gesperrt) {
@@ -155,7 +157,7 @@ export const appRouter = router({
 
     /** Eigenes Profil per Telefonnummer abrufen (für Wiedereinstieg nach App-Neustart). */
     profil: publicProcedure
-      .input(z.object({ telefon: z.string() }))
+      .input(z.object({ telefon: z.string(), geraeteId: z.string().max(100).optional() }))
       .query(async ({ input }) => {
         const nutzer = await getNutzerByTelefon(input.telefon);
         if (!nutzer) return null;
@@ -163,6 +165,10 @@ export const appRouter = router({
           throw new Error(
             `Dein Konto wurde gesperrt.${nutzer.sperrGrund ? " Grund: " + nutzer.sperrGrund : ""}`
           );
+        }
+        // Geräte-ID beim Login aktualisieren (Gerätewechsel erlaubt, überschreibt alte ID)
+        if (input.geraeteId && input.geraeteId !== nutzer.geraeteId) {
+          await aktualisiereNutzerProfil(nutzer.id, { geraeteId: input.geraeteId } as any);
         }
         return {
           id: nutzer.id,

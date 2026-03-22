@@ -24,7 +24,7 @@ import {
 import { router } from "expo-router";
 import { ScreenContainer } from "@/components/screen-container";
 import { trpc, createTRPCClient } from "@/lib/trpc";
-import { speichereNutzerProfil } from "@/lib/nutzer-store";
+import { speichereNutzerProfil, ladeOderErstelleGeraeteId } from "@/lib/nutzer-store";
 import { useColors } from "@/hooks/use-colors";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -128,8 +128,9 @@ export default function OnboardingScreen() {
 
     try {
       // Prüfen ob Nummer bereits vorhanden (Login-Versuch)
+      const geraeteId = await ladeOderErstelleGeraeteId();
       const client = createTRPCClient();
-      const profil = await (client as any).nutzer.einloggen.mutate({ telefon: tel });
+      const profil = await (client as any).nutzer.profil.query({ telefon: tel, geraeteId });
 
       if (profil) {
         // Nutzer existiert bereits → direkt einloggen
@@ -168,13 +169,16 @@ export default function OnboardingScreen() {
       setFehler("Bitte gib eine gültige E-Mail-Adresse ein oder lass das Feld leer.");
       return;
     }
-    registrierenMutation.mutate({
-      telefon: telefon.trim().replace(/\s/g, ""),
-      email: emailTrimmed || undefined,
-      name: name.trim(),
-      strasse: strasse.trim() || undefined,
-      ort: ort.trim() || undefined,
-      plz: plz.trim() || undefined,
+    ladeOderErstelleGeraeteId().then((geraeteId) => {
+      registrierenMutation.mutate({
+        telefon: telefon.trim().replace(/\s/g, ""),
+        email: emailTrimmed || undefined,
+        name: name.trim(),
+        strasse: strasse.trim() || undefined,
+        ort: ort.trim() || undefined,
+        plz: plz.trim() || undefined,
+        geraeteId,
+      });
     });
   };
 

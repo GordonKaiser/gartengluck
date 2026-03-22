@@ -5,6 +5,8 @@
  */
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
+import * as Crypto from "expo-crypto";
 
 const NUTZER_KEY = "gartengluck_nutzer_profil";
 
@@ -156,5 +158,37 @@ export async function aktualisiereBestellStatusInHistorie(bestellId: number, neu
     }
   } catch {
     // Ignorieren
+  }
+}
+
+// ── Geräte-ID ──────────────────────────────────────────────────────────────────
+
+const GERAETE_ID_KEY = "locabuy_geraete_id";
+
+/**
+ * Gibt die einmalige Geräte-ID zurück.
+ * Wird beim ersten Aufruf generiert und sicher im Keychain gespeichert.
+ * Auf Web: AsyncStorage als Fallback.
+ */
+export async function ladeOderErstelleGeraeteId(): Promise<string> {
+  try {
+    // Zuerst aus SecureStore laden (iOS/Android Keychain)
+    const gespeichert = await SecureStore.getItemAsync(GERAETE_ID_KEY);
+    if (gespeichert) return gespeichert;
+    // Neue UUID generieren
+    const neueId = Crypto.randomUUID();
+    await SecureStore.setItemAsync(GERAETE_ID_KEY, neueId);
+    return neueId;
+  } catch {
+    // Web-Fallback: AsyncStorage
+    try {
+      const raw = await AsyncStorage.getItem(GERAETE_ID_KEY);
+      if (raw) return raw;
+      const neueId = Crypto.randomUUID();
+      await AsyncStorage.setItem(GERAETE_ID_KEY, neueId);
+      return neueId;
+    } catch {
+      return Crypto.randomUUID();
+    }
   }
 }

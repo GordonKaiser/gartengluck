@@ -6,31 +6,51 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal",
-      "channel": "development"
+      "distribution": "internal"
     },
     "preview": {
       "distribution": "internal",
-      "channel": "preview"
+      "channel": "preview",
+      "android": {
+        "buildType": "apk"
+      }
     },
-    "production": {
+    "testflight": {
+      "distribution": "store",
       "channel": "production",
       "ios": {
         "credentialsSource": "remote"
-      },
+      }
+    },
+    "production": {
+      "channel": "production",
       "android": {
-        "buildType": "app-bundle"
+        "buildType": "app-bundle",
+        "credentialsSource": "remote"
       }
     }
   },
   "submit": {
     "production": {
       "ios": {
-        "ascAppId": "6760811268"
+        "appleId": "gordon.kaiser@icloud.com",
+        "ascAppId": "6760811268",
+        "ascApiKeyIssuerId": "a11b882b-d13a-45dc-8e0d-fbe16f0b038b",
+        "ascApiKeyId": "8HAP7QBX75",
+        "ascApiKeyPath": "./certs/AuthKey_8HAP7QBX75.p8"
       },
       "android": {
-        "serviceAccountKeyPath": "/home/ubuntu/.google/solar-sylph-386404-2108fb3e473d.json",
+        "serviceAccountKeyPath": "./certs/google-service-account.json",
         "track": "internal"
+      }
+    },
+    "testflight": {
+      "ios": {
+        "appleId": "gordon.kaiser@icloud.com",
+        "ascAppId": "6760811268",
+        "ascApiKeyIssuerId": "a11b882b-d13a-45dc-8e0d-fbe16f0b038b",
+        "ascApiKeyId": "8HAP7QBX75",
+        "ascApiKeyPath": "./certs/AuthKey_8HAP7QBX75.p8"
       }
     }
   }

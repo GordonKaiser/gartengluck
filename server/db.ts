@@ -443,8 +443,8 @@ export async function registriereNutzer(data: InsertGartengluckNutzer) {
   let insertId: number;
   try {
     const [res] = await conn.execute(
-      'INSERT INTO gartengluck_nutzer (telefon, email, name, strasse, ort, plz, push_token, gesperrt) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      [data.telefon, (data as any).email ?? null, data.name, data.strasse ?? null, data.ort ?? null, data.plz ?? null, data.pushToken ?? null, false]
+      'INSERT INTO gartengluck_nutzer (telefon, email, name, strasse, ort, plz, push_token, geraete_id, gesperrt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [data.telefon, (data as any).email ?? null, data.name, data.strasse ?? null, data.ort ?? null, data.plz ?? null, data.pushToken ?? null, (data as any).geraeteId ?? null, false]
     );
     insertId = (res as any).insertId;
   } finally {
@@ -518,7 +518,7 @@ export async function updateNutzerPushToken(telefon: string, pushToken: string) 
 
 export async function aktualisiereNutzerProfil(
   id: number,
-  daten: { name?: string; email?: string | null; strasse?: string | null; ort?: string | null; plz?: string | null; profilbildUrl?: string | null; pushBenachrichtigungen?: boolean }
+  daten: { name?: string; email?: string | null; strasse?: string | null; ort?: string | null; plz?: string | null; profilbildUrl?: string | null; pushBenachrichtigungen?: boolean; geraeteId?: string | null }
 ) {
   const db = await getDb();
   if (!db) throw new Error("Datenbank nicht verfügbar");

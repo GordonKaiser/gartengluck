@@ -313,3 +313,12 @@
 - [x] Server: nutzer.profilAktualisieren um pushBenachrichtigungen erweitern
 - [x] Profil-Bearbeiten-Screen: Push-Benachrichtigungen Toggle
 - [x] Push-Token nur registrieren wenn Nutzer Benachrichtigungen aktiviert hat
+
+## SMS-Verifizierung & Server-Fix (22.03.2026)
+- [x] Bug-Fix: nutzer.einloggen → nutzer.profil im Onboarding
+- [x] DB: geraete_id-Spalte in gartengluck_nutzer
+- [x] Server: Registrierung speichert Geräte-ID
+- [x] Server: Profil-Abfrage prüft Geräte-ID (Login mit neuer ID überschreibt alte)
+- [x] App: Geräte-ID beim ersten Start generieren (UUID, SecureStore)
+- [x] Onboarding: Geräte-ID bei Registrierung mitsenden
+- [x] Onboarding: Geräte-ID beim Login mitsenden (Gerätewechsel)
