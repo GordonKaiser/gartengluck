@@ -328,3 +328,10 @@
 - [x] Server: nutzer.kontoLoeschen Endpunkt
 - [x] Einstellungen: "Konto löschen"-Button mit Bestätigungs-Dialog
 - [x] Nach Löschung: lokales Profil löschen + zurück zum Onboarding
+
+## LocaFarm-Übergabedokument v1.0.43 (März 2026)
+
+- [ ] Datenschutz-Checkbox im Registrierungsformular hinzufügen (Pflichtfeld, Link zu Datenschutzerklärung)
+- [ ] Push-Retry-Muster für Xiaomi/Android implementieren (nach Rückkehr aus Einstellungen bis zu 5 Sek. auf Berechtigung warten)
+- [ ] Status "bereit" korrekt als "Abholbereit" anzeigen (nicht als "bereit")
+- [ ] Abholdatum aus Push-Payload in Bestelldetail-Ansicht anzeigen (falls vorhanden)

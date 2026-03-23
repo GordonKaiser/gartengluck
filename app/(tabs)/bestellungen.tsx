@@ -191,6 +191,12 @@ export default function BestellungenScreen() {
           <Text style={s.bestellnr}>Bestellnr. #{item.id}</Text>
         )}
 
+        {item.abholdatum && (item.status === "abholbereit" || item.status === "bereit") && (
+          <Text style={[s.bestellnr, { color: colors.primary, marginTop: 2 }]}>
+            📅 Abholdatum: {new Date(item.abholdatum).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" })}
+          </Text>
+        )}
+
         {item.status === "abgeholt" && (
           <Pressable
             style={({ pressed }) => [s.bewertungButton, pressed && { opacity: 0.8 }]}

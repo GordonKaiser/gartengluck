@@ -29,7 +29,7 @@ const BESTELLHISTORIE_KEY = "gartengluck_bestellhistorie";
 const APP_PIN_KEY = "gartengluck_app_pin";
 
 /** Aktualisiert den Status einer Bestellung in der lokalen Historie */
-async function aktualisiereBestellStatus(bestellId: number, neuerStatus: string) {
+async function aktualisiereBestellStatus(bestellId: number, neuerStatus: string, abholdatum?: string) {
   try {
     const raw = await AsyncStorage.getItem(BESTELLHISTORIE_KEY);
     if (!raw) return;
@@ -38,6 +38,7 @@ async function aktualisiereBestellStatus(bestellId: number, neuerStatus: string)
     for (const eintrag of historie) {
       if (eintrag.id === bestellId) {
         eintrag.status = neuerStatus;
+        if (abholdatum) eintrag.abholdatum = abholdatum;
         geaendert = true;
       }
     }
@@ -233,7 +234,8 @@ export default function RootLayout() {
     const foregroundSub = Notifications.addNotificationReceivedListener(async (notification) => {
       const data = notification.request.content.data;
       if (data?.bestellId && data?.neuerStatus) {
-        await aktualisiereBestellStatus(Number(data.bestellId), String(data.neuerStatus));
+        const abholdatum = data?.abholdatum ? String(data.abholdatum) : undefined;
+        await aktualisiereBestellStatus(Number(data.bestellId), String(data.neuerStatus), abholdatum);
         // Bei Abholung: Bewertungs-Dialog anzeigen
         if (String(data.neuerStatus) === "abgeholt" && data.hofName && data.hofUserId) {
           setBewertungDialog({
@@ -248,7 +250,8 @@ export default function RootLayout() {
     const tapSub = Notifications.addNotificationResponseReceivedListener(async (response) => {
       const data = response.notification.request.content.data;
       if (data?.bestellId && data?.neuerStatus) {
-        await aktualisiereBestellStatus(Number(data.bestellId), String(data.neuerStatus));
+        const abholdatum = data?.abholdatum ? String(data.abholdatum) : undefined;
+        await aktualisiereBestellStatus(Number(data.bestellId), String(data.neuerStatus), abholdatum);
         // Bei Abholung: Bewertungs-Dialog anzeigen
         if (String(data.neuerStatus) === "abgeholt" && data.hofName && data.hofUserId) {
           setBewertungDialog({

@@ -111,6 +111,7 @@ export interface BestellHistorieEintrag {
   kundeTelefon: string;
   gesamtpreis?: number;
   datum: string;        // ISO-Datum der Bestellung
+  abholdatum?: string;  // Optionales Abholdatum vom Hof (aus Push-Payload)
 }
 
 /** Alle gespeicherten Bestellungen laden (neueste zuerst). */
@@ -141,7 +142,7 @@ export async function speichereBestellungInHistorie(eintrag: BestellHistorieEint
 }
 
 /** Status einer Bestellung in der lokalen Historie aktualisieren. */
-export async function aktualisiereBestellStatusInHistorie(bestellId: number, neuerStatus: string): Promise<void> {
+export async function aktualisiereBestellStatusInHistorie(bestellId: number, neuerStatus: string, abholdatum?: string): Promise<void> {
   try {
     const raw = await AsyncStorage.getItem(BESTELLHISTORIE_KEY);
     if (!raw) return;
@@ -150,6 +151,7 @@ export async function aktualisiereBestellStatusInHistorie(bestellId: number, neu
     for (const eintrag of liste) {
       if (eintrag.id === bestellId) {
         eintrag.status = neuerStatus;
+        if (abholdatum) eintrag.abholdatum = abholdatum;
         geaendert = true;
       }
     }
